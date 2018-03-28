@@ -1,8 +1,11 @@
 test:
-	ocamlbuild -use-ocamlfind 
+	ocamlbuild -use-ocamlfind
+
+compile-i:
+	ocamlc -c state.mli database.mli event.mli 
 
 compile:
-	ocamlbuild -use-ocamlfind *.cmo
+	ocamlbuild -use-ocamlfind event.cmo state.cmo
 
 check:
 	bash checkenv.sh
