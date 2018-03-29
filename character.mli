@@ -4,11 +4,14 @@ open State
 module type Character = sig
 (* [D] is the signature of the game database. *)
   module D : Database
+
   module S : State
 
-(* [data] is the type of data in database.mli *)
-  type data = D.t
+(* [state] is the type of State in state.mli *)
   type state = S.t
+
+(* [data] is the type of data in database.mli *)
+  type data = D.data
 
   (* type t is the character type. this should contain a record of information
      about a character in the game. this record can be updated by state and events *)

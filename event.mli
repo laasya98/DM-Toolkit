@@ -1,36 +1,47 @@
-open State
 open Database
 open Character
+open Item
 
 (* An [Event] contains information and functions used to handle an
    event in the game, such as a shop, quest, or battle. It allows the
    state to interact with the options in the event. *)
 module type Event = sig
-(* [D] is the signature of the game database. *)
   module D : Database
-
-(* [State] is the signature of the game state. *)
-  module S : State
-
-(* [state] is the type of State in state.mli *)
-  type state = S.t
+  module C : Character
+  module I : Item
 
 (* [data] is the type of data in database.mli *)
-  type data = D.t
+  type data = D.data
+
+(* [character] is the type of a character in character.mli *)
+  type character = C.c
+
+(* [item] is the type of an item in item.mli *)
+  type item = I.i
 
 (* [t] is the type of an event. *)
   type t
 
+(* [form] is the variety of an event. *)
+  type form = Battle | Shop | Interaction
+
+(* [role] is the role of an npc.
+   A Friendly npc will aid the characters in the event
+   A Hostile npc will oppose the characters in the event
+   A Neutral npc will do neither (ex: shopkeeper). *)
   type role = Hostile | Friendly | Neutral
 
-(* [make_event type d] creates an event of type [type] (ex: shop, battle,
-   levelup, etc) with properties defined by state [st] and optional argument [d]
-   if applicable. If no [d] is passed, a default event of that type
-   is returned. *)
-  val make_event : string -> data -> state -> t
+(* [npc] is the type of an npc. It wraps the Character type with a role and
+   a tag. *)
+  type npc = {details:character; role:role; tag:int}
 
-(* [get_type evt] is a string describing the type of the event. *)
-  val get_type : t -> string
+(* [make_event name form d] creates an event of type [form] with the name [name]
+   and properties defined by data option [d]. If [d] is None, a default event
+   of that type is returned. *)
+  val make_event : string -> form -> data option -> t
+
+(* [get_form evt] is the form of the event. *)
+  val get_form : t -> form
 
 (* [get_name evt] is a string describing the name of the event. *)
   val get_name : t -> string
@@ -39,19 +50,31 @@ module type Event = sig
    the event *)
   val save_event : t -> data
 
-(* [add_npc name d role st] adds an npc with name [name] parsed from data [d]
-   with a [role] that determines its actions within the event. *)
-  val add_npc : string -> data -> role -> state -> state
+(* [add_npc name d role evt] adds an npc with name [name] parsed from data [d]
+   with a [role] that determines its actions within the event.
+   If [d] is invalid, return [evt]. *)
+  val add_npc : string -> data -> role -> t -> t
 
-(* [remove_npc name st] removes the npc with name [name] from [st].*)
-  val remove_npc : string -> state -> state
+(* [remove_npc tag evt] removes the npc with tag [tag] from [evt], and returns
+   the new [evt]. If there is no npc of that tag, return [evt]. *)
+  val remove_npc : int -> t -> t
 
-(* [action command args st] executes the action specified by [command,]
-   with the arguments in [args] if nessesary. It applies the effects of this
-   action to [st], then returns the new state. *)
-  val action : string -> 'a list -> state -> state
+(* [get_npcs evt] is a list of the NPCs present in the event. *)
+  val get_npcs : t -> npc list
 
-(* [end_event st] manually ends the event currently running in state and returns
-   a new state object *)
-  val end_event : state -> state
+(* [add_item name d evt] adds an item defined by [d] with name [name] to the
+   event [evt]. If [d] is invalid, return [evt]. *)
+  val add_item : string -> data -> t -> t
+
+(* [remove_item name evt] removes the item with name [name] from the
+   event in state [st]. If there is no item of that name, return [evt]. *)
+  val remove_item : string -> t -> t
+
+(* [get_items evt] is the list of items in the event - probably only relevant
+   in shops. *)
+  val get_items : t -> item list
+
+(* [change_form form t] changes the form of event [t] to that specified by
+   [form]. This may affect fields of [t] other than just [form]. *)
+  val change_form : form -> t -> t
 end
