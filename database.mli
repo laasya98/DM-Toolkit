@@ -1,6 +1,6 @@
 
 
 module type Database = sig
-  (* [t] is the type of the data *)
-  type t
+  (* [data] is the type of the data *)
+  type data
 end
