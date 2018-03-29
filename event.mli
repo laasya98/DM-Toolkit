@@ -21,50 +21,28 @@ module type Event = sig
 (* [t] is the type of an event. *)
   type t
 
-  (* [start_event d] creates an event with properties defined by [d]. *)
-  val start_event : data -> t
+(* [get_event type d] creates an event of type [type] (ex: shop, battle,
+   levelup, etc) with properties defined by state [st] and optional argument [d]
+   if applicable. If no [d] is passed, a default event of that type
+   is returned. *)
+  val get_event : string -> data -> state -> t
 
 (* [get_attribute attr evt] is [Some v], where [v] is the value of
    the specified attribute of [evt]. If [attr] is not a valid attribute
    in event [evt], [get_attribute atter evt] is [None]. *)
   val get_attribute : string -> t -> 'a option
 
-(* [get_output evt] is the output that should be displayed at this point
-   in the event. For use by State. *)
-  val get_output : t -> string
-
-(* [set_attribute name value evt] is [t] where the attribute
-   with name [name] is assigned value [value]. If [name] is not a valid
+(* [set_attribute attr value evt] is [t] where the attribute
+   with name [attr] is assigned value [value]. If [name] is not a valid
    attribute of [evt], [evt] is returned. *)
   val set_attribute : string -> 'a -> t -> t
 
-(* [list_options evt] lists the valid commands and their arguments
-   that can be used for this event *)
-  val list_options : t -> string list
-
-(* [action command args evt st] executes the action specified by [command,]
+(* [action command args st] executes the action specified by [command,]
    with the arguments in [args] if nessesary. It applies the effects of this
-   action to [evt], then returns the new event state. *)
-  val event_action : string -> 'a list -> t -> t
+   action to [st], then returns the new state. *)
+  val action : string -> 'a list -> state -> state
 
-  val load_changes : state -> t -> state
-end
-
-module type Combat = sig
-  type t
-  include Event with type t := t
-  module C : Character
-  type character = C.t
-
-  val start_combat : data -> character list -> t
-
-(* [add_enemy name evt] *)
-  val add_enemy : string -> t -> t
-
-  val remove_enemy : string -> t -> t
-
-(* [attack caster action targets evt] *)
-  val attack : string -> string -> string list -> t -> t
-
-  val stall : string -> t -> t
+(* [end_event st] manually ends the event currently running in state and returns
+   a new state object *)
+  val end_event : state -> state
 end
