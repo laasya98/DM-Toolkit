@@ -6,10 +6,10 @@ open Character
    event in the game, such as a shop, quest, or battle. It allows the
    state to interact with the options in the event. *)
 module type Event = sig
-(* [D] is the signiture of the game database. *)
+(* [D] is the signature of the game database. *)
   module D : Database
 
-(* [State] is the signiture of the game state. *)
+(* [State] is the signature of the game state. *)
   module S : State
 
 (* [state] is the type of State in state.mli *)
