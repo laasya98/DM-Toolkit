@@ -5,11 +5,13 @@ module type Character = sig
 (* [D] is the signature of the game database. *)
   module D : Database
 
+  module S : State
+
 (* [state] is the type of State in state.mli *)
   type state = S.t
 
 (* [data] is the type of data in database.mli *)
-  type data = D.t
+  type data = D.data
 
   (* type t is the character type. this should contain a record of information
      about a character in the game. this record can be updated by state and events *)
@@ -56,7 +58,4 @@ module type Character = sig
 
   (* [inv character data] is a list of the items a player has. *)
   val inv :  c -> data -> string list
-
-
-
 end
