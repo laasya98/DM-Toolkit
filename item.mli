@@ -9,11 +9,18 @@ module type Item = sig
   (* [i] is the type of an item. *)
   type i
 
-  (* [make_item d] is an item with the properties defined in [d]*)
-  val make_item : data -> i
+(* [itemtype] is the variety of item, which determines where it is equipped. *)
+  type itemtype = Weapon | Shield | Armor | Ring | Other
 
-  (* [name i] is the name of the item. *)
+(* [make_item n d] is an item with the properties defined in [d] and
+   name [n]. *)
+  val make_item : string -> data -> i
+
+(* [name i] is the name of the item. *)
   val name : i -> string
+
+(* [item_type i] is the itemtype of [i]. *)
+  val item_type : i -> itemtype
 
 (* [description i] is the string description of the item *)
   val description : i -> string
@@ -21,11 +28,11 @@ module type Item = sig
 (* [weight i] is the integer weight of the item *)
   val weight : i -> int
 
-(* [passive_effects i] is the list of the names of effects caused simply by the
-   item being in a character's inventory. *)
+(* [passive_effects i] is the list of the names of effects caused by having
+   the item equipped. *)
   val passive_effects : i -> string list
 
-(*[use_effects i] is the list of the names of effects that are triggered by
+(* [use_effects i] is the list of the names of effects that are triggered by
   using the item.*)
   val use_effects : i -> string list
 

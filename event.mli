@@ -23,7 +23,7 @@ module type Event = sig
   type t
 
 (* [form] is the variety of an event. *)
-  type form = Battle | Shop | EditChar | Interaction
+  type form = Battle | Shop | Interaction
 
 (* [role] is the role of an npc.
    A Friendly npc will aid the characters in the event
@@ -35,12 +35,12 @@ module type Event = sig
    a tag. *)
   type npc = {details:character; role:role; tag:int}
 
-(* [make_event form d] creates an event of type [form] with properties defined
-   by state [st] and optional argument [d], if applicable. If no [d] is passed,
-   a default event of that type is returned. *)
-  val make_event : form -> data option -> t
+(* [make_event name form d] creates an event of type [form] with the name [name]
+   and properties defined by data option [d]. If [d] is None, a default event
+   of that type is returned. *)
+  val make_event : string -> form -> data option -> t
 
-(* [get_type evt] is the form of the event. *)
+(* [get_form evt] is the form of the event. *)
   val get_form : t -> form
 
 (* [get_name evt] is a string describing the name of the event. *)
@@ -73,4 +73,8 @@ module type Event = sig
 (* [get_items evt] is the list of items in the event - probably only relevant
    in shops. *)
   val get_items : t -> item list
+
+(* [change_form form t] changes the form of event [t] to that specified by
+   [form]. This may affect fields of [t] other than just [form]. *)
+  val change_form : form -> t -> t
 end
