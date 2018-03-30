@@ -31,6 +31,9 @@ module type Command = sig
 
   (** [parse str] is the command parsed from the player input [str].
       [parse] requires any string, which will be parsed into one of the commands
-      above, defaulting to Invalid for any non-specific string.*)
+      above, defaulting to Invalid for any non-specific string (this invalid is 
+      not the same as a command being invalid according to the game state. A
+      valid string parsed into a command may not be accepted by state if there
+      is no valid way to use that command in State).*)
   val parse : string -> command
 end
