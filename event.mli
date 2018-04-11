@@ -44,8 +44,8 @@ module type Event = sig
 (* [get_npcs evt] is a list of the NPCs present in the event. *)
   val get_npcs : t -> npc list
 
-(* [add_item name i evt] adds an item defined by [i] with name [name] to the
-   event [evt]. If [d] is invalid, return [evt]. *)
+(* [add_item i evt] adds an item defined by [i] to the
+   event [evt]. If [i] is invalid, return [evt]. *)
   val add_item : string -> item -> t -> t
 
 (* [remove_item name evt] removes the item with name [name] from the
