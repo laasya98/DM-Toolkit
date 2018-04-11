@@ -2,7 +2,7 @@ open Database
 open Event
 open Character
 open Command
-open Item
+open Global
 
 (** A [State] is a representation of the state of the toolkit, including every
     current location and entity, and any statuses or active effects for the
@@ -10,17 +10,14 @@ open Item
 module type State = sig
   module D : Database
   module C : Character
-  module I : Item
   module E : Event
+  module Com :Command
 
 (* [data] is the type of data in database.mli *)
   type data = D.data
 
 (* [character] is the type of a character in character.mli *)
   type character = C.c
-
-(* [item] is the type of an item in item.mli *)
-  type item = I.i
 
 (* [event] is the type of an event in event.mli *)
   type event = E.t
@@ -68,10 +65,5 @@ module type State = sig
 (* [action cmd state] takes in a command and a state and updates the state to
    reflect whatever command is input. This can involve calling events,
    characters, items, or database look-ups.*)
-  val action : Command.command -> state -> state
-
-
-
-
-
+  val action : Com.command -> state -> state
 end

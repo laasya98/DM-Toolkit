@@ -1,20 +1,9 @@
-open Database
-
-module type Item = sig
-  module D : Database
-
-  (* [data] is the type of data in database.mli *)
-  type data = D.data
-
+(*module type Item = sig
   (* [i] is the type of an item. *)
   type i
 
 (* [itemtype] is the variety of item, which determines where it is equipped. *)
   type itemtype = Weapon | Shield | Armor | Ring | Other
-
-(* [make_item n d] is an item with the properties defined in [d] and
-   name [n]. *)
-  val make_item : string -> data -> i
 
 (* [name i] is the name of the item. *)
   val name : i -> string
@@ -53,3 +42,4 @@ item can no longer be actively used.*)
   val set_value : int -> i -> i
 
 end
+*)

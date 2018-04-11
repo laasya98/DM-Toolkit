@@ -2,7 +2,7 @@ test:
 	ocamlbuild -use-ocamlfind
 
 compile-i:
-	ocamlc -c database.mli item.mli character.mli event.mli state.mli
+	ocamlc -c global.mli command.mli character.mli event.mli database.mli state.mli 
 
 compile:
 	ocamlbuild -use-ocamlfind event.cmo state.cmo

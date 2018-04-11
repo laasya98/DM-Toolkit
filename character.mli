@@ -1,21 +1,6 @@
-open Database
-open State
-open Event
+open Global
 
 module type Character = sig
-(* [D] is the signature of the game database. *)
-  module D : Database
-  module S : State
-  module E : Event
-
-(* [state] is the type of State in state.mli *)
-  type state = S.t
-
-(* [data] is the type of data in database.mli *)
-  type data = D.data
-
-  type event = E.event
-
   (* type t is the character type. this should contain a record of information
      about a character in the game. this record can be updated by state and events *)
   type c
@@ -33,7 +18,7 @@ module type Character = sig
   val status :  c -> string
 
   (* [update_state character ] updates the status of a character based off of the game state*)
-  val update_status :  c -> state -> c
+(*val update_status :  c -> state -> c TODO: change*)
 
   (* [defense character] is an int that describes the player's defense stat. *)
   val defense :  c -> int
@@ -92,9 +77,7 @@ module type Character = sig
   (* [add_skill character skill] adds ability to the abilities a character can perform. *)
   val add_ability :  c -> ability -> c
 
-  (* [inv character data] is a list of the items a player has. *)
-  val inv :  c -> data -> item list
-
-
+  (* [inv character] is a list of the items a player has. *)
+  val inv :  c -> item list
 
 end
