@@ -1,15 +1,11 @@
 open Database
-open State
 open Event
 
 module type Character = sig
 (* [D] is the signature of the game database. *)
   module D : Database
-  module S : State
   module E : Event
 
-(* [state] is the type of State in state.mli *)
-  type state = S.t
 
 (* [data] is the type of data in database.mli *)
   type data = D.data
@@ -33,7 +29,7 @@ module type Character = sig
   val status :  c -> string
 
   (* [update_state character ] updates the status of a character based off of the game state*)
-  val update_status :  c -> state -> c
+  val update_status :  c -> c
 
   (* [defense character] is an int that describes the player's defense stat. *)
   val defense :  c -> int
