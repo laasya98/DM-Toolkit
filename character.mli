@@ -18,7 +18,7 @@ module type Character = sig
   val status :  c -> string
 
   (* [update_state character ] updates the status of a character based off of the game state*)
-(*val update_status :  c -> state -> c TODO: change*)
+  val update_status :  c -> c
 
   (* [defense character] is an int that describes the player's defense stat. *)
   val defense :  c -> int
