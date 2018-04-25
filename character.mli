@@ -1,15 +1,34 @@
 open Global
 
 module type Character = sig
-  (* type t is the character type. this should contain a record of information
-     about a character in the game. this record can be updated by state and events *)
-  type c
+
+
+  (* type item should be all the possible items types a player can potentially have
+  in their inventory*)
+  type item
 
   (* type skill should be all the possible skill types a player can potentially have *)
   type skill
 
   (* type skill should be all the possible spells a player can potentially use *)
   type ability
+
+  (* type t is the character type. this should contain a record of information
+     about a character in the game. this record can be updated by state and events *)
+  type c = {
+    name:string;
+    mutable status:string;
+    mutable defense: int ;
+    mutable intel:int;
+    mutable strength:int;
+    mutable speed:int;
+    mutable max_hp:int;
+    mutable hp:int;
+    mutable level:int;
+    mutable skills: skill list;
+    mutable abilities: ability list;
+    mutable inv: item list;
+  }
 
   (* [name character] is a string containing the character's title. *)
   val name :  c -> string
