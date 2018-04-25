@@ -71,8 +71,9 @@ struct
       let items =  i::evt.items in
       alter_event evt ~items:(items) "Item added."
     with _ ->
-      alter_event evt "Item could not be added due to an error in the file."
+      alter_event evt "Item could not be added."
 
+        (*TODO: remove just one if duplicates? *)
   let remove_item name evt =
     let items = List.filter (fun (i:item) -> i.name <> name) evt.items in
     alter_event evt ~items:(items) "Item removed."

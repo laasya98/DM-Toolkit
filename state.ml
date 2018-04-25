@@ -36,14 +36,28 @@ module type State = sig
   val action : Com.command -> state -> state
 end
 
+module MakeState
+    = functor (C:Character) -> functor (D:Database) -> functor (E:Event) ->
+      functor (Com:Command) ->
+    struct
+
+    type data = D.data
+    type character = C.c
+    type event = E.t
+
 (*************************** KERRI STUFF BELOW *****************************)
 
-let inv c = [] (*TODO temp*)
+  (** SHOP **)
+let buy_item name evt =
+  match List.find_opt (fun x -> x.name =name) (E.get_items evt) with
+  | Some i -> failwith "unimplemented"
+  | None -> failwith "unimplemented"
 
+  (** COMBAT **)
   (*TODO: get the EQUIPPED weapon. *)
 let get_weapon c =
   let weapon =List.find (fun x ->
-      match x.i_type with | Weapon _ -> true |_-> false) (inv c) in
+      match x.i_type with | Weapon _ -> true |_-> false) (C.inv c) in
   match weapon.i_type with
   | Weapon w -> w
   | _ -> failwith "No weapon"
@@ -51,20 +65,23 @@ let get_weapon c =
 (*TODO: get the EQUIPPED armor. *)
 let get_armor c =
   let armor = List.find
-      (fun x -> match x.i_type with | Armor _ -> true | _-> false) (inv c) in
+      (fun x -> match x.i_type with | Armor _ -> true | _-> false) (C.inv c) in
   match armor.i_type with
   | Armor a -> a
   | _ -> failwith "No armor" (*TODO: AC for no armor? *)
-
-let strength c = 0 (*TODO temp*)
 
 (*TODO: use Dex for ranged?
   Proficiency?
   make AC
 *)
-let attack_roll castor target =
+let attack_roll attacker target =
   let d20 = 1+ Random.int 19 in
-  let ability = strength castor in
+  let ability =
+    try
+      if (get_weapon attacker).t = Ranged then C.dex attacker
+      else C.strength attacker
+    with _ -> C.strength attacker
+  in
   let prof = 0 in
   let ac = try (get_armor target).ac with _ -> 0 in
   if d20 = 1 then 0
@@ -78,22 +95,21 @@ let rec roll_dice dice acc =
   | [] -> acc
   | h::t -> roll_dice t (acc + 1 + Random.int h)
 
-(* die = (quantity, dNN)
-TODO: add die to item
-*)
-let damage_roll castor crit =
-  let weapon = get_weapon castor in
+let damage_roll attacker crit =
+  let weapon = get_weapon attacker in
   let dice = try weapon.dice with _ -> [] in
   let bonus = try weapon.damage with _ -> 0  in
-  let ability = strength castor in
+  let ability = C.strength attacker in
   bonus + ability + roll_dice dice 0
 
 let deal_damage amount target = failwith "unimplemented"
 
 (* returns the new state of the target after being hit*)
-let attack castor target =
-  let hit = attack_roll castor target in
+let attack attacker target =
+  let hit = attack_roll attacker target in
   if hit = 0 then target else
-    deal_damage (damage_roll castor (hit=2)) target
+    deal_damage (damage_roll attacker (hit=2)) target
 
 (*************************** KERRI STUFF ABOVE *****************************)
+
+end
