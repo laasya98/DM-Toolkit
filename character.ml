@@ -6,7 +6,21 @@ module type Character = sig
   type skill
   type ability
 
-   type c
+   type c = {
+       name:string;
+       status:string;
+       defense: int ;
+       intel:int;
+       strength:int;
+       speed:int;
+       max_hp:int;
+       hp:int;
+       xp:int;
+       level:int;
+       skills: skill list;
+       abilities: ability list;
+       inv: item list;
+  }
 
   val name :  c -> string
   val status :  c -> string
@@ -34,24 +48,24 @@ module type Character = sig
 end
 
 module Character = struct
-  type item = string (*TODO fix i guess*)
+  type item = Global.item (*TODO fix i guess*)
   type skill
   type ability
 
   type c = {
       name:string;
-     status:string;
-     defense: int ;
-     intel:int;
-     strength:int;
-     speed:int;
-     max_hp:int;
-     hp:int;
-     xp:int;
-     level:int;
-     skills: skill list;
-     abilities: ability list;
-     inv: item list;
+      status:string;
+      defense: int ;
+      intel:int;
+      strength:int;
+      speed:int;
+      max_hp:int;
+      hp:int;
+      xp:int;
+      level:int;
+      skills: skill list;
+      abilities: ability list;
+      inv: item list;
   }
 
   let name  c = c.name

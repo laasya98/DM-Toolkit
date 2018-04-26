@@ -17,17 +17,18 @@ module type Character = sig
      about a character in the game. this record can be updated by state and events *)
   type c = {
     name:string;
-    mutable status:string;
-    mutable defense: int ;
-    mutable intel:int;
-    mutable strength:int;
-    mutable speed:int;
-    mutable max_hp:int;
-    mutable hp:int;
-    mutable level:int;
-    mutable skills: skill list;
-    mutable abilities: ability list;
-    mutable inv: item list;
+    status:string;
+    defense: int ;
+    intel:int;
+    strength:int;
+    speed:int;
+    max_hp:int;
+    hp:int;
+    xp:int;
+    level:int;
+    skills: skill list;
+    abilities: ability list;
+    inv: item list;
   }
 
   (* [name character] is a string containing the character's title. *)
