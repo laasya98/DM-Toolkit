@@ -41,12 +41,14 @@ module type Event = sig
    the new [evt]. If there is no npc of that tag, return [evt]. *)
   val remove_npc : int -> t -> t
 
+  val update_npc : npc -> ?c:character -> ?r:role -> t -> t
+
 (* [get_npcs evt] is a list of the NPCs present in the event. *)
   val get_npcs : t -> npc list
 
 (* [add_item i evt] adds an item defined by [i] to the
    event [evt]. If [i] is invalid, return [evt]. *)
-  val add_item : string -> item -> t -> t
+  val add_item : item -> t -> t
 
 (* [remove_item name evt] removes the item with name [name] from the
    event in state [st]. If there is no item of that name, return [evt]. *)
@@ -59,4 +61,7 @@ module type Event = sig
 (* [change_form form t] changes the form of event [t] to that specified by
    [form]. This may affect fields of [t] other than just [form]. *)
   val change_form : form -> t -> t
+
+  val attack_opt : character option -> string -> character option -> string -> t
+    -> (t * character option)
 end

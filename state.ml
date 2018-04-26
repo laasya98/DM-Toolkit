@@ -45,6 +45,11 @@ module MakeState
     type character = C.c
     type event = E.t
 
+    type state = {
+      event:event;
+      characters: character list;
+    }
+
 (*************************** KERRI STUFF BELOW *****************************)
 
   (** SHOP **)
@@ -53,62 +58,14 @@ let buy_item name evt =
   | Some i -> failwith "unimplemented"
   | None -> failwith "unimplemented"
 
-  (** COMBAT **)
-  (*TODO: get the EQUIPPED weapon. *)
-let get_weapon c =
-  let weapon =List.find (fun x ->
-      match x.i_type with | Weapon _ -> true |_-> false) (C.inv c) in
-  match weapon.i_type with
-  | Weapon w -> w
-  | _ -> failwith "No weapon"
+(** COMBAT **)
 
-(*TODO: get the EQUIPPED armor. *)
-let get_armor c =
-  let armor = List.find
-      (fun x -> match x.i_type with | Armor _ -> true | _-> false) (C.inv c) in
-  match armor.i_type with
-  | Armor a -> a
-  | _ -> failwith "No armor" (*TODO: AC for no armor? *)
-
-(*TODO: use Dex for ranged?
-  Proficiency?
-  make AC
-*)
-let attack_roll attacker target =
-  let d20 = 1+ Random.int 19 in
-  let ability =
-    try
-      if (get_weapon attacker).t = Ranged then C.dex attacker
-      else C.strength attacker
-    with _ -> C.strength attacker
-  in
-  let prof = 0 in
-  let ac = try (get_armor target).ac with _ -> 0 in
-  if d20 = 1 then 0
-  else if d20 = 20 then 2
-  else
-    let roll = d20 + ability + prof in
-    if roll > ac then 1 else 0
-
-let rec roll_dice dice acc =
-  match dice with
-  | [] -> acc
-  | h::t -> roll_dice t (acc + 1 + Random.int h)
-
-let damage_roll attacker crit =
-  let weapon = get_weapon attacker in
-  let dice = try weapon.dice with _ -> [] in
-  let bonus = try weapon.damage with _ -> 0  in
-  let ability = C.strength attacker in
-  bonus + ability + roll_dice dice 0
-
-let deal_damage amount target = failwith "unimplemented"
-
-(* returns the new state of the target after being hit*)
-let attack attacker target =
-  let hit = attack_roll attacker target in
-  if hit = 0 then target else
-    deal_damage (damage_roll attacker (hit=2)) target
+let attack a t evt st =
+  let at = List.find_opt (fun x -> C.name x = a) st.characters in
+  let t = List.find_opt (fun x -> C.name x = t) st.characters in
+  match t with
+  | None -> failwith "update event only"
+  | Some c -> failwith "update character effected"
 
 (*************************** KERRI STUFF ABOVE *****************************)
 
