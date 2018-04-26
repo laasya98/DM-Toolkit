@@ -29,13 +29,12 @@ module type State = sig
    with). *)
   type gamestate
 
-(* [entity] is a general type for items, characters, locations, and effects
+(* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
    is able to interact in the gamespace.*)
   type entity =
     |Item of item
     |Character of character
-    |Location of string
     |Effect of (entity * int)
     |Event of event
 

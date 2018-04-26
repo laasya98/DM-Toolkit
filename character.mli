@@ -13,6 +13,9 @@ module type Character = sig
   (* type skill should be all the possible spells a player can potentially use *)
   type ability
 
+  (* type c_class is the types of *)
+  type c_class
+
   (* type t is the character type. this should contain a record of information
      about a character in the game. this record can be updated by state and events *)
   type c = {
@@ -21,6 +24,7 @@ module type Character = sig
     defense: int ;
     intel:int;
     strength:int;
+    dexterity:int;
     speed:int;
     max_hp:int;
     hp:int;
@@ -28,6 +32,7 @@ module type Character = sig
     level:int;
     skills: skill list;
     abilities: ability list;
+    equipped: item list;
     inv: item list;
   }
 
@@ -45,6 +50,12 @@ module type Character = sig
 
   (* [update_def character new_d] character with defense = new_d. *)
   val update_def :  c -> int -> c
+
+  (* [dex character] is an int that describes the player's dexterity stat. *)
+  val dex :  c -> int
+
+  (* [update_dex character new_d] character with dex = new_d. *)
+  val update_dex :  c -> int -> c
 
   (* [intel character] is an int that describes the player's intelligence stat. *)
   val intel :  c -> int
@@ -99,5 +110,15 @@ module type Character = sig
 
   (* [inv character] is a list of the items a player has. *)
   val inv :  c -> item list
+
+  (* [add_item character i] adds i to the characters inventory.*)
+  val add_item :  c -> item -> c
+
+  (* [equipped character] is a list of the items a player has equipped. *)
+  val equipped :  c -> item list
+
+  (* [equip character e] adds e to the characters equpped items.
+     Requires that e is present in the character's inventory*)
+  val equip :  c -> item -> c
 
 end

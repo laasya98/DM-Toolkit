@@ -16,15 +16,30 @@ module type State = sig
   type data = D.data
   type character = C.c
   type event = E.t
+  type location =
 
   type state
-  type gamestate
+
   type entity =
     |Item of item
     |Character of character
-    |Location of string
     |Effect of (entity * int)
     |Event of event
+
+  type exits = {}
+
+  type location = {
+    name : string;
+    description : string;
+    contents : entity list;
+    exits : ( string * location ) list (*(direction, location)*)
+    }
+
+  type gamestate = {
+    locations : location list;
+    party : character list;
+    active_events : event list;
+  }
 
   val init_state : D.data -> state
   val current_room : state -> string
