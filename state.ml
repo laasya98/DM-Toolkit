@@ -16,7 +16,7 @@ module type State = sig
   type data = D.data
   type character = C.c
   type event = E.t
-  type location =
+  type location
 
   type state
 
@@ -76,11 +76,15 @@ let buy_item name evt =
 (** COMBAT **)
 
 let attack a t evt st =
-  let at = List.find_opt (fun x -> C.name x = a) st.characters in
-  let t = List.find_opt (fun x -> C.name x = t) st.characters in
-  match t with
-  | None -> failwith "update event only"
-  | Some c -> failwith "update character effected"
+  let ac = List.find_opt (fun x -> C.name x = a) st.characters in
+  let tc = List.find_opt (fun x -> C.name x = t) st.characters in
+  match E.attack_opt ac a tc t evt with
+  | (evt', None) -> {event=evt'; characters=st.characters}
+  | (evt', Some c) ->
+    let c' =
+      List.map (fun x -> if C.name x = C.name c then c else x) st.characters
+    in
+    {event = evt'; characters=c'}
 
 (*************************** KERRI STUFF ABOVE *****************************)
 

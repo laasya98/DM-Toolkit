@@ -2,9 +2,9 @@ open Global
 
 module type Character = sig
 
-  type item
   type skill
   type ability
+  type c_class
 
   type c = {
         name:string;
@@ -29,6 +29,8 @@ module type Character = sig
   val update_status :  c -> c
   val defense :  c -> int
   val update_def :  c -> int -> c
+  val dex :  c -> int
+  val update_dex :  c -> int -> c
   val intel :  c -> int
   val update_intel :  c -> int -> c
   val strength :  c -> int
@@ -46,10 +48,11 @@ module type Character = sig
   val add_skill :  c -> skill -> c
   val abilities :  c -> ability list
   val add_ability :  c -> ability -> c
-  val equipped :  c -> item list
-  val equip :  c -> item -> c
   val inv :  c -> item list
   val add_item :  c -> item -> c
+  val equipped :  c -> item list
+  val equip :  c -> item -> c
+
 end
 
 module Character = struct

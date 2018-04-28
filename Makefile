@@ -1,8 +1,8 @@
 test:
-	ocamlbuild -use-ocamlfind
+	ocamlbuild -use-ocamlfind test.byte && ./test.byte
 
 compile-i:
-	ocamlc -c global.mli command.mli character.mli event.mli database.mli state.mli 
+	ocamlc -c global.mli command.mli character.mli event.mli database.mli state.mli
 
 compile:
 	ocamlbuild -use-ocamlfind event.cmo state.cmo

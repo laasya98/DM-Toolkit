@@ -1,12 +1,6 @@
 open Global
 
 module type Character = sig
-
-
-  (* type item should be all the possible items types a player can potentially have
-  in their inventory*)
-  type item
-
   (* type skill should be all the possible skill types a player can potentially have *)
   type skill
 
