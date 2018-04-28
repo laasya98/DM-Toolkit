@@ -122,4 +122,6 @@ module Character = struct
       {c with equipped = e::equipment}
     else c
 
+  let add_item c i = failwith "unimplemented"
+
 end

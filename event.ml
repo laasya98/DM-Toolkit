@@ -3,16 +3,19 @@ open Global
 
 module type Event = sig
   module C : Character
-  type character = C.c
+  type character = Character.c
   type t
   type form = Battle | Shop | Interaction
   type role = Hostile | Friendly | Neutral
   type npc = {details:character; role:role; tag:int}
+
+  val make_event : string -> form -> npc list -> item list -> t
   val get_form : t -> form
   val get_name : t -> string
-  val add_npc : string -> character -> role -> t -> t
+  val get_output : t -> string
+  val add_npc : character -> role -> t -> t
   val remove_npc : int -> t -> t
-  val update_npc : npc -> ?c:character -> ?r:role -> t -> t
+  val update_npc : npc -> ?c:character -> ?r:role -> ?o:string -> t -> t
   val get_npcs : t -> npc list
   val add_item : item -> t -> t
   val remove_item : string -> t -> t
@@ -22,16 +25,10 @@ module type Event = sig
     -> (t * character option)
 end
 
+module Event = struct
+    module C = Character
 
-module type EventMaker = functor (C:Character)
-  -> Event with module C=C
-
-module MakeEvent :EventMaker
-  = functor (C:Character) ->
-  struct
-    module C = C
-
-  type character = C.c
+  type character = Character.c
 
   type form = Battle | Shop | Interaction
 
@@ -50,6 +47,16 @@ module MakeEvent :EventMaker
     output: string;
   }
 
+  let make_event name form npcs items =
+    {
+      name=name;
+      form = form;
+      npcs = npcs;
+      items = items;
+      tagNum = 0;
+      output = "Event created.";
+    }
+
   let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(npcs=evt.npcs)
       ?(tag=evt.tagNum) ?(items = evt.items) output =
     {
@@ -65,10 +72,12 @@ module MakeEvent :EventMaker
 
   let get_name evt = evt.name
 
+  let get_output evt = evt.output
+
   (* [add_npc name d role evt] adds an npc with name [name] parsed from data [d]
      with a [role] that determines its actions within the event.
      If [d] is invalid, return [evt]. *)
-  let add_npc name c role evt =
+  let add_npc c role evt =
     let npc = {details=c; role=role; tag=evt.tagNum} in
     alter_event evt ~npcs:(npc::evt.npcs) ~tag:(evt.tagNum + 1) "NPC added."
 
@@ -83,11 +92,10 @@ module MakeEvent :EventMaker
   let npc_by_name n evt =
     List.find_opt (fun x -> C.name x.details = n) evt.npcs
 
-(* sets npc.details to character c *)
-  let update_npc npc ?(c=npc.details) ?(r=npc.role) evt =
+  let update_npc npc ?(c=npc.details) ?(r=npc.role) ?(o="") evt =
     let n = {details=c; role = r; tag = npc.tag} in
-    let npcs = List.map (fun x -> if x.tag = n.tag then n else x) evt.npcs in
-    alter_event evt ~npcs:(npcs) "NPC status updated."
+    let npcs = List.map (fun x -> if x.tag = npc.tag then n else x) evt.npcs in
+    alter_event evt ~npcs:(npcs) (o^"NPC status updated.")
 
   let add_item i evt =
     try
@@ -105,11 +113,10 @@ module MakeEvent :EventMaker
 
   let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
-
   (*TODO: get the EQUIPPED weapon. *)
   let get_weapon c =
     let weapon =List.find (fun x ->
-        match x.i_type with | Weapon _ -> true |_-> false) (C.inv c) in
+        match x.i_type with | Weapon _ -> true |_-> false) (C.equipped c) in
     match weapon.i_type with
     | Weapon w -> w
     | _ -> failwith "No weapon"
@@ -117,10 +124,12 @@ module MakeEvent :EventMaker
   (*TODO: get the EQUIPPED armor. *)
   let get_armor c =
     let armor = List.find
-        (fun x -> match x.i_type with | Armor _ -> true | _-> false) (C.inv c) in
+        (fun x -> match x.i_type with | Armor _ -> true | _-> false)
+        (C.equipped c)
+    in
     match armor.i_type with
     | Armor a -> a
-    | _ -> failwith "No armor" (*TODO: AC for no armor? *)
+    | _ -> failwith "No armor"
 
   let attack_roll attacker target =
     let d20 = 1+ Random.int 19 in
@@ -144,8 +153,8 @@ module MakeEvent :EventMaker
     | h::t -> roll_dice t (acc + 1 + Random.int h)
 
   let damage_roll attacker crit =
-    let weapon = get_weapon attacker in
     let dice = try
+        let weapon = get_weapon attacker in
         if crit then weapon.dice @ weapon.dice
         else weapon.dice
       with _ -> [] in
@@ -153,7 +162,7 @@ module MakeEvent :EventMaker
       if (get_weapon attacker).t = Ranged then C.dex attacker
       else C.strength attacker
     with _ -> C.strength attacker in
-    ability + roll_dice dice 0
+      ability + roll_dice dice 0
 
   let deal_damage amount target =
     let hp = C.curr_hp target in
@@ -167,7 +176,8 @@ module MakeEvent :EventMaker
 
   let attack_npc a t evt =
     let t' = attack_t a t.details in
-    update_npc t ~c:t' evt
+    let out = (C.name t.details)^" was attacked. " in
+    update_npc t ~c:t' ~o:out evt
 
   let attack_opt a an t tn evt =
     let at = match a with

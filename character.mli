@@ -116,3 +116,5 @@ module type Character = sig
   val equip :  c -> item -> c
 
 end
+
+module Character : Character

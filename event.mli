@@ -8,7 +8,7 @@ module type Event = sig
   module C : Character
 
 (* [character] is the type of a character in character.mli *)
-  type character = C.c
+  type character = Character.c
 
 (* [t] is the type of an event. *)
   type t
@@ -26,22 +26,26 @@ module type Event = sig
    a tag. *)
   type npc = {details:character; role:role; tag:int}
 
+  val make_event : string -> form -> npc list -> item list -> t
+
 (* [get_form evt] is the form of the event. *)
   val get_form : t -> form
 
 (* [get_name evt] is a string describing the name of the event. *)
   val get_name : t -> string
 
+  val get_output : t -> string
+
 (* [add_npc name c role evt] adds an npc with name [name],
    character [c], and [role] that determines its actions within the event.
    If [d] is invalid, return [evt]. *)
-  val add_npc : string -> character -> role -> t -> t
+  val add_npc : character -> role -> t -> t
 
 (* [remove_npc tag evt] removes the npc with tag [tag] from [evt], and returns
    the new [evt]. If there is no npc of that tag, return [evt]. *)
   val remove_npc : int -> t -> t
 
-  val update_npc : npc -> ?c:character -> ?r:role -> t -> t
+  val update_npc : npc -> ?c:character -> ?r:role -> ?o:string -> t -> t
 
 (* [get_npcs evt] is a list of the NPCs present in the event. *)
   val get_npcs : t -> npc list
@@ -65,3 +69,5 @@ module type Event = sig
   val attack_opt : character option -> string -> character option -> string -> t
     -> (t * character option)
 end
+
+module Event : Event
