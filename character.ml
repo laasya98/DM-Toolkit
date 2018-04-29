@@ -112,16 +112,14 @@ module Character = struct
     let abilities = c.abilities in
     {c with abilities = a::abilities}
   let inv c = c.inv
-  let add_inv c i =
-    let items = c.inv in
-    {c with inv = i::items}
   let equipped c = c.equipped
   let equip c e =
     let equipment = c.equipped in
     if List.mem e c.inv then
       {c with equipped = e::equipment}
     else c
-
-  let add_item c i = failwith "unimplemented"
+  let add_item c i =
+    let items = c.inv in
+    {c with inv = i::items}
 
 end
