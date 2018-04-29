@@ -1,0 +1,13 @@
+Class,Hit Die,Primary Ability,STP
+Barbarian,d12,Str,Str&&Con
+Bard,d8,Cha,Dex&&Cha
+Cleric,d8,Wis,Wis&&Cha
+Druid,d8,Wis,Int&&Wis
+Fighter,d10,Str||Dex,Str&&Con
+Monk,d8,Dex&&Wis,Str&&Dex
+Paladin,d10,Str&&Cha,Wis&&Cha
+Ranger,d10,Dex&&Wis,Str&&Dex
+Rogue,d8,Dex,Dex&&Int
+Sorcerer,d6,Cha,Con&&Cha
+Warlock,d8,Cha,Wis&&Cha
+Wizard,d6,Int,Int&&Wis
