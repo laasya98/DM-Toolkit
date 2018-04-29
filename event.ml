@@ -9,7 +9,7 @@ module type Event = sig
   type role = Hostile | Friendly | Neutral
   type npc = {details:character; role:role; tag:int}
 
-  val make_event : string -> form -> npc list -> item list -> t
+  val make_event : string -> form -> npc list -> (item * quantity) list -> t
   val get_form : t -> form
   val get_name : t -> string
   val get_output : t -> string
@@ -17,9 +17,9 @@ module type Event = sig
   val remove_npc : int -> t -> t
   val update_npc : npc -> ?c:character -> ?r:role -> ?o:string -> t -> t
   val get_npcs : t -> npc list
-  val add_item : item -> t -> t
-  val remove_item : string -> t -> t
-  val get_items : t -> item list
+  val add_item : item -> quantity -> t -> t
+  val remove_item : string -> quantity -> t -> t
+  val get_items : t -> (item * quantity) list
   val change_form : form -> t -> t
   val attack_opt : character option -> string -> character option -> string -> t
     -> (t * character option)
@@ -42,7 +42,7 @@ module Event = struct
     name: string;
     form:form;
     npcs: npc list;
-    items: item list;
+    items: (item * quantity) list;
     tagNum: int;
     output: string;
   }
@@ -97,17 +97,34 @@ module Event = struct
     let npcs = List.map (fun x -> if x.tag = npc.tag then n else x) evt.npcs in
     alter_event evt ~npcs:(npcs) (o^"NPC status updated.")
 
-  let add_item i evt =
-    try
-      let items =  i::evt.items in
-      alter_event evt ~items:(items) "Item added."
-    with _ ->
-      alter_event evt "Item could not be added."
+  let change_item_q i q lst =
+    List.map (fun (a,b) -> if a=i then (a,q) else (a,b)) lst
 
-        (*TODO: remove just one if duplicates? *)
-  let remove_item name evt =
-    let items = List.filter (fun (i:item) -> i.name <> name) evt.items in
-    alter_event evt ~items:(items) "Item removed."
+  let add_item i q evt =
+    match List.find_opt (fun (x,q) -> x=i) evt.items with
+    | None -> alter_event evt ~items:((i,q)::evt.items) "Item added."
+    | Some (x,n) ->
+      match n with
+      | Infinity -> alter_event evt "There are already infinite."
+      | Int n ->
+        match q with
+        | Int q -> alter_event evt
+                     ~items:(change_item_q i (Int (n+q)) evt.items) "Item added."
+        | Infinity -> alter_event evt
+                     ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
+
+  let remove_item name q evt =
+    match List.find_opt (fun ((x:item),q) -> x.name=name) evt.items with
+    | None -> alter_event evt "Item not present."
+    | Some (x,n) ->
+      match n with
+      | Infinity -> alter_event evt "There are infinite."
+      | Int n ->
+        match q with
+        | Int q -> alter_event evt
+                     ~items:(change_item_q x (Int (n-q)) evt.items) "Item removed."
+        | Infinity -> alter_event evt
+                     ~items:(List.filter (fun (a,b) -> a<>x) evt.items) "Infinite removed."
 
   let get_items evt = evt.items
 

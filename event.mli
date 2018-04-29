@@ -26,7 +26,7 @@ module type Event = sig
    a tag. *)
   type npc = {details:character; role:role; tag:int}
 
-  val make_event : string -> form -> npc list -> item list -> t
+  val make_event : string -> form -> npc list -> (item * quantity) list -> t
 
 (* [get_form evt] is the form of the event. *)
   val get_form : t -> form
@@ -52,15 +52,15 @@ module type Event = sig
 
 (* [add_item i evt] adds an item defined by [i] to the
    event [evt]. If [i] is invalid, return [evt]. *)
-  val add_item : item -> t -> t
+  val add_item : item -> quantity -> t -> t
 
 (* [remove_item name evt] removes the item with name [name] from the
    event in state [st]. If there is no item of that name, return [evt]. *)
-  val remove_item : string -> t -> t
+  val remove_item : string -> quantity -> t -> t
 
 (* [get_items evt] is the list of items in the event - probably only relevant
    in shops. *)
-  val get_items : t -> item list
+  val get_items : t -> (item * quantity) list
 
 (* [change_form form t] changes the form of event [t] to that specified by
    [form]. This may affect fields of [t] other than just [form]. *)

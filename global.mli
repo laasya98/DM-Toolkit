@@ -5,6 +5,8 @@ type effect = {
   amount:int;
 }
 
+type quantity = Int of int | Infinity
+
 type wtype = Ranged | Melee
 
 type weapontype = {
@@ -30,6 +32,6 @@ type item = {
   description:string;
   weight:int;
   effect:effect;
-  uses:int;
+  uses:quantity;
   value:int;
 }

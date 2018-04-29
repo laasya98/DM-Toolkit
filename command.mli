@@ -21,7 +21,7 @@ module type Command = sig
     |Take of string
     |Drop of string
     |Shop of string
-    |Fight of string list
+    |Fight of (string * string)
     |CreateEntity
     |CharacterAction
     |StateChange of (string * string)

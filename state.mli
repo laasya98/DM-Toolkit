@@ -60,7 +60,6 @@ module type State = sig
 (* [event s] is a list of current events for the current gamespace. *)
   val event : state -> event list
 
-
 (* [action cmd state] takes in a command and a state and updates the state to
    reflect whatever command is input. This can involve calling events,
    characters, items, or database look-ups.*)
