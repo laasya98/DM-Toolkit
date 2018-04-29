@@ -16,7 +16,6 @@ module type State = sig
   type data = D.data
   type character = C.c
   type event = E.t
-  type location
 
   type state
 
@@ -25,8 +24,6 @@ module type State = sig
     |Character of character
     |Effect of (entity * int)
     |Event of event
-
-  type exits = {}
 
   type location = {
     name : string;
@@ -51,21 +48,30 @@ module type State = sig
   val action : Com.command -> state -> state
 end
 
-module MakeState
-    = functor (C:Character) -> functor (D:Database) -> functor (E:Event) ->
-      functor (Com:Command) ->
-    struct
+module State = struct
+  module D = Database
+  module C = Character
+  module E = Event
+  module Com = Command
 
-    type data = D.data
-    type character = C.c
-    type event = E.t
-
-    type state = {
-      event:event;
-      characters: character list;
-    }
+  type character = C.c
+  type event = E.t
 
 (*************************** KERRI STUFF BELOW *****************************)
+
+      (*TODO: use official ones*)
+  type state = {
+    event:event;
+    characters: character list;
+    output: string;
+  }
+
+let alter_state st ?(evt=st.event) ?(chars=st.characters) output =
+  {
+    event=evt;
+    characters=chars;
+    output=output;
+  }
 
   (** SHOP **)
 let buy_item name evt =
@@ -78,14 +84,21 @@ let buy_item name evt =
 let attack a t evt st =
   let ac = List.find_opt (fun x -> C.name x = a) st.characters in
   let tc = List.find_opt (fun x -> C.name x = t) st.characters in
-  match E.attack_opt ac a tc t evt with
-  | (evt', None) -> {event=evt'; characters=st.characters}
-  | (evt', Some c) ->
-    let c' =
-      List.map (fun x -> if C.name x = C.name c then c else x) st.characters
-    in
-    {event = evt'; characters=c'}
+  try
+    match E.attack_opt ac a tc t evt with
+    | (evt', None) -> alter_state st ~evt:evt' (E.get_output evt)
+    | (evt', Some c) ->
+      let c' =
+        List.map (fun x -> if C.name x = C.name c then c else x) st.characters
+      in
+      alter_state st ~evt:evt' ~chars:c' (E.get_output evt)
+  with _ -> alter_state st "Action Failed: Invalid Character Name"
 
 (*************************** KERRI STUFF ABOVE *****************************)
+
+let action c st =
+  match c with
+  | Fight (a,b) -> attack a b st.event st
+  | _ -> failwith "unimplemented"
 
 end
