@@ -1,4 +1,6 @@
+S .
 B _build
+B _build/src
 PKG oUnit
 PKG str
 PKG unix

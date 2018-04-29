@@ -13,18 +13,33 @@ module type State = sig
   module E : Event
   module Com :Command
 
-  type data = D.data
-  type character = C.c
-  type event = E.t
+  type role = PC | Hostile | Friendly | Neutral
 
-  type state
-  type gamestate
+  type data = D.data
+  type character = Character.c
+  type event = Event.t
+  type command = Com.command
+
   type entity =
     |Item of item
     |Character of character
-    |Location of string
     |Effect of (entity * int)
     |Event of event
+
+  type location = {
+    name : string;
+    description : string;
+    contents : entity list;
+    exits : ( string * location ) list (*(direction, location)*)
+    }
+
+  type state = {
+    locations : location list;
+    characters : (character * role) list;
+    event : event;
+    output :string;
+    current_location : location;
+  }
 
   val init_state : D.data -> state
   val current_room : state -> string
@@ -32,84 +47,130 @@ module type State = sig
   val current_room_characters : state -> string list
   val rooms : state -> string list
   val effects : state -> string list
-  val event : state -> event list
+  val event : state -> event
   val action : Com.command -> state -> state
+  val output : state -> string
 end
 
-module MakeState
-    = functor (C:Character) -> functor (D:Database) -> functor (E:Event) ->
-      functor (Com:Command) ->
-    struct
+module State = struct
+  module D = Database
+  module C = Character
+  module E = Event
+  module Com = Command
 
-    type data = D.data
-    type character = C.c
-    type event = E.t
+  type character = Character.c
+  type event = Event.t
+  type command = Com.command
+  type data = D.data
+
+  type role = PC | Hostile | Friendly | Neutral
+
+  type entity =
+    |Item of item
+    |Character of character
+    |Effect of (entity * int)
+    |Event of event
+
+  type location = {
+    name : string;
+    description : string;
+    contents : entity list;
+    exits : ( string * location ) list (*(direction, location)*)
+  }
+
+  type state = {
+    locations : location list;
+    characters : (character * role) list;
+    event : event;
+    output :string;
+    current_location : location;
+  }
+
+  let init_state d = d(*TODO: uuuJuUuh *)
+  let current_location st = st.current_location.name
+  let current_gamestate st = failwith "unimplemented"
+  let current_room_characters st = st
+  let rooms st = failwith "unimplemented"
+  let effects st = failwith "unimplemented"
+  let event st = st.event
+
+  (*still needs to add remove_item and support giving more than one item*)
+  let give st item p1 p2 ?(q=1) = failwith "unimplemented"
+      (* )
+    let c1 = (List.find (fun x -> fst x = p1)) in
+    let c1' = ((*C.remove_item*) fst c1, snd c1) in
+    let c2 = C.add_item (List.filter (fun x -> fst x = p2)) item in
+    let c2' = (C.add_item (fst c2) item, snd c2) in
+    let clist = (List.filter (fun x -> (fst x != c1) || (fst x != c2))) in
+         {st with characters = c1'::c2'::clist} *)
 
 (*************************** KERRI STUFF BELOW *****************************)
 
-  (** SHOP **)
-let buy_item name evt =
-  match List.find_opt (fun x -> x.name =name) (E.get_items evt) with
-  | Some i -> failwith "unimplemented"
-  | None -> failwith "unimplemented"
+  let alter_state st ?(currLoc=st.current_location)
+      ?(evt=st.event) ?(chars=st.characters) output =
+  {
+    current_location = currLoc;
+    locations = st.locations;
+    event=evt;
+    characters=chars;
+    output=output;
+  }
 
-  (** COMBAT **)
-  (*TODO: get the EQUIPPED weapon. *)
-let get_weapon c =
-  let weapon =List.find (fun x ->
-      match x.i_type with | Weapon _ -> true |_-> false) (C.inv c) in
-  match weapon.i_type with
-  | Weapon w -> w
-  | _ -> failwith "No weapon"
+let update_char c c' ?(r'=None) st =
+  match r' with
+  | None -> List.map (fun (x,r) -> if x=c then (c',r) else (x,r)) st.characters
+  | Some r' ->
+    List.map (fun (x,r) -> if x=c then (c',r') else (x,r)) st.characters
 
-(*TODO: get the EQUIPPED armor. *)
-let get_armor c =
-  let armor = List.find
-      (fun x -> match x.i_type with | Armor _ -> true | _-> false) (C.inv c) in
-  match armor.i_type with
-  | Armor a -> a
-  | _ -> failwith "No armor" (*TODO: AC for no armor? *)
+(** SHOP **)
+let buy c i q evt st =
+  let c' = C.add_item c i in (*TODO: add quantity, remove cost*)
+  let evt' = E.remove_item i.name q evt in
+  alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
 
-(*TODO: use Dex for ranged?
-  Proficiency?
-  make AC
-*)
-let attack_roll attacker target =
-  let d20 = 1+ Random.int 19 in
-  let ability =
-    try
-      if (get_weapon attacker).t = Ranged then C.dex attacker
-      else C.strength attacker
-    with _ -> C.strength attacker
-  in
-  let prof = 0 in
-  let ac = try (get_armor target).ac with _ -> 0 in
-  if d20 = 1 then 0
-  else if d20 = 20 then 2
-  else
-    let roll = d20 + ability + prof in
-    if roll > ac then 1 else 0
+let buy_item c name q evt st=
+  match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
+  | None -> alter_state st "Action Failed: Invalid character name."
+  | Some (c,_) ->
+    if Event.get_form evt <> Shop then
+      alter_state st "Action Failed: There is no shop here."
+    else
+      match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
+      | None -> alter_state st "Action Failed: That item is not available."
+      | Some (i, Infinity) -> buy c i (Int q) evt st
+      | Some (i, Int n) ->
+        if n<q then
+          alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
+        else
+          buy c i (Int n) evt st
 
-let rec roll_dice dice acc =
-  match dice with
-  | [] -> acc
-  | h::t -> roll_dice t (acc + 1 + Random.int h)
 
-let damage_roll attacker crit =
-  let weapon = get_weapon attacker in
-  let dice = try weapon.dice with _ -> [] in
-  let bonus = try weapon.damage with _ -> 0  in
-  let ability = C.strength attacker in
-  bonus + ability + roll_dice dice 0
+(** COMBAT **)
 
-let deal_damage amount target = failwith "unimplemented"
-
-(* returns the new state of the target after being hit*)
-let attack attacker target =
-  let hit = attack_roll attacker target in
-  if hit = 0 then target else
-    deal_damage (damage_roll attacker (hit=2)) target
+let attack a t evt st:state =
+  let ac = List.find_opt (fun (x,_) -> C.name x = a) st.characters in
+  let tc = List.find_opt (fun (x,_) -> C.name x = t) st.characters in
+  match ac with
+  | None -> alter_state st "Action Failed: Invalid Attacker Name"
+  | Some (a,_) ->
+    match tc with
+    | None -> alter_state st "Action Failed: Invalid Target Name"
+    | Some (t,_) -> let (evt', t') = E.attack a t evt in
+      let chars = update_char t t' st in
+      alter_state st ~evt:evt' ~chars:chars
+        ((C.name a)^" attacked "^(C.name t)^"!")
 
 (*************************** KERRI STUFF ABOVE *****************************)
+
+let action (c:command) (st:state) =
+  match c with
+  | Fight (a,b) -> attack a b st.event st
+  | Buy (ch,i,q) -> begin
+      try buy_item ch i (int_of_string q) st.event st
+      with _ -> alter_state st "Invalid item quantity."
+    end
+  | _ -> failwith "unimplemented"
+
+let output st = st.output
 
 end

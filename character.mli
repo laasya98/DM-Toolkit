@@ -1,33 +1,99 @@
 open Global
 
 module type Character = sig
-
-
-  (* type item should be all the possible items types a player can potentially have
-  in their inventory*)
-  type item
-
   (* type skill should be all the possible skill types a player can potentially have *)
   type skill
 
   (* type skill should be all the possible spells a player can potentially use *)
   type ability
 
+  (*type dwarf_sub =
+   | Plain
+   | Hill
+   | Mountain
+
+   type elf_sub =
+    | Plain
+    | High
+    | Wood
+    | Dark
+
+  type half_sub =
+   | Plain
+   | Lightfoot
+   | Stout
+
+  type dragon_descent =
+    | Black
+    | Blue
+    | Brass
+    | Bronze
+    | Copper
+    | Gold
+    | Green
+    | Red
+    | Silver
+    | White
+
+  type gnome_sub =
+   | Plain
+   | Forest
+   | Rock *)
+
+
+
+  (* type c_class is the types of classes of a character*)
+  type c_class =
+    | Barbarian
+    | Bard
+    | Cleric
+    | Druid
+    | Fighter
+    | Monk
+    | Paladin
+    | Ranger
+    | Rogue
+    | Sorcerer
+    | Warlock
+    | Wizard
+
+  (* type c_class is the types of races of a character*)
+  type race =
+    | Dwarf
+    | Elf
+    | Halfling
+    | Human
+    | Dragonborn
+    | Gnome
+    | Half_Elf
+    | Half_Orc
+    | Tiefling
+
+  (* use wisdom*)
+
   (* type t is the character type. this should contain a record of information
      about a character in the game. this record can be updated by state and events *)
   type c = {
     name:string;
-    mutable status:string;
-    mutable defense: int ;
-    mutable intel:int;
-    mutable strength:int;
-    mutable speed:int;
-    mutable max_hp:int;
-    mutable hp:int;
-    mutable level:int;
-    mutable skills: skill list;
-    mutable abilities: ability list;
-    mutable inv: item list;
+    status:string;
+    defense: int ;
+    race:race;
+    c_class:c_class;
+    constitution: int;
+    wisdom:int;
+    intel:int;
+    strength:int;
+    dexterity:int;
+    speed:int;
+    max_hp:int;
+    hp:int;
+    xp:int;
+    level:int;
+    skills: skill list;
+    abilities: ability list;
+    equipped: item list * quantity;
+    inv: item list * quantity;
+    money: int;
   }
 
   (* [name character] is a string containing the character's title. *)
@@ -36,14 +102,27 @@ module type Character = sig
   (* [status character ] is a string containing the character's current status. *)
   val status :  c -> string
 
-  (* [update_state character ] updates the status of a character based off of the game state*)
+(* [update_status character ] updates the status of a character based off of
+   the game state*)
   val update_status :  c -> c
+
+  (* [wisdom character] is an int that describes the player's wisdom stat. *)
+  val wisdom :  c -> int
+
+  (* [update_wisdom character new_w ] character with wisdom = new_w. *)
+  val update_wisdom :  c -> int ->  c
 
   (* [defense character] is an int that describes the player's defense stat. *)
   val defense :  c -> int
 
   (* [update_def character new_d] character with defense = new_d. *)
   val update_def :  c -> int -> c
+
+  (* [dex character] is an int that describes the player's dexterity stat. *)
+  val dex :  c -> int
+
+  (* [update_dex character new_d] character with dex = new_d. *)
+  val update_dex :  c -> int -> c
 
   (* [intel character] is an int that describes the player's intelligence stat. *)
   val intel :  c -> int
@@ -72,6 +151,9 @@ module type Character = sig
   (* [max_hp character] is an int that contains the player's max possible hit points.*)
   val max_hp :  c -> int
 
+  (* [update_max_hp character new_hp] character with max_hp = new_hp.*)
+  val update_max_hp :  c -> int -> c
+
   (* [xp character] is an int that contains the player's experience points . *)
   val xp :  c -> int
 
@@ -99,4 +181,28 @@ module type Character = sig
   (* [inv character] is a list of the items a player has. *)
   val inv :  c -> item list
 
+  (* [add_item character i] adds i to the characters inventory.*)
+  val add_item :  c -> item -> c
+
+  (* [equipped character] is a list of the items a player has equipped. *)
+  val equipped :  c -> item list
+
+  (* [equip character e] adds e to the characters equpped items.
+     Requires that e is present in the character's inventory*)
+  val equip :  c -> item -> c
+
+  (*[money character] is an int describing how much money a character has *)
+  val money :  c -> int
+
+  (* [update_money character cash] character with money = cash *)
+  val update_money :  c -> int -> c
+
+  (* [const character] is an int that describes the player's constitution stat. *)
+  val const :  c -> int
+
+  (* [update_const character new_c] character with constitution = new_c.*)
+  val update_const :  c -> int -> c
+
 end
+
+module Character : Character

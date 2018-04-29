@@ -2,17 +2,69 @@ open Global
 
 module type Character = sig
 
-  type item
   type skill
   type ability
 
-   type c
+  (* type c_class is the types of classes of a character*)
+  type c_class =
+    | Barbarian
+    | Bard
+    | Cleric
+    | Druid
+    | Fighter
+    | Monk
+    | Paladin
+    | Ranger
+    | Rogue
+    | Sorcerer
+    | Warlock
+    | Wizard
+
+  (* type c_class is the types of races of a character*)
+  type race =
+    | Dwarf
+    | Elf
+    | Halfling
+    | Human
+    | Dragonborn
+    | Gnome
+    | Half_Elf
+    | Half_Orc
+    | Tiefling
+
+
+  type c = {
+    name:string;
+    status:string;
+    defense: int ;
+    race:race;
+    c_class:c_class;
+    constitution: int;
+    wisdom:int;
+    intel:int;
+    strength:int;
+    dexterity:int;
+    speed:int;
+    max_hp:int;
+    hp:int;
+    xp:int;
+    level:int;
+    skills: skill list;
+    abilities: ability list;
+    equipped: item list * quantity;
+    inv: item list * quantity;
+    money: int;
+  }
 
   val name :  c -> string
   val status :  c -> string
   val update_status :  c -> c
+  val wisdom :  c -> int
+  val update_wisdom :  c -> int ->  c
   val defense :  c -> int
   val update_def :  c -> int -> c
+  val dex :  c -> int
+  val update_dex :  c -> int -> c
   val intel :  c -> int
   val update_intel :  c -> int -> c
   val strength :  c -> int
@@ -22,6 +74,7 @@ module type Character = sig
   val curr_hp :  c -> int
   val update_hp :  c -> int -> c
   val max_hp :  c -> int
+  val update_max_hp :  c -> int -> c
   val xp :  c -> int
   val update_xp :  c -> int -> c
   val level :  c -> int
@@ -31,34 +84,82 @@ module type Character = sig
   val abilities :  c -> ability list
   val add_ability :  c -> ability -> c
   val inv :  c -> item list
+  val add_item :  c -> item -> c
+  val equipped :  c -> item list
+  val equip :  c -> item -> c
+  val money :  c -> int
+  val update_money :  c -> int -> c
+  val const :  c -> int
+  val update_const :  c -> int -> c
+
 end
 
 module Character = struct
-  type item = string (*TODO fix i guess*)
+  type item = Global.item
   type skill
   type ability
 
+  type c_class =
+    | Barbarian
+    | Bard
+    | Cleric
+    | Druid
+    | Fighter
+    | Monk
+    | Paladin
+    | Ranger
+    | Rogue
+    | Sorcerer
+    | Warlock
+    | Wizard
+
+  type race =
+    | Dwarf
+    | Elf
+    | Halfling
+    | Human
+    | Dragonborn
+    | Gnome
+    | Half_Elf
+    | Half_Orc
+    | Tiefling
+
   type c = {
-      name:string;
-     status:string;
-     defense: int ;
-     intel:int;
-     strength:int;
-     speed:int;
-     max_hp:int;
-     hp:int;
-     xp:int;
-     level:int;
-     skills: skill list;
-     abilities: ability list;
-     inv: item list;
+    name:string;
+    status:string;
+    defense: int ;
+    race:race;
+    c_class:c_class;
+    constitution: int;
+    wisdom:int;
+    intel:int;
+    strength:int;
+    dexterity:int;
+    speed:int;
+    max_hp:int;
+    hp:int;
+    xp:int;
+    level:int;
+    skills: skill list;
+    abilities: ability list;
+    equipped: item list * quantity;
+    inv: item list * quantity;
+    money: int;
   }
 
   let name  c = c.name
+  let race  c = c.race
+  let class_of  c = c.c_class
   let status c = c.status
-  let update_status c = c
+  let update_status c = c (*TODO what*)
+  let wisdom  c = c.wisdom
+  let update_wisdom  c w = {c with wisdom = w}
+  let const  c = c.constitution
+  let update_const  c o = {c with constitution = o}
   let defense  c = c.defense
   let update_def c d = {c with defense = d;}
+  let dex  c = c.dexterity
+  let update_dex c d = {c with dexterity = d;}
   let intel c = c.intel
   let update_intel c i = {c with intel = i;}
   let strength c = c.strength
@@ -66,12 +167,19 @@ module Character = struct
   let speed c = c.speed
   let update_speed c s = {c with speed = s}
   let curr_hp c = c.hp
-  let update_hp c h = {c with hp = h}
+  let update_hp c h =
+    if c.max_hp < h then c else
+    {c with hp = h}
   let max_hp c = c.max_hp
+  let update_max_hp c h =
+    {c with max_hp = h}
   let xp c = c.xp
   let update_xp c x = {c with xp = x}
   let level  c = c.level
-  let level_up  c l = {c with level = l}
+  let level_up  c l =
+    {c with
+      level = l
+    }
   (* TODO: whatever algorithm updates strength/skills/speed based off of level/chartype*)
   let skills c =  c.skills
   let add_skill c s =
@@ -81,6 +189,23 @@ module Character = struct
   let add_ability c a =
     let abilities = c.abilities in
     {c with abilities = a::abilities}
-  let inv c = c.inv
-
+  let inv c = fst c.inv
+  let equipped c = fst c.equipped
+  let equip c e =
+    let equipment = equipped c in
+    let qty = snd c.equipped in
+    match qty with
+    | Int k -> if List.length equipment <= k && List.mem e (inv c) then
+        {c with equipped = e::equipment,(snd c.equipped)} else c
+    | Infinity -> if List.mem e (inv c) then
+        {c with equipped = e::equipment,(snd c.equipped)} else c
+  let add_item c i =
+    let items = inv c in
+    let qty = snd c.inv in
+    match qty with
+    | Int k -> if List.length items <= k then {c with inv = i::items, qty}
+      else c
+    | Infinity -> {c with inv = i::items, (snd c.inv)}
+  let money c = c.money
+  let update_money c m = {c with money = m}
 end
