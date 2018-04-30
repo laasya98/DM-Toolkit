@@ -19,6 +19,40 @@ type armortype = {
   ac : int
 }
 
+type dwarf_sub =
+ | Plain
+ | Hill
+ | Mountain
+
+ type elf_sub =
+  | Plain
+  | High
+  | Wood
+  | Dark
+
+type half_sub =
+ | Plain
+ | Lightfoot
+ | Stout
+
+type dragon_descent =
+  | Black
+  | Blue
+  | Brass
+  | Bronze
+  | Copper
+  | Gold
+  | Green
+  | Red
+  | Silver
+  | White
+
+type half_sub =
+ | Plain
+ | Forest
+ | Rock
+
+
 type race =
   | Dwarf
   | Elf
