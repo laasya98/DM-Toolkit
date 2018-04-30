@@ -5,8 +5,32 @@ module type Character = sig
   type skill
   type ability
 
-  type race = Global.race
-  type c_class = Global.c_class
+  (* type c_class is the types of classes of a character*)
+  type c_class =
+    | Barbarian
+    | Bard
+    | Cleric
+    | Druid
+    | Fighter
+    | Monk
+    | Paladin
+    | Ranger
+    | Rogue
+    | Sorcerer
+    | Warlock
+    | Wizard
+
+  (* type c_class is the types of races of a character*)
+  type race =
+    | Dwarf
+    | Elf
+    | Halfling
+    | Human
+    | Dragonborn
+    | Gnome
+    | Half_Elf
+    | Half_Orc
+    | Tiefling
 
 
   type c = {
@@ -26,8 +50,8 @@ module type Character = sig
         level:int;
         skills: skill list;
         abilities: ability list;
-        equipped: item list;
-        inv: item list;
+        equipped: item list * quantity;
+        inv: item list * quantity;
       }
 
   val name :  c -> string
@@ -65,11 +89,34 @@ module type Character = sig
 end
 
 module Character = struct
-  type item = Global.item (*TODO fix i guess*)
+  type item = Global.item
   type skill
   type ability
-  type race = Global.race
-  type c_class = Global.c_class
+
+  type c_class =
+    | Barbarian
+    | Bard
+    | Cleric
+    | Druid
+    | Fighter
+    | Monk
+    | Paladin
+    | Ranger
+    | Rogue
+    | Sorcerer
+    | Warlock
+    | Wizard
+
+  type race =
+    | Dwarf
+    | Elf
+    | Halfling
+    | Human
+    | Dragonborn
+    | Gnome
+    | Half_Elf
+    | Half_Orc
+    | Tiefling
 
   type c = {
     name:string;
@@ -88,8 +135,8 @@ module Character = struct
     level:int;
     skills: skill list;
     abilities: ability list;
-    equipped: item list;
-    inv: item list;
+    equipped: item list * quantity;
+    inv: item list * quantity;
   }
 
   let name  c = c.name
@@ -132,15 +179,21 @@ module Character = struct
   let add_ability c a =
     let abilities = c.abilities in
     {c with abilities = a::abilities}
-  let inv c = c.inv
-  let equipped c = c.equipped
+  let inv c = fst c.inv
+  let equipped c = fst c.equipped
   let equip c e =
-    let equipment = c.equipped in
-    if List.mem e c.inv then
-      {c with equipped = e::equipment}
-    else c
+    let equipment = equipped c in
+    let qty = snd c.equipped in
+    match qty with
+    | Int k -> if List.length equipment <= k && List.mem e (inv c) then
+        {c with equipped = e::equipment,(snd c.equipped)} else c
+    | Infinity -> if List.mem e (inv c) then
+        {c with equipped = e::equipment,(snd c.equipped)} else c
   let add_item c i =
-    let items = c.inv in
-    {c with inv = i::items}
-
+    let items = inv c in
+    let qty = snd c.inv in
+    match qty with
+    | Int k -> if List.length items <= k then {c with inv = i::items, qty}
+      else c
+    | Infinity -> {c with inv = i::items, (snd c.inv)}
 end
