@@ -38,6 +38,7 @@ module type State = sig
     characters : (character * role) list;
     event : event;
     output :string;
+    current_location : location;
   }
 
   val init_state : D.data -> state
@@ -82,6 +83,7 @@ module State = struct
     characters : (character * role) list;
     event : event;
     output :string;
+    current_location : location;
   }
 
   let init_state d = failwith "unimplemented"
@@ -91,6 +93,7 @@ module State = struct
   let rooms st = failwith "unimplemented"
   let effects st = failwith "unimplemented"
   let event st = st.event
+  let give st item p1 p2 q = failwith "unimplemented: requires method to remove items from inventory in character"
 
 (*************************** KERRI STUFF BELOW *****************************)
 

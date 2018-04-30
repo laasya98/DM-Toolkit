@@ -18,18 +18,21 @@ module type State = sig
      A Friendly npc will aid the characters in the event
      A Hostile npc will oppose the characters in the event
      A Neutral npc will do neither (ex: shopkeeper). *)
-  type role = PC |Hostile | Friendly | Neutral
+    type role = Hostile | Friendly | Neutral
 
 (* [data] is the type of data in database.mli *)
   type data = D.data
 
 (* [character] is the type of a character in character.mli *)
-  type character = Character.c
+  type character = C.c
 
 (* [event] is the type of an event in event.mli *)
-  type event = Event.t
+  type event = E.t
 
-  type command = Com.command
+(* [state] is the type of a state*)
+  type state
+
+
 
 (* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
@@ -49,13 +52,13 @@ module type State = sig
     exits : ( string * location ) list (*(direction, location)*)
   }
 
-  (* [state] is the type of gamestate (set of rooms and entitites to interact
-     with). *)
+  (* [state] is the type of gamestate, which includes a list of locations, . *)
   type state = {
     locations : location list;
     characters : (character * role) list;
-    event : event option;
+    event : event;
     output :string;
+    current_location : location;
   }
 
 (* [init_state s] is the initial state of the game loaded from a save file s
@@ -77,15 +80,18 @@ module type State = sig
 (* [effects s] is a list of effects in the current room for current entities.*)
   val effects : state -> string list
 
-(* [event s] is the current event for the current gamespace. *)
-  val event : state -> event
+(* [event s] is a list of current events for the current gamespace. *)
+  val event : state -> event list
+
+(** [give st item p1 p2 q] takes in a state, an item, a character to take an
+    item from, a character to give the item to, and a quantity of items to give.
+    Outputs an error message if the p1 does not have the item in the correct
+    quantity in their inventory, if p2 cannot hold the additional weight, or
+    there is less than one item being given.*)
+  val give : state -> item -> character -> character -> state
 
 (* [action cmd state] takes in a command and a state and updates the state to
    reflect whatever command is input. This can involve calling events,
    characters, items, or database look-ups.*)
   val action : Com.command -> state -> state
-
-  val output : state -> string
 end
-
-module State:State
