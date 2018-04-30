@@ -1,0 +1,18 @@
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Start test Adventure test suite:0:form.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Test Adventure test suite:0:form is successful.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: End test Adventure test suite:0:form.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Start test Adventure test suite:2:npcs.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Test Adventure test suite:2:npcs is successful.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: End test Adventure test suite:2:npcs.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Start test Adventure test suite:3:get_items.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Test Adventure test suite:3:get_items is successful.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: End test Adventure test suite:3:get_items.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Start test Adventure test suite:6:add_npc.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Test Adventure test suite:6:add_npc is successful.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: End test Adventure test suite:6:add_npc.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Start test Adventure test suite:7:remove_npc.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Test Adventure test suite:7:remove_npc is successful.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: End test Adventure test suite:7:remove_npc.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Start test Adventure test suite:10:a2.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: Test Adventure test suite:10:a2 is successful.
+2018-04-30T04:12:28+00:00 dhcp-rhodes-344.eduroam.cornell.edu#01 I: End test Adventure test suite:10:a2.
