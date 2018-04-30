@@ -87,7 +87,7 @@ module Command = struct
       else if (starts_with "shop" s) then Shop (remove_start "shop" s)
       else if (starts_with "move" s) then
         let x = (remove_start "move" s) in
-        let lst = String.split_on_char ' ' x in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         if List.length lst = 2 then
           match lst with
           | a::b::[] -> Move (a,b)
@@ -95,7 +95,7 @@ module Command = struct
         else Invalid
       else if (starts_with "use" s) then
         let x = (remove_start "use" s) in
-        let lst = String.split_on_char ' ' x in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         if List.length lst = 2 then
           match lst with
           | a::b::[] -> Use (a,b)
@@ -103,7 +103,7 @@ module Command = struct
         else Invalid
       else if (starts_with "roll" s) then
         let x = (remove_start "roll" s) in
-        let lst = String.split_on_char ' ' x in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         if List.length lst = 2 then
           match lst with
           | a::b::[] -> Roll (a,b)
@@ -111,7 +111,7 @@ module Command = struct
         else Invalid
       else if (starts_with "fight" s) then
         let x = (remove_start "fight" s) in
-        let lst = String.split_on_char ' ' x in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         match lst with
         | a::t::_ -> Fight (a,t)
         | _ -> Invalid
