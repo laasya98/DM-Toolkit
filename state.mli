@@ -13,6 +13,13 @@ module type State = sig
   module E : Event
   module Com :Command
 
+  (* [role] is the role of a character.
+     PC signals a player character.
+     A Friendly npc will aid the characters in the event
+     A Hostile npc will oppose the characters in the event
+     A Neutral npc will do neither (ex: shopkeeper). *)
+    type role = Hostile | Friendly | Neutral
+
 (* [data] is the type of data in database.mli *)
   type data = D.data
 
@@ -45,12 +52,13 @@ module type State = sig
     exits : ( string * location ) list (*(direction, location)*)
   }
 
-  (* [gamestate] is the type of gamestate (set of rooms and entitites to interact
+  (* [state] is the type of gamestate (set of rooms and entitites to interact
      with). *)
-  type gamestate = {
+  type state = {
     locations : location list;
-    party : character list;
-    active_events : event list;
+    characters : (character * role) list;
+    event : event;
+    output :string;
   }
 
 (* [init_state s] is the initial state of the game loaded from a save file s

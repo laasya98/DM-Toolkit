@@ -16,17 +16,7 @@ module type Event = sig
 (* [form] is the variety of an event. *)
   type form = Battle | Shop | Interaction
 
-(* [role] is the role of an npc.
-   A Friendly npc will aid the characters in the event
-   A Hostile npc will oppose the characters in the event
-   A Neutral npc will do neither (ex: shopkeeper). *)
-  type role = Hostile | Friendly | Neutral
-
-(* [npc] is the type of an npc. It wraps the Character type with a role and
-   a tag. *)
-  type npc = {details:character; role:role; tag:int}
-
-  val make_event : string -> form -> npc list -> (item * quantity) list -> t
+  val make_event : string -> form -> (item * quantity) list -> t
 
 (* [get_form evt] is the form of the event. *)
   val get_form : t -> form
@@ -35,20 +25,6 @@ module type Event = sig
   val get_name : t -> string
 
   val get_output : t -> string
-
-(* [add_npc name c role evt] adds an npc with name [name],
-   character [c], and [role] that determines its actions within the event.
-   If [d] is invalid, return [evt]. *)
-  val add_npc : character -> role -> t -> t
-
-(* [remove_npc tag evt] removes the npc with tag [tag] from [evt], and returns
-   the new [evt]. If there is no npc of that tag, return [evt]. *)
-  val remove_npc : int -> t -> t
-
-  val update_npc : npc -> ?c:character -> ?r:role -> ?o:string -> t -> t
-
-(* [get_npcs evt] is a list of the NPCs present in the event. *)
-  val get_npcs : t -> npc list
 
 (* [add_item i evt] adds an item defined by [i] to the
    event [evt]. If [i] is invalid, return [evt]. *)
@@ -66,8 +42,7 @@ module type Event = sig
    [form]. This may affect fields of [t] other than just [form]. *)
   val change_form : form -> t -> t
 
-  val attack_opt : character option -> string -> character option -> string -> t
-    -> (t * character option)
+  val attack: character -> character -> t -> (t * character)
 end
 
 module Event : Event

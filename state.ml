@@ -13,6 +13,8 @@ module type State = sig
   module E : Event
   module Com :Command
 
+  type role = PC | Hostile | Friendly | Neutral
+
   type data = D.data
   type character = C.c
   type event = E.t
@@ -32,10 +34,11 @@ module type State = sig
     exits : ( string * location ) list (*(direction, location)*)
     }
 
-  type gamestate = {
+  type state = {
     locations : location list;
-    party : character list;
-    active_events : event list;
+    characters : (character * role) list;
+    event : event;
+    output :string;
   }
 
   val init_state : D.data -> state
@@ -44,7 +47,7 @@ module type State = sig
   val current_room_characters : state -> string list
   val rooms : state -> string list
   val effects : state -> string list
-  val event : state -> event list
+  val event : state -> event
   val action : Com.command -> state -> state
 end
 
@@ -70,23 +73,18 @@ module State = struct
     exits : ( string * location ) list (*(direction, location)*)
   }
 
-  type gamestate = {
+  type state = {
     locations : location list;
-    party : character list;
-    active_events : event list;
+    characters : character list;
+    event : event;
+    output :string;
   }
 
 (*************************** KERRI STUFF BELOW *****************************)
 
-      (*TODO: use official ones*)
-  type state = {
-    event:event;
-    characters: character list;
-    output: string;
-  }
-
 let alter_state st ?(evt=st.event) ?(chars=st.characters) output =
   {
+    locations = st.locations;
     event=evt;
     characters=chars;
     output=output;
@@ -105,15 +103,15 @@ let buy_item name evt = ()
 let attack a t evt st:state =
   let ac = List.find_opt (fun x -> C.name x = a) st.characters in
   let tc = List.find_opt (fun x -> C.name x = t) st.characters in
-  try
-    match E.attack_opt ac a tc t evt with
-    | (evt', None) -> alter_state st ~evt:evt' (E.get_output evt)
-    | (evt', Some c) ->
-      let c' =
-        List.map (fun x -> if C.name x = C.name c then c else x) st.characters
-      in
-      alter_state st ~evt:evt' ~chars:c' (E.get_output evt)
-  with _ -> alter_state st "Action Failed: Invalid Character Name"
+  match ac with
+  | None -> alter_state st "Action Failed: Invalid Attacker Name"
+  | Some a ->
+    match tc with
+    | None -> alter_state st "Action Failed: Invalid Target Name"
+    | Some t -> let (evt', t') = E.attack a t evt in
+      let chars = List.map (fun x -> if x=t then t' else x) in
+      alter_state st ~evt:evt' ~chars:chars
+        ((C.name a)^" attacked "^(C.name t)^"!")
 
 (*************************** KERRI STUFF ABOVE *****************************)
 
