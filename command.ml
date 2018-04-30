@@ -16,6 +16,7 @@ module type Command = sig
     |Take of string
     |Drop of string
     |Shop of string
+    |Buy of (string * string *string)
     |Fight of (string * string)
     |CreateEntity
     |CharacterAction
@@ -43,6 +44,7 @@ module Command = struct
     |Take of string
     |Drop of string
     |Shop of string
+    |Buy of (string * string *string)
     |Fight of (string * string)
     |CreateEntity
     |CharacterAction
@@ -112,6 +114,12 @@ module Command = struct
         let lst = String.split_on_char ' ' x in
         match lst with
         | a::t::_ -> Fight (a,t)
+        | _ -> Invalid
+      else if (starts_with "buy" s) then
+        let x = (remove_start "buy" s) in
+        let lst = String.split_on_char ' ' x in
+        match lst with
+        | c::i::q::[] -> Buy (c,i,q)
         | _ -> Invalid
       else Invalid
 end

@@ -54,7 +54,7 @@ module type State = sig
   type state = {
     locations : location list;
     characters : (character * role) list;
-    event : event option;
+    event : event;
     output :string;
   }
 
