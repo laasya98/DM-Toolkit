@@ -26,3 +26,5 @@ module type Database = sig
   val get_class : string -> string
 
 end
+
+module Database:Database

@@ -16,8 +16,9 @@ module type State = sig
   type role = PC | Hostile | Friendly | Neutral
 
   type data = D.data
-  type character = C.c
-  type event = E.t
+  type character = Character.c
+  type event = Event.t
+  type command = Com.command
 
   type entity =
     |Item of item
@@ -47,6 +48,7 @@ module type State = sig
   val effects : state -> string list
   val event : state -> event
   val action : Com.command -> state -> state
+  val output : state -> string
 end
 
 module State = struct
@@ -55,8 +57,10 @@ module State = struct
   module E = Event
   module Com = Command
 
-  type character = C.c
-  type event = E.t
+  type character = Character.c
+  type event = Event.t
+  type command = Com.command
+  type data = D.data
 
   type role = PC | Hostile | Friendly | Neutral
 
@@ -80,6 +84,14 @@ module State = struct
     output :string;
   }
 
+  let init_state d = failwith "unimplemented"
+  let current_room st = failwith "unimplemented"
+  let current_gamestate st = failwith "unimplemented"
+  let current_room_characters st = failwith "unimplemented"
+  let rooms st = failwith "unimplemented"
+  let effects st = failwith "unimplemented"
+  let event st = st.event
+
 (*************************** KERRI STUFF BELOW *****************************)
 
 let alter_state st ?(evt=st.event) ?(chars=st.characters) output =
@@ -92,11 +104,19 @@ let alter_state st ?(evt=st.event) ?(chars=st.characters) output =
 
 (** SHOP **)
 
-let buy_item name evt = ()
-    (*
-  match List.find_opt (fun x -> x.name =name) (E.get_items evt) with
-  | Some i -> failwith "unimplemented"
-  | None -> failwith "unimplemented"*)
+let buy_item c name q evt st=
+  if Event.get_form evt <> Shop then
+    alter_state st "Action Failed: There is no shop here."
+  else
+    match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
+    | None -> alter_state st "Action Failed: That item is not available."
+    | Some (i, Infinity) -> failwith "unim"
+    | Some (i, Int n) ->
+      if n<q then
+        alter_state st ("There are only "^(string_of_int n)^" available.")
+      else
+        failwith "unim"
+
 
 (** COMBAT **)
 
@@ -115,9 +135,11 @@ let attack a t evt st:state =
 
 (*************************** KERRI STUFF ABOVE *****************************)
 
-(*let action c (st:state) =
+let action (c:command) (st:state) =
   match c with
   | Fight (a,b) -> attack a b st.event st
-  | _ -> failwith "unimplemented" *)
+  | _ -> failwith "unimplemented"
+
+let output st = st.output
 
 end

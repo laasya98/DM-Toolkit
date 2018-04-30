@@ -19,7 +19,7 @@ module type Event = sig
 end
 
 module Event = struct
-    module C = Character
+  module C = Character
 
   type character = Character.c
 
@@ -150,7 +150,7 @@ module Event = struct
     if hit = 0 then target else
       deal_damage (damage_roll attacker (hit=2)) target
 
-(*TODO: add xp gain, etc *)
+(*TODO: add test for death, turn #, items becoming available, xp gain, etc *)
   let attack a t evt =
     (evt, attack_t a t)
 

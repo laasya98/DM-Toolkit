@@ -37,3 +37,5 @@ module type Command = sig
       is no valid way to use that command in State).*)
   val parse : string -> command
 end
+
+module Command:Command
