@@ -50,6 +50,7 @@ module type Character = sig
   val curr_hp :  c -> int
   val update_hp :  c -> int -> c
   val max_hp :  c -> int
+  val update_max_hp :  c -> int -> c
   val xp :  c -> int
   val update_xp :  c -> int -> c
   val level :  c -> int
@@ -112,9 +113,11 @@ module Character = struct
   let update_speed c s = {c with speed = s}
   let curr_hp c = c.hp
   let update_hp c h =
-    if c.max_hp <= h then c else
+    if c.max_hp < h then c else
     {c with hp = h}
   let max_hp c = c.max_hp
+  let update_max_hp c h =
+    {c with max_hp = h}
   let xp c = c.xp
   let update_xp c x = {c with xp = x}
   let level  c = c.level

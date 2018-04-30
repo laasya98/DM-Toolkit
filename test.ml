@@ -98,8 +98,14 @@ let character_tests = [
   "update hp bad" >:: (fun _ -> assert_equal 10
                       (Character.curr_hp (Character.update_hp char1 50)));
   "max hp" >:: (fun _ -> assert_equal 10 (Character.max_hp char1));
-  (*"update max hp" >:: (fun _ -> assert_equal 50
-                      (Character.hp (Character.update_max_hp char1 50)));*)
+  "update max hp" >:: (fun _ -> assert_equal 50
+                      (Character.max_hp (Character.update_max_hp char1 50)));
+  "update hp not bad" >:: (fun _ -> assert_equal 50
+                      (Character.curr_hp (Character.update_hp
+                      (Character.update_max_hp char1 50) 50)));
+  "xp" >:: (fun _ -> assert_equal 0 (Character.xp char1));
+  "update xp" >:: (fun _ -> assert_equal 800
+                      (Character.xp (Character.update_xp char1 800)));
   "inv" >:: (fun _ -> assert_equal [item2] (Character.inv char1));
   "add item" >:: (fun _ -> assert_equal [item1;item2]
                      (Character.inv (Character.add_item char1 item1)));

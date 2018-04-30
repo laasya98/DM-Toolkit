@@ -93,6 +93,9 @@ module type Character = sig
   (* [max_hp character] is an int that contains the player's max possible hit points.*)
   val max_hp :  c -> int
 
+  (* [update_max_hp character new_hp] character with max_hp = new_hp.*)
+  val update_max_hp :  c -> int -> c
+
   (* [xp character] is an int that contains the player's experience points . *)
   val xp :  c -> int
 
