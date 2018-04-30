@@ -2,6 +2,7 @@ open OUnit2
 open Event
 open Character
 open Global
+open State
 
 let evtC1 = Event.make_event "evtC1" Battle []
 

@@ -18,7 +18,7 @@ module type State = sig
      A Friendly npc will aid the characters in the event
      A Hostile npc will oppose the characters in the event
      A Neutral npc will do neither (ex: shopkeeper). *)
-    type role = Hostile | Friendly | Neutral
+  type role = PC |Hostile | Friendly | Neutral
 
 (* [data] is the type of data in database.mli *)
   type data = D.data
@@ -28,11 +28,6 @@ module type State = sig
 
 (* [event] is the type of an event in event.mli *)
   type event = E.t
-
-(* [state] is the type of a state*)
-  type state
-
-
 
 (* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
@@ -80,8 +75,8 @@ module type State = sig
 (* [effects s] is a list of effects in the current room for current entities.*)
   val effects : state -> string list
 
-(* [event s] is a list of current events for the current gamespace. *)
-  val event : state -> event list
+(* [event s] is the current event for the current gamespace. *)
+  val event : state -> event
 
 (* [action cmd state] takes in a command and a state and updates the state to
    reflect whatever command is input. This can involve calling events,

@@ -19,8 +19,6 @@ module type State = sig
   type character = C.c
   type event = E.t
 
-  type state
-
   type entity =
     |Item of item
     |Character of character
@@ -60,6 +58,8 @@ module State = struct
   type character = C.c
   type event = E.t
 
+  type role = PC | Hostile | Friendly | Neutral
+
   type entity =
     |Item of item
     |Character of character
@@ -75,7 +75,7 @@ module State = struct
 
   type state = {
     locations : location list;
-    characters : character list;
+    characters : (character * role) list;
     event : event;
     output :string;
   }
@@ -101,15 +101,15 @@ let buy_item name evt = ()
 (** COMBAT **)
 
 let attack a t evt st:state =
-  let ac = List.find_opt (fun x -> C.name x = a) st.characters in
-  let tc = List.find_opt (fun x -> C.name x = t) st.characters in
+  let ac = List.find_opt (fun (x,_) -> C.name x = a) st.characters in
+  let tc = List.find_opt (fun (x,_) -> C.name x = t) st.characters in
   match ac with
   | None -> alter_state st "Action Failed: Invalid Attacker Name"
-  | Some a ->
+  | Some (a,_) ->
     match tc with
     | None -> alter_state st "Action Failed: Invalid Target Name"
-    | Some t -> let (evt', t') = E.attack a t evt in
-      let chars = List.map (fun x -> if x=t then t' else x) in
+    | Some (t,_) -> let (evt', t') = E.attack a t evt in
+      let chars = List.map (fun (x,r) -> if x=t then (t',r) else (x,r)) st.characters in
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
 
