@@ -1,5 +1,7 @@
 open Global
 
+exception Nope
+
 module type Character = sig
 
   type skill
@@ -109,7 +111,9 @@ module Character = struct
   let speed c = c.speed
   let update_speed c s = {c with speed = s}
   let curr_hp c = c.hp
-  let update_hp c h = {c with hp = h}
+  let update_hp c h =
+    if c.max_hp <= h then c else
+    {c with hp = h}
   let max_hp c = c.max_hp
   let xp c = c.xp
   let update_xp c x = {c with xp = x}

@@ -4,8 +4,7 @@
  * Authors: Allan Buchness, Kerri Diamond, Laasya Renganathan, Luke Ellert-Beck
  * NetID: lpr46
  *
- * Acknowledge here any contributions made to your solution that
- * did not originate from you or from the course staff:
+ *
  *
  *)
 open State
@@ -15,7 +14,7 @@ open ANSITerminal
 (* [repl s] updates the state of the adventure *)
 let rec repl state =
   print_string  "\n> "; ()
-  
+
 (* [play_game f] plays the game in adventure file [f]. *)
 let start_game f =
   try ()
