@@ -1,7 +1,5 @@
 open Global
 
-exception Nope
-
 module type Character = sig
 
   type skill

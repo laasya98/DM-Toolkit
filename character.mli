@@ -34,8 +34,8 @@ module type Character = sig
     level:int;
     skills: skill list;
     abilities: ability list;
-    equipped: item list;
-    inv: item list;
+    equipped: item list; (* consider making this an item list * int tuple for capacity*)
+    inv: item list; 
   }
 
   (* [name character] is a string containing the character's title. *)

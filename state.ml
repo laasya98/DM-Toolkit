@@ -57,6 +57,25 @@ module State = struct
   type character = C.c
   type event = E.t
 
+  type entity =
+    |Item of item
+    |Character of character
+    |Effect of (entity * int)
+    |Event of event
+
+  type location = {
+    name : string;
+    description : string;
+    contents : entity list;
+    exits : ( string * location ) list (*(direction, location)*)
+  }
+
+  type gamestate = {
+    locations : location list;
+    party : character list;
+    active_events : event list;
+  }
+
 (*************************** KERRI STUFF BELOW *****************************)
 
       (*TODO: use official ones*)
@@ -73,15 +92,17 @@ let alter_state st ?(evt=st.event) ?(chars=st.characters) output =
     output=output;
   }
 
-  (** SHOP **)
-let buy_item name evt =
+(** SHOP **)
+
+let buy_item name evt = ()
+    (*
   match List.find_opt (fun x -> x.name =name) (E.get_items evt) with
   | Some i -> failwith "unimplemented"
-  | None -> failwith "unimplemented"
+  | None -> failwith "unimplemented"*)
 
 (** COMBAT **)
 
-let attack a t evt st =
+let attack a t evt st:state =
   let ac = List.find_opt (fun x -> C.name x = a) st.characters in
   let tc = List.find_opt (fun x -> C.name x = t) st.characters in
   try
@@ -96,9 +117,9 @@ let attack a t evt st =
 
 (*************************** KERRI STUFF ABOVE *****************************)
 
-let action c st =
+(*let action c (st:state) =
   match c with
   | Fight (a,b) -> attack a b st.event st
-  | _ -> failwith "unimplemented"
+  | _ -> failwith "unimplemented" *)
 
 end

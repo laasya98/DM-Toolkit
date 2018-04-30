@@ -25,9 +25,7 @@ module type State = sig
 (* [state] is the type of a state*)
   type state
 
-(* [gamestate] is the type of gamestate (set of rooms and entitites to interact
-   with). *)
-  type gamestate
+
 
 (* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
@@ -37,6 +35,23 @@ module type State = sig
     |Character of character
     |Effect of (entity * int)
     |Event of event
+
+(* TODO write a spec or something*)
+
+  type location = {
+    name : string;
+    description : string;
+    contents : entity list;
+    exits : ( string * location ) list (*(direction, location)*)
+  }
+
+  (* [gamestate] is the type of gamestate (set of rooms and entitites to interact
+     with). *)
+  type gamestate = {
+    locations : location list;
+    party : character list;
+    active_events : event list;
+  }
 
 (* [init_state s] is the initial state of the game loaded from a save file s
    from a database.*)

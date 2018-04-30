@@ -47,11 +47,10 @@ type dragon_descent =
   | Silver
   | White
 
-type half_sub =
+type gnome_sub =
  | Plain
  | Forest
  | Rock
-
 
 type race =
   | Dwarf

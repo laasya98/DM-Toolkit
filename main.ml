@@ -9,7 +9,6 @@
  *)
 open State
 open Command
-open ANSITerminal
 
 (* [repl s] updates the state of the adventure *)
 let rec repl state =

@@ -5,7 +5,7 @@ compile-i:
 	ocamlc -c global.mli command.mli character.mli event.mli database.mli state.mli
 
 compile:
-	ocamlbuild -use-ocamlfind event.cmo state.cmo
+	ocamlbuild -use-ocamlfind event.cmo state.cmo character.cmo 
 
 check:
 	bash checkenv.sh
