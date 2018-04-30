@@ -4,8 +4,6 @@ open Character
 open Global
 open State
 
-let evtC1 = Event.make_event "evtC1" Battle []
-
 let item1 = {
   name="item1";
   i_type=Other;
@@ -68,8 +66,6 @@ let char2:Character.c = {
   inv=[item1];
 }
 
-let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)]
-
 let character_tests = [
   "name" >:: (fun _ -> assert_equal "char2" (Character.name char2));
   "wisdom" >:: (fun _ -> assert_equal 0 (Character.wisdom char1));
@@ -114,6 +110,8 @@ let character_tests = [
                       (Character.equipped (Character.equip char1 item1)));
 ]
 
+let evtC1 = Event.make_event "evtC1" Battle []
+let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)]
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
@@ -122,9 +120,13 @@ let event_tests = [
   "changeF" >:: (fun _ -> assert_equal (Interaction:Event.form) (Event.change_form Interaction evtC1 |> Event.get_form));
 ]
 
-let evtC3 = Event.make_event "evtC1" Battle [(item1, Int 1)]
+type state = State.state
+let st1:(state) = {locations=[]; characters=[(char1, PC); (char2,Hostile)]; event=evtC2; output=""}
 
 let combat_tests = [
+  "invA" >:: (fun _ -> assert_equal "Action Failed: Invalid Attacker Name" (State.action (Fight ("nop","char2")) st1 |> State.output));
+  "invT" >:: (fun _ -> assert_equal "Action Failed: Invalid Target Name" (State.action (Fight ("char1","nop")) st1 |> State.output));
+  "att" >:: (fun _ -> assert_equal "char1 attacked char2!" (State.action (Fight ("char1","char2")) st1 |> State.output));
 ]
 
 let suite =

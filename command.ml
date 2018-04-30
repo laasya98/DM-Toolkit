@@ -29,7 +29,6 @@ end
 
 
 module Command = struct
-
   type command =
     |Load of string
     |Save
@@ -44,7 +43,7 @@ module Command = struct
     |Take of string
     |Drop of string
     |Shop of string
-    |Fight of string list
+    |Fight of (string * string)
     |CreateEntity
     |CharacterAction
     |StateChange of (string * string)
@@ -111,6 +110,8 @@ module Command = struct
       else if (starts_with "fight" s) then
         let x = (remove_start "fight" s) in
         let lst = String.split_on_char ' ' x in
-        Fight lst
+        match lst with
+        | a::t::_ -> Fight (a,t)
+        | _ -> Invalid
       else Invalid
 end

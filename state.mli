@@ -24,10 +24,12 @@ module type State = sig
   type data = D.data
 
 (* [character] is the type of a character in character.mli *)
-  type character = C.c
+  type character = Character.c
 
 (* [event] is the type of an event in event.mli *)
-  type event = E.t
+  type event = Event.t
+
+  type command = Com.command
 
 (* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
@@ -52,7 +54,7 @@ module type State = sig
   type state = {
     locations : location list;
     characters : (character * role) list;
-    event : event;
+    event : event option;
     output :string;
   }
 
@@ -82,4 +84,8 @@ module type State = sig
    reflect whatever command is input. This can involve calling events,
    characters, items, or database look-ups.*)
   val action : Com.command -> state -> state
+
+  val output : state -> string
 end
+
+module State:State
