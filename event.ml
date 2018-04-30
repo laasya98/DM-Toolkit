@@ -59,7 +59,12 @@ module Event = struct
   let get_output evt = evt.output
 
   let change_item_q i q lst =
+    let gz n = match n with
+      |Infinity -> true
+      |Int n -> n>0
+    in
     List.map (fun (a,b) -> if a=i then (a,q) else (a,b)) lst
+    |> List.filter (fun (_,n) -> gz n)
 
   let add_item i q evt =
     match List.find_opt (fun (x,q) -> x=i) evt.items with
@@ -79,13 +84,16 @@ module Event = struct
     | None -> alter_event evt "Item not present."
     | Some (x,n) ->
       match n with
-      | Infinity -> alter_event evt "There are infinite."
+      | Infinity -> if q=Infinity then alter_event evt
+            ~items:(change_item_q x (Int 0) evt.items) "Infinite removed."
+        else
+          alter_event evt "There are infinite remaining."
       | Int n ->
         match q with
         | Int q -> alter_event evt
-                     ~items:(change_item_q x (Int (n-q)) evt.items) "Item removed."
+                    ~items:(change_item_q x (Int (n-q)) evt.items) "Item removed."
         | Infinity -> alter_event evt
-                     ~items:(List.filter (fun (a,b) -> a<>x) evt.items) "Infinite removed."
+                        ~items:(change_item_q x (Int 0) evt.items) "Infinite removed."
 
   let get_items evt = evt.items
 

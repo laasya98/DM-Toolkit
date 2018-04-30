@@ -112,28 +112,52 @@ let character_tests = [
 
 let evtC1 = Event.make_event "evtC1" Battle []
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)]
+let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)]
+
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
-  "add_item" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
+  "add_item1" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
+  "add_item2" >:: (fun _ -> assert_equal [(item1,Int 5)] (Event.add_item item1 (Int 4) evtC2 |> Event.get_items));
+  "add_item3" >:: (fun _ -> assert_equal [(item1,Infinity)] (Event.add_item item1 (Infinity) evtC1 |> Event.get_items));
+  "add_item3" >:: (fun _ -> assert_equal [(item1,Infinity)] (Event.add_item item1 (Infinity) evtC2 |> Event.get_items));
+  "remove_item1" >:: (fun _ -> assert_equal [] (Event.remove_item "item1" (Int 1) evtC1 |> Event.get_items));
+  "remove_item2" >:: (fun _ -> assert_equal [] (Event.remove_item "item1" (Int 1) evtC2 |> Event.get_items));
+  "remove_item3" >:: (fun _ -> assert_equal [] (Event.remove_item "item1" (Infinity) evtC2 |> Event.get_items));
+  "remove_item4" >:: (fun _ -> assert_equal [] (Event.remove_item "item1" (Infinity) evtC2 |> Event.get_items));
+  "remove_item5" >:: (fun _ -> assert_equal [(item1,Int 3)] (Event.remove_item "item2" (Infinity) evtS |> Event.get_items));
+  "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 3); (item2, Infinity)] (Event.remove_item "item2" (Int 4) evtS |> Event.get_items));
+  "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 1); (item2, Infinity)] (Event.remove_item "item1" (Int 2) evtS |> Event.get_items));
+
   "changeF" >:: (fun _ -> assert_equal (Interaction:Event.form) (Event.change_form Interaction evtC1 |> Event.get_form));
 ]
 
 type state = State.state
 let st1:(state) = {locations=[]; characters=[(char1, PC); (char2,Hostile)]; event=evtC2; output=""}
+let st2:(state) = {locations=[]; characters=[(char1, PC)]; event=evtS; output=""}
 
-let combat_tests = [
-  "invA" >:: (fun _ -> assert_equal "Action Failed: Invalid Attacker Name" (State.action (Fight ("nop","char2")) st1 |> State.output));
-  "invT" >:: (fun _ -> assert_equal "Action Failed: Invalid Target Name" (State.action (Fight ("char1","nop")) st1 |> State.output));
-  "att" >:: (fun _ -> assert_equal "char1 attacked char2!" (State.action (Fight ("char1","char2")) st1 |> State.output));
+let state_tests = [
+  (*Combat*)
+  "comb invA" >:: (fun _ -> assert_equal "Action Failed: Invalid Attacker Name" (State.action (Fight ("nop","char2")) st1 |> State.output));
+  "comb invT" >:: (fun _ -> assert_equal "Action Failed: Invalid Target Name" (State.action (Fight ("char1","nop")) st1 |> State.output));
+  "comb att" >:: (fun _ -> assert_equal "char1 attacked char2!" (State.action (Fight ("char1","char2")) st1 |> State.output));
+
+  (*Shop*)
+  "shop invQ" >:: (fun _ -> assert_equal "Invalid item quantity." (State.action (Buy("char1","item1","nope")) st2 |> State.output));
+  "shop invC" >:: (fun _ -> assert_equal "Action Failed: Invalid character name." (State.action (Buy("c1","item1","4")) st2 |> State.output));
+  "shop invI" >:: (fun _ -> assert_equal "Action Failed: That item is not available." (State.action (Buy("char1","it","4")) st2 |> State.output));
+  "shop invN" >:: (fun _ -> assert_equal "Action Failed: There are only 3 available." (State.action (Buy("char1","item1","4")) st2 |> State.output));
+  "shop invE" >:: (fun _ -> assert_equal "Action Failed: There is no shop here." (State.action (Buy("char1","item1","2")) st1 |> State.output));
+  "shop buy" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item1","2")) st2 |> State.output));
+  "shop buyI" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item2","200")) st2 |> State.output));
 ]
 
 let suite =
   "Adventure test suite"
   >::: List.flatten [
     event_tests;
-    combat_tests;
+    state_tests;
     character_tests;
   ]
 
