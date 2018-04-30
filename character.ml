@@ -34,25 +34,27 @@ module type Character = sig
 
 
   type c = {
-        name:string;
-        status:string;
-        defense: int ;
-        race:race;
-        c_class:c_class;
-        wisdom:int;
-        intel:int;
-        strength:int;
-        dexterity:int;
-        speed:int;
-        max_hp:int;
-        hp:int;
-        xp:int;
-        level:int;
-        skills: skill list;
-        abilities: ability list;
-        equipped: item list * quantity;
-        inv: item list * quantity;
-      }
+    name:string;
+    status:string;
+    defense: int ;
+    race:race;
+    c_class:c_class;
+    constitution: int;
+    wisdom:int;
+    intel:int;
+    strength:int;
+    dexterity:int;
+    speed:int;
+    max_hp:int;
+    hp:int;
+    xp:int;
+    level:int;
+    skills: skill list;
+    abilities: ability list;
+    equipped: item list * quantity;
+    inv: item list * quantity;
+    money: int;
+  }
 
   val name :  c -> string
   val status :  c -> string
@@ -85,6 +87,10 @@ module type Character = sig
   val add_item :  c -> item -> c
   val equipped :  c -> item list
   val equip :  c -> item -> c
+  val money :  c -> int
+  val update_money :  c -> int -> c
+  val const :  c -> int
+  val update_const :  c -> int -> c
 
 end
 
@@ -124,6 +130,7 @@ module Character = struct
     defense: int ;
     race:race;
     c_class:c_class;
+    constitution: int;
     wisdom:int;
     intel:int;
     strength:int;
@@ -137,6 +144,7 @@ module Character = struct
     abilities: ability list;
     equipped: item list * quantity;
     inv: item list * quantity;
+    money: int;
   }
 
   let name  c = c.name
@@ -146,6 +154,8 @@ module Character = struct
   let update_status c = c (*TODO what*)
   let wisdom  c = c.wisdom
   let update_wisdom  c w = {c with wisdom = w}
+  let const  c = c.constitution
+  let update_const  c o = {c with constitution = o}
   let defense  c = c.defense
   let update_def c d = {c with defense = d;}
   let dex  c = c.dexterity
@@ -196,4 +206,6 @@ module Character = struct
     | Int k -> if List.length items <= k then {c with inv = i::items, qty}
       else c
     | Infinity -> {c with inv = i::items, (snd c.inv)}
+  let money c = c.money
+  let update_money c m = {c with money = m}
 end

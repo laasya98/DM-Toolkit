@@ -79,6 +79,7 @@ module type Character = sig
     defense: int ;
     race:race;
     c_class:c_class;
+    constitution: int;
     wisdom:int;
     intel:int;
     strength:int;
@@ -92,6 +93,7 @@ module type Character = sig
     abilities: ability list;
     equipped: item list * quantity;
     inv: item list * quantity;
+    money: int;
   }
 
   (* [name character] is a string containing the character's title. *)
@@ -188,6 +190,18 @@ module type Character = sig
   (* [equip character e] adds e to the characters equpped items.
      Requires that e is present in the character's inventory*)
   val equip :  c -> item -> c
+
+  (*[money character] is an int describing how much money a character has *)
+  val money :  c -> int
+
+  (* [update_money character cash] character with money = cash *)
+  val update_money :  c -> int -> c
+
+  (* [const character] is an int that describes the player's constitution stat. *)
+  val const :  c -> int
+
+  (* [update_const character new_c] character with constitution = new_c.*)
+  val update_const :  c -> int -> c
 
 end
 
