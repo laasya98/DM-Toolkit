@@ -31,6 +31,9 @@ let char1:Character.c = {
   c_class = Barbarian;
   defense=0;
   wisdom=0;
+  charisma=0;
+  constitution = 0;
+  money = 10;
   intel=0;
   strength=2;
   dexterity=1;
@@ -41,8 +44,8 @@ let char1:Character.c = {
   level=1;
   skills=[];
   abilities=[];
-  equipped=[];
-  inv=[item2];
+  equipped=[],3;
+  inv=[item2,1],3;
 }
 
 let char2:Character.c = {
@@ -51,6 +54,9 @@ let char2:Character.c = {
   race = Halfling;
   c_class = Sorcerer;
   wisdom=0;
+  charisma = 0;
+  constitution = 0;
+  money = 10;
   defense=0;
   intel=0;
   strength=2;
@@ -62,8 +68,8 @@ let char2:Character.c = {
   level=1;
   skills=[];
   abilities=[];
-  equipped=[];
-  inv=[item1];
+  equipped=[],3;
+  inv=[item1,2],3;
 }
 
 let character_tests = [
@@ -100,14 +106,14 @@ let character_tests = [
   "xp" >:: (fun _ -> assert_equal 0 (Character.xp char1));
   "update xp" >:: (fun _ -> assert_equal 800
                       (Character.xp (Character.update_xp char1 800)));
-  "inv" >:: (fun _ -> assert_equal [item2] (Character.inv char1));
+  "inv" >:: (fun _ -> assert_equal [item1] (Character.inv char1));
   "add item" >:: (fun _ -> assert_equal [item1;item2]
-                     (Character.inv (Character.add_item char1 item1)));
+                     (Character.inv (Character.add_item char1 item1 1)));
   "equipped stuff" >:: (fun _ -> assert_equal [] (Character.equipped char1));
   "good equip" >:: (fun _ -> assert_equal [item2]
-                       (Character.equipped (Character.equip char1 item2)));
+                       (Character.equipped (Character.equip char1 item2 1)));
   "bad equip" >:: (fun _ -> assert_equal []
-                      (Character.equipped (Character.equip char1 item1)));
+                      (Character.equipped (Character.equip char1 item1 1)));
 ]
 
 let evtC1 = Event.make_event "evtC1" Battle []

@@ -40,6 +40,7 @@ module type Character = sig
     race:race;
     c_class:c_class;
     constitution: int;
+    charisma: int;
     wisdom:int;
     intel:int;
     strength:int;
@@ -51,8 +52,8 @@ module type Character = sig
     level:int;
     skills: skill list;
     abilities: ability list;
-    equipped: item list * quantity;
-    inv: item list * quantity;
+    equipped: ((item * int) list )* int;
+    inv: ((item * int) list )* int;
     money: int;
   }
 
@@ -84,13 +85,15 @@ module type Character = sig
   val abilities :  c -> ability list
   val add_ability :  c -> ability -> c
   val inv :  c -> item list
-  val add_item :  c -> item -> c
+  val add_item :  c -> item -> int -> c
   val equipped :  c -> item list
-  val equip :  c -> item -> c
+  val equip :  c -> item -> int -> c
   val money :  c -> int
   val update_money :  c -> int -> c
   val const :  c -> int
   val update_const :  c -> int -> c
+  val charisma :  c -> int
+  val update_charisma :  c -> int -> c
 
 end
 
@@ -131,6 +134,7 @@ module Character = struct
     race:race;
     c_class:c_class;
     constitution: int;
+    charisma: int;
     wisdom:int;
     intel:int;
     strength:int;
@@ -142,8 +146,8 @@ module Character = struct
     level:int;
     skills: skill list;
     abilities: ability list;
-    equipped: item list * quantity;
-    inv: item list * quantity;
+    equipped: ((item * int) list )* int;
+    inv: ((item * int) list )* int;
     money: int;
   }
 
@@ -191,21 +195,27 @@ module Character = struct
     {c with abilities = a::abilities}
   let inv c = fst c.inv
   let equipped c = fst c.equipped
-  let equip c e =
-    let equipment = equipped c in
-    let qty = snd c.equipped in
-    match qty with
-    | Int k -> if List.length equipment <= k && List.mem e (inv c) then
-        {c with equipped = e::equipment,(snd c.equipped)} else c
-    | Infinity -> if List.mem e (inv c) then
-        {c with equipped = e::equipment,(snd c.equipped)} else c
-  let add_item c i =
-    let items = inv c in
-    let qty = snd c.inv in
-    match qty with
-    | Int k -> if List.length items <= k then {c with inv = i::items, qty}
+
+  let insert_qty i n l =
+    if List.mem_assoc i l then
+      List.map(fun (a,b) -> if i = a then (i,b+n) else (a,b)) l else
+      (i,n)::l
+  (*let remove_qty i n l =
+    if List.mem_assoc i l then
+      List.map(fun (a,b) -> if i = a then (i,b-n) else (a,b)) l else
+      l *)
+  let equip c e n =
+    let equipment =  fst (c.equipped) in
+    let cap = snd c.equipped in
+    if List.length equipment <= cap && List.mem_assoc e (fst (c.inv)) then
+      {c with equipped = (insert_qty e n equipment),cap} else c
+  let add_item c i n =
+    let items = fst (c.inv) in
+    let cap = snd c.inv in
+    if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
       else c
-    | Infinity -> {c with inv = i::items, (snd c.inv)}
   let money c = c.money
   let update_money c m = {c with money = m}
+  let charisma c = c.charisma
+  let update_charisma c a = {c with charisma = a}
 end

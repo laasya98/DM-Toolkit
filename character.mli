@@ -80,6 +80,7 @@ module type Character = sig
     race:race;
     c_class:c_class;
     constitution: int;
+    charisma: int;
     wisdom:int;
     intel:int;
     strength:int;
@@ -91,8 +92,8 @@ module type Character = sig
     level:int;
     skills: skill list;
     abilities: ability list;
-    equipped: item list * quantity;
-    inv: item list * quantity;
+    equipped: ((item * int) list )* int;
+    inv: ((item * int) list )* int;
     money: int;
   }
 
@@ -182,14 +183,14 @@ module type Character = sig
   val inv :  c -> item list
 
   (* [add_item character i] adds i to the characters inventory.*)
-  val add_item :  c -> item -> c
+  val add_item :  c -> item -> int -> c
 
   (* [equipped character] is a list of the items a player has equipped. *)
   val equipped :  c -> item list
 
   (* [equip character e] adds e to the characters equpped items.
      Requires that e is present in the character's inventory*)
-  val equip :  c -> item -> c
+  val equip :  c -> item -> int -> c
 
   (*[money character] is an int describing how much money a character has *)
   val money :  c -> int
@@ -202,6 +203,12 @@ module type Character = sig
 
   (* [update_const character new_c] character with constitution = new_c.*)
   val update_const :  c -> int -> c
+
+  (* [charisma character] is an int that describes the player's charisma stat. *)
+  val charisma :  c -> int
+
+  (* [update_charisma character new_c] character with charisma = new_c.*)
+  val update_charisma :  c -> int -> c
 
 end
 
