@@ -18,7 +18,7 @@ module type State = sig
      A Friendly npc will aid the characters in the event
      A Hostile npc will oppose the characters in the event
      A Neutral npc will do neither (ex: shopkeeper). *)
-  type role = PC | Hostile | Friendly | Neutral
+  type role = Party | Hostile | Friendly | Neutral
 
 (* [data] is the type of data in database.mli *)
   type data = D.data
@@ -31,12 +31,11 @@ module type State = sig
 
   type command = Com.command
 
-(* [entity] is a general type for items, characters, and effects
+(* [entity] is a general type for items, events, and effects
    that may be on other entities. Entities are in rooms and constitute the what
    is able to interact in the gamespace.*)
   type entity =
     |Item of item
-    |Character of character
     |Effect of (entity * int)
     |Event of event
 
@@ -45,6 +44,7 @@ module type State = sig
   type location = {
     name : string;
     description : string;
+    characters : character list;
     contents : entity list;
     exits : ( string * location ) list (*(direction, location)*)
   }
@@ -62,11 +62,8 @@ module type State = sig
    from a database.*)
   val init_state : D.data -> state
 
-(* [current_room s] returns the current room that the DM Toolkit is focused on. *)
-  val current_room : state -> string
-
-(* [current_gamestate s] returns a description of the current gamestate. *)
-  val current_gamestate : state -> string
+(* [current_location s] returns the current location of the toolkit's focus. *)
+  val current_location : state -> string
 
 (* [current_room_characters s] is a list of characters in the current room. *)
   val current_room_characters : state -> string list
@@ -92,7 +89,13 @@ module type State = sig
    characters, items, or database look-ups.*)
   val action : Com.command -> state -> state
 
+(** [move st dir] moves the focus of the toolkit to the direction dir of the
+        current room.*)
+  val move : state -> string -> state
+
   val output : state -> string
+
+
 end
 
 module State : State
