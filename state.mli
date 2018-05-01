@@ -44,7 +44,7 @@ module type State = sig
   type location = {
     name : string;
     description : string;
-    characters : character list;
+    characters : (character * role) list;
     contents : entity list;
     exits : ( string * location ) list (*(direction, location)*)
   }

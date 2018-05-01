@@ -28,7 +28,7 @@ module type State = sig
   type location = {
     name : string;
     description : string;
-    characters : character list;
+    characters : (character * role) list;
     contents : entity list;
     exits : ( string * location ) list (*(direction, location)*)
     }
@@ -75,7 +75,7 @@ module State = struct
   type location = {
     name : string;
     description : string;
-    characters : character list;
+    characters : (character * role) list;
     contents : entity list;
     exits : ( string * location ) list (*(direction, location)*)
   }
@@ -108,13 +108,19 @@ module State = struct
   let effects st = failwith "unimplemented"
   let event st = st.event
 
-  let move st dir = failwith "Unimplemented"
-    (*if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
+  let move st dir =
+    if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
     then alter_state st "Not a direction"
     else let newlocation =
            snd (List.find (fun x -> fst x = dir) st.current_location.exits) in
+      let newcharacters =
+        (List.filter (fun x -> snd x = Party) st.characters)
+        @ newlocation.characters in
 
-      alter_state st ~currLoc:newlocation*)
+
+
+      alter_state st ~currLoc:newlocation ~chars:newcharacters
+        ("Party moves" ^dir)
 
 
   (*still needs to add remove_item and support giving more than one item*)
