@@ -26,10 +26,11 @@ let item2 = {
 
 let char1:Character.c = {
   name="char1";
-  status="";
   race = Human;
   c_class = Barbarian;
-  defense=0;
+  armor_class=0;
+  hd = 10;
+  hd_qty = 1;
   wisdom=0;
   charisma=0;
   constitution = 0;
@@ -50,14 +51,15 @@ let char1:Character.c = {
 
 let char2:Character.c = {
   name="char2";
-  status="";
   race = Halfling;
   c_class = Sorcerer;
   wisdom=0;
   charisma = 0;
   constitution = 0;
   money = 10;
-  defense=0;
+  armor_class=0;
+  hd = 12;
+  hd_qty = 1;
   intel=0;
   strength=2;
   dexterity=1;
@@ -77,9 +79,9 @@ let character_tests = [
   "wisdom" >:: (fun _ -> assert_equal 0 (Character.wisdom char1));
   "update wisdom" >:: (fun _ -> assert_equal 10
                           (Character. wisdom (Character.update_wisdom char1 10)));
-  "defense" >:: (fun _ -> assert_equal 0 (Character.defense char1));
-  "update defense" >:: (fun _ -> assert_equal 10
-                          (Character.defense(Character.update_def char1 10)));
+  "armorclass" >:: (fun _ -> assert_equal 0 (Character.armor_class char1));
+  "update ac" >:: (fun _ -> assert_equal 10
+                          (Character.armor_class(Character.update_ac char1 10)));
   "speed" >:: (fun _ -> assert_equal 1 (Character.speed char2));
   "update speed" >:: (fun _ -> assert_equal 10
                           (Character.speed (Character.update_speed char1 10)));

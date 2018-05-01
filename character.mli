@@ -1,8 +1,23 @@
 open Global
 
 module type Character = sig
-  (* type skill should be all the possible skill types a player can potentially have *)
+  (* type skill should be all the possible skill types a player can potentially have
+     it stores an int as the modifier and a bool as whether or not the skill is proficient*)
+  (*type corestat =
+    | Strength
+    | Wisdom
+    | Intelligence
+    | Charisma
+    | Constitution
+    | Dexterity*)
+
   type skill
+      (*{
+    name:string;
+    prof:bool;
+    modifier:int;
+    corestat:corestat;
+        } *)
 
   (* type skill should be all the possible spells a player can potentially use *)
   type ability
@@ -75,21 +90,28 @@ module type Character = sig
      about a character in the game. this record can be updated by state and events *)
   type c = {
     name:string;
-    status:string;
-    defense: int ;
     race:race;
     c_class:c_class;
+
+    armor_class: int ;
+
     constitution: int;
     charisma: int;
     wisdom:int;
     intel:int;
     strength:int;
     dexterity:int;
+
     speed:int;
     max_hp:int;
     hp:int;
+
+    hd:int;
+    hd_qty:int;
+
     xp:int;
     level:int;
+
     skills: skill list;
     abilities: ability list;
     equipped: ((item * int) list )* int;
@@ -100,24 +122,17 @@ module type Character = sig
   (* [name character] is a string containing the character's title. *)
   val name :  c -> string
 
-  (* [status character ] is a string containing the character's current status. *)
-  val status :  c -> string
-
-(* [update_status character ] updates the status of a character based off of
-   the game state*)
-  val update_status :  c -> c
-
   (* [wisdom character] is an int that describes the player's wisdom stat. *)
   val wisdom :  c -> int
 
   (* [update_wisdom character new_w ] character with wisdom = new_w. *)
   val update_wisdom :  c -> int ->  c
 
-  (* [defense character] is an int that describes the player's defense stat. *)
-  val defense :  c -> int
+  (* [armor_class character] is an int that describes the player's armorclass stat. *)
+  val armor_class :  c -> int
 
-  (* [update_def character new_d] character with defense = new_d. *)
-  val update_def :  c -> int -> c
+  (* [update_def character new_ac] character with ac = new_ac. *)
+  val update_ac :  c -> int -> c
 
   (* [dex character] is an int that describes the player's dexterity stat. *)
   val dex :  c -> int

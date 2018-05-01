@@ -6,29 +6,29 @@ module type Command = sig
 
   (* command is an imcomplete variant of command possibilities, which will be
      updated as more functionality is needed.  *)
-  type command =
-    |Load of string
-    |Save
-    |Quit
-    |Help
-    |Event of string
-    |Inquiry
-    |Move of (string *string)
-    |Use of (string * string)
-    |Inv
-    |Give of string
-    |Take of string
-    |Drop of string
-    |Shop of string
-    |Buy of (string * string *string)
-    |Fight of (string * string)
-    |Turn
-    |CreateEntity
-    |CharacterAction
-    |StateChange of (string * string)
-    |ItemChange of (string * string)
-    |Roll of (string * string)
-    |Invalid
+     type command =
+       |Load of string
+       |Save
+       |Quit
+       |Help
+       |Event of string
+       |Inquiry
+       |Move of (string *string)
+       |Use of (string * string)
+       |Inv
+       |Give of string
+       |Take of string
+       |Drop of string
+       |Shop of string
+       |Buy of (string * string *string)
+       |Fight of (string * string)
+       |Turn
+       |QuickBuild of string list
+       |CharacterAction
+       |StateChange of (string * string)
+       |ItemChange of (string * string)
+       |Roll of (string * string)
+       |Invalid
 
   (** [parse str] is the command parsed from the player input [str].
       [parse] requires any string, which will be parsed into one of the commands

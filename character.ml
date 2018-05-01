@@ -35,21 +35,28 @@ module type Character = sig
 
   type c = {
     name:string;
-    status:string;
-    defense: int ;
     race:race;
     c_class:c_class;
+
+    armor_class: int ;
+
     constitution: int;
     charisma: int;
     wisdom:int;
     intel:int;
     strength:int;
     dexterity:int;
+
     speed:int;
     max_hp:int;
     hp:int;
+
+    hd:int;
+    hd_qty:int;
+
     xp:int;
     level:int;
+
     skills: skill list;
     abilities: ability list;
     equipped: ((item * int) list )* int;
@@ -58,12 +65,10 @@ module type Character = sig
   }
 
   val name :  c -> string
-  val status :  c -> string
-  val update_status :  c -> c
   val wisdom :  c -> int
   val update_wisdom :  c -> int ->  c
-  val defense :  c -> int
-  val update_def :  c -> int -> c
+  val armor_class :  c -> int
+  val update_ac :  c -> int -> c
   val dex :  c -> int
   val update_dex :  c -> int -> c
   val intel :  c -> int
@@ -129,21 +134,28 @@ module Character = struct
 
   type c = {
     name:string;
-    status:string;
-    defense: int ;
     race:race;
     c_class:c_class;
+
+    armor_class: int ;
+
     constitution: int;
     charisma: int;
     wisdom:int;
     intel:int;
     strength:int;
     dexterity:int;
+
     speed:int;
     max_hp:int;
     hp:int;
+
+    hd:int;
+    hd_qty:int;
+
     xp:int;
     level:int;
+
     skills: skill list;
     abilities: ability list;
     equipped: ((item * int) list )* int;
@@ -154,14 +166,12 @@ module Character = struct
   let name  c = c.name
   let race  c = c.race
   let class_of  c = c.c_class
-  let status c = c.status
-  let update_status c = c (*TODO what*)
   let wisdom  c = c.wisdom
   let update_wisdom  c w = {c with wisdom = w}
   let const  c = c.constitution
   let update_const  c o = {c with constitution = o}
-  let defense  c = c.defense
-  let update_def c d = {c with defense = d;}
+  let armor_class  c = c.armor_class
+  let update_ac c a = {c with armor_class = a;}
   let dex  c = c.dexterity
   let update_dex c d = {c with dexterity = d;}
   let intel c = c.intel
@@ -218,4 +228,61 @@ module Character = struct
   let update_money c m = {c with money = m}
   let charisma c = c.charisma
   let update_charisma c a = {c with charisma = a}
+
+
+  let class_of_string s =
+    match s |> String.lowercase_ascii  |> String.trim with
+    | "barbarian" -> Barbarian
+    | "bard" -> Bard
+    | "cleric" -> Cleric
+    | "druid" -> Druid
+    | "fighter" -> Fighter
+    | "monk" -> Monk
+    | "paladin" -> Paladin
+    | "ranger" -> Ranger
+    | "rogue" -> Rogue
+    | "sorcerer" -> Sorcerer
+    | "warlock" -> Warlock
+    | "wizard" -> Wizard
+    | _ -> failwith "don't do that"
+
+  let race_of_string s =
+    match s |> String.lowercase_ascii  |> String.trim with
+      | "dwarf" -> Dwarf
+      | "elf" -> Elf
+      | "halfling" -> Halfling
+      | "human" -> Human
+      | "dragonborn" -> Dragonborn
+      | "gnome" -> Gnome
+      | "half-elf" | "halfelf" -> Half_Elf
+      | "halforc" | "half-orc" -> Half_Orc
+      | "tiefling" -> Tiefling
+      | _ -> failwith "not a race, spell better pls"
+
+  let quickbuild c r =
+    {
+      name = "Allan";
+      race = r;
+      c_class = c;
+      armor_class = 0;
+      constitution = 0;
+      charisma = 0;
+      wisdom = 0;
+      intel = 0;
+      strength = 0;
+      dexterity = 0;
+      speed = 0;
+      max_hp = 0;
+      hp = 0;
+      hd = 0;
+      hd_qty = 0;
+      xp = 0;
+      level = 0;
+      skills = [];
+      abilities = [];
+      equipped = [],0;
+      inv = [],0;
+      money = 0;
+  }
+
 end
