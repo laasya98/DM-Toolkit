@@ -7,6 +7,7 @@ module type Event = sig
   type t
   type form = Battle | Shop | Interaction
 
+  val init_event : string -> t
   val make_event : string -> form -> (item * quantity) list -> string list -> t
   val get_form : t -> form
   val get_name : t -> string
@@ -49,6 +50,17 @@ module Event = struct
       items = items;
       turn = 0;
       turn_order = turn_order;
+      spells=[];
+      output = "Event created.";
+    }
+
+  let init_event name =
+    {
+      name=name;
+      form = Interaction;
+      items = [];
+      turn = 0;
+      turn_order = [];
       spells=[];
       output = "Event created.";
     }

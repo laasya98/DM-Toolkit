@@ -1,7 +1,6 @@
-
 (* For now, just change a stat by set amount. *)
 type effect = {
-  stat:string; (*TODO: temp. Coordinate with character?*)
+  stat:string; (*TODO: temp. Coordinate with character.*)
   amount:int;
 }
 
@@ -18,7 +17,6 @@ type weapontype = {
 type armortype = {
   ac : int
 }
-
 
 type itemtype =
   | Weapon of weapontype
@@ -44,19 +42,6 @@ type damage_spell ={
   range: int;
   multiple : bool;
 }
-
-(* Example:
-   {
-    name="Magic Missile";
-    level = 1;
-    saving_stat = "none";
-    damage_die = [4];
-    bonus_damage = 1;
-    range = 120;
-    targets = 3;
-    multiple = true;
-   }
-*)
 
 type spelltype =
   | Damage of damage_spell
