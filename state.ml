@@ -13,7 +13,7 @@ module type State = sig
   module E : Event
   module Com :Command
 
-  type role = PC | Hostile | Friendly | Neutral
+  type role = Party | Hostile | Friendly | Neutral
 
   type data = D.data
   type character = Character.c
@@ -42,15 +42,16 @@ module type State = sig
   }
 
   val init_state : D.data -> state
-  val current_room : state -> string
-  val current_gamestate : state -> string
+  val current_location : state -> string
   val current_room_characters : state -> string list
   val rooms : state -> string list
   val effects : state -> string list
   val event : state -> event
   val give : state -> item -> character -> character -> state
   val action : Com.command -> state -> state
+  val move : state -> string -> state
   val output : state -> string
+
 end
 
 module State = struct
@@ -64,7 +65,7 @@ module State = struct
   type command = Com.command
   type data = D.data
 
-  type role = PC | Hostile | Friendly | Neutral
+  type role = Party | Hostile | Friendly | Neutral
 
   type entity =
     |Item of item
@@ -81,7 +82,7 @@ module State = struct
 
   type state = {
     locations : location list;
-    party : (character * role) list;
+    characters : (character * role) list;
     event : event;
     output :string;
     current_location : location;
@@ -99,21 +100,21 @@ module State = struct
       output=output;
     }
 
-  let init_state d = d(*TODO: uuuJuUuh *)
+  let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
 
   let current_location st = st.current_location.name
-  let current_room_characters st = st
+  let current_room_characters st = failwith "unimplemented"
   let rooms st = failwith "unimplemented"
   let effects st = failwith "unimplemented"
   let event st = st.event
 
-  let move st dir =
-    if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
+  let move st dir = failwith "Unimplemented"
+    (*if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
     then alter_state st "Not a direction"
     else let newlocation =
            snd (List.find (fun x -> fst x = dir) st.current_location.exits) in
 
-      alter_state st ~currLoc:newlocation
+      alter_state st ~currLoc:newlocation*)
 
 
   (*still needs to add remove_item and support giving more than one item*)

@@ -18,7 +18,7 @@ module type State = sig
      A Friendly npc will aid the characters in the event
      A Hostile npc will oppose the characters in the event
      A Neutral npc will do neither (ex: shopkeeper). *)
-  type role = PC | Hostile | Friendly | Neutral
+  type role = Party | Hostile | Friendly | Neutral
 
 (* [data] is the type of data in database.mli *)
   type data = D.data
@@ -52,7 +52,7 @@ module type State = sig
   (* [state] is the type of gamestate, which includes a list of locations, . *)
   type state = {
     locations : location list;
-    party : (character * role) list;
+    characters : (character * role) list;
     event : event;
     output :string;
     current_location : location;
@@ -77,10 +77,6 @@ module type State = sig
 (* [event s] is a list of current events for the current gamespace. *)
   val event : state -> event
 
-(** [move st dir] moves the focus of the toolkit to the direction dir of the
-    current room.*)
-  val move : state -> string -> state
-
 (** [give st item p1 p2 q] takes in a state, an item, a character to take an
     item from, a character to give the item to, and a quantity of items to give.
     Outputs an error message if the p1 does not have the item in the correct
@@ -93,7 +89,13 @@ module type State = sig
    characters, items, or database look-ups.*)
   val action : Com.command -> state -> state
 
+(** [move st dir] moves the focus of the toolkit to the direction dir of the
+        current room.*)
+  val move : state -> string -> state
+
   val output : state -> string
+
+
 end
 
 module State : State
