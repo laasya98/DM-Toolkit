@@ -116,9 +116,9 @@ let character_tests = [
                       (Character.equipped (Character.equip char1 item1 1)));
 ]
 
-let evtC1 = Event.make_event "evtC1" Battle []
-let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)]
-let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)]
+let evtC1 = Event.make_event "evtC1" Battle [] []
+let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
+let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
 
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));

@@ -7,7 +7,7 @@ module type Event = sig
   type t
   type form = Battle | Shop | Interaction
 
-  val make_event : string -> form -> (item * quantity) list -> t
+  val make_event : string -> form -> (item * quantity) list -> string list -> t
   val get_form : t -> form
   val get_name : t -> string
   val get_output : t -> string

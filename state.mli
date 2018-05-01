@@ -29,6 +29,8 @@ module type State = sig
 (* [event] is the type of an event in event.mli *)
   type event = Event.t
 
+  type command = Com.command
+
 (* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
    is able to interact in the gamespace.*)
@@ -76,7 +78,7 @@ module type State = sig
   val effects : state -> string list
 
 (* [event s] is a list of current events for the current gamespace. *)
-  val event : state -> event list
+  val event : state -> event
 
 (** [give st item p1 p2 q] takes in a state, an item, a character to take an
     item from, a character to give the item to, and a quantity of items to give.

@@ -18,6 +18,7 @@ module type Command = sig
     |Shop of string
     |Buy of (string * string *string)
     |Fight of (string * string)
+    |Turn
     |CreateEntity
     |CharacterAction
     |StateChange of (string * string)
@@ -46,6 +47,7 @@ module Command = struct
     |Shop of string
     |Buy of (string * string *string)
     |Fight of (string * string)
+    |Turn
     |CreateEntity
     |CharacterAction
     |StateChange of (string * string)

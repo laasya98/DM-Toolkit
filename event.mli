@@ -16,7 +16,7 @@ module type Event = sig
 (* [form] is the variety of an event. *)
   type form = Battle | Shop | Interaction
 
-  val make_event : string -> form -> (item * quantity) list -> t
+  val make_event : string -> form -> (item * quantity) list -> string list-> t
 
 (* [get_form evt] is the form of the event. *)
   val get_form : t -> form
