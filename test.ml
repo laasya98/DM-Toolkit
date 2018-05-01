@@ -26,10 +26,11 @@ let item2 = {
 
 let char1:Character.c = {
   name="char1";
-  status="";
   race = Human;
   c_class = Barbarian;
-  defense=0;
+  armor_class=0;
+  hd = 10;
+  hd_qty = 1;
   wisdom=0;
   charisma=0;
   constitution = 0;
@@ -50,14 +51,15 @@ let char1:Character.c = {
 
 let char2:Character.c = {
   name="char2";
-  status="";
   race = Halfling;
   c_class = Sorcerer;
   wisdom=0;
   charisma = 0;
   constitution = 0;
   money = 10;
-  defense=0;
+  armor_class=0;
+  hd = 12;
+  hd_qty = 1;
   intel=0;
   strength=2;
   dexterity=1;
@@ -77,9 +79,9 @@ let character_tests = [
   "wisdom" >:: (fun _ -> assert_equal 0 (Character.wisdom char1));
   "update wisdom" >:: (fun _ -> assert_equal 10
                           (Character. wisdom (Character.update_wisdom char1 10)));
-  "defense" >:: (fun _ -> assert_equal 0 (Character.defense char1));
-  "update defense" >:: (fun _ -> assert_equal 10
-                          (Character.defense(Character.update_def char1 10)));
+  "armorclass" >:: (fun _ -> assert_equal 0 (Character.armor_class char1));
+  "update ac" >:: (fun _ -> assert_equal 10
+                          (Character.armor_class(Character.update_ac char1 10)));
   "speed" >:: (fun _ -> assert_equal 1 (Character.speed char2));
   "update speed" >:: (fun _ -> assert_equal 10
                           (Character.speed (Character.update_speed char1 10)));
@@ -106,7 +108,7 @@ let character_tests = [
   "xp" >:: (fun _ -> assert_equal 0 (Character.xp char1));
   "update xp" >:: (fun _ -> assert_equal 800
                       (Character.xp (Character.update_xp char1 800)));
-  "inv" >:: (fun _ -> assert_equal [(item1,1)] (Character.inv char1));
+  "inv" >:: (fun _ -> assert_equal [(item2,1)] (Character.inv char1));
   "add item" >:: (fun _ -> assert_equal [item1,1;item2,1]
                      (Character.inv (Character.add_item char1 item1 1)));
   "equipped stuff" >:: (fun _ -> assert_equal [] (Character.equipped char1));
@@ -116,14 +118,26 @@ let character_tests = [
                       (Character.equipped (Character.equip char1 item1 1)));
 ]
 
-let evtC1 = Event.make_event "evtC1" Battle [] []
+let evtC1 = Event.make_event "evtC1" Battle [] ["A";"B";"C"]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
+let spell1 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=3;
+              duration=0;}
+let spell2 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=1;
+              duration=0;}
 
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
+  "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
+  "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> fst |> Event.get_turn));
+  "get_tlst" >:: (fun _ -> assert_equal ["A";"B";"C"] (Event.get_turnlst evtC1));
+  "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
+
+  "cast" >:: (fun _ -> assert_equal [(spell2, 1)] (Event.cast char1 spell2 [] evtC1 |> fst|> Event.get_waiting_spells));
+  "cast_d" >:: (fun _ -> assert_equal [] (Event.cast char1 spell2 [] evtC1 |> fst |> Event.turn |> fst|> Event.get_waiting_spells));
+
   "add_item1" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
   "add_item2" >:: (fun _ -> assert_equal [(item1,Int 5)] (Event.add_item item1 (Int 4) evtC2 |> Event.get_items));
   "add_item3" >:: (fun _ -> assert_equal [(item1,Infinity)] (Event.add_item item1 (Infinity) evtC1 |> Event.get_items));
@@ -135,7 +149,6 @@ let event_tests = [
   "remove_item5" >:: (fun _ -> assert_equal [(item1,Int 3)] (Event.remove_item "item2" (Infinity) evtS |> Event.get_items));
   "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 3); (item2, Infinity)] (Event.remove_item "item2" (Int 4) evtS |> Event.get_items));
   "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 1); (item2, Infinity)] (Event.remove_item "item1" (Int 2) evtS |> Event.get_items));
-
   "changeF" >:: (fun _ -> assert_equal (Interaction:Event.form) (Event.change_form Interaction evtC1 |> Event.get_form));
 ]
 

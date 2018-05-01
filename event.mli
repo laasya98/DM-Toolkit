@@ -43,6 +43,12 @@ module type Event = sig
   val change_form : form -> t -> t
 
   val attack: character -> character -> t -> (t * character)
+
+  val turn : t -> (t * character list)
+  val get_turn : t -> int
+  val get_turnlst : t -> string list
+  val cast : character -> spell -> character list -> t -> (t * character list)
+  val get_waiting_spells : t -> (spell*int) list
 end
 
 module Event : Event

@@ -16,6 +16,11 @@ module type Event = sig
   val get_items : t -> (item * quantity) list
   val change_form : form -> t -> t
   val attack: character -> character -> t -> (t * character)
+  val turn : t -> (t * character list)
+  val get_turn : t -> int
+  val get_turnlst : t -> string list
+  val cast : character -> spell -> character list -> t -> (t * character list)
+  val get_waiting_spells : t -> (spell*int) list
 end
 
 module Event = struct
@@ -24,6 +29,8 @@ module Event = struct
   type character = Character.c
 
   type form = Battle | Shop | Interaction
+  type spellTimer = {turn:int; castor: character; spell: spell;
+                     targets: character list}
 
   type t = {
     name: string;
@@ -31,6 +38,7 @@ module Event = struct
     items: (item * quantity) list;
     turn: int;
     turn_order: string list;
+    spells: spellTimer list;
     output: string;
   }
 
@@ -41,11 +49,13 @@ module Event = struct
       items = items;
       turn = 0;
       turn_order = turn_order;
+      spells=[];
       output = "Event created.";
     }
 
   let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(items = evt.items)
-      ?(turn = evt.turn) ?(t_order = evt.turn_order) output =
+      ?(turn = evt.turn) ?(t_order = evt.turn_order)
+      ?(spells = evt.spells) output =
     {
       name=name;
       form = form;
@@ -53,6 +63,7 @@ module Event = struct
       turn = turn;
       turn_order = t_order;
       output = output;
+      spells = spells;
     }
 
   let get_form evt = evt.form
@@ -175,13 +186,15 @@ module Event = struct
   (* [0 1 (2) 3] *)
   let get_turnlst evt = evt.turn_order
 
-  let turn evt =
-    let t' = evt.turn + 1 in
-    let tlst = match evt.turn_order with
-      |[] -> []
-      |h::t -> t @ [h]
-    in
-    alter_event evt ~turn:t' ~t_order:tlst "Turn incremented."
+  let get_turn evt = evt.turn
+
+  let get_waiting_spells evt =
+    List.map (fun x -> (x.spell, x.turn)) evt.spells
+
+  let add_spell c s t evt =
+    let turn = evt.turn + s.to_cast in
+    let spell = {turn=turn; castor=c; spell=s; targets=t} in
+    alter_event evt ~spells:(spell::evt.spells) "Spell timer added."
 
   let spell_damage s t =
     let d = roll_dice s.damage_die s.bonus_damage in
@@ -191,9 +204,35 @@ module Event = struct
     List.map (fun n -> spell_damage s n) t
 
   let cast c s t evt =
-    match s with
-    | Damage d -> failwith "unimplemented"
-    | Conjuration -> failwith "unimplemented"
-    | Transmutation -> failwith "unimplemented"
+    if s.to_cast = 0 then
+      match s.stype with (*TODO*)
+      | Damage d -> (evt, [])
+      | Conjuration -> (evt, [])
+      | Transmutation -> (evt, [])
+    else
+      (add_spell c s t evt, [])
+
+  let turn evt =
+    let t' = evt.turn + 1 in
+    let tlst = match evt.turn_order with
+      |[] -> []
+      |h::t -> t @ [h]
+    in
+    let spells =
+      List.filter (fun (s:spellTimer) -> s.turn = t') evt.spells
+    in
+    let rs = List.filter (fun (s:spellTimer) -> s.turn <> t') evt.spells
+    in
+    (*TODO: cast all the spells woot woot*)
+    let rec castAll s (e, tar) =
+      match s with
+      | [] -> (e,tar)
+      | h::t -> (cast h.castor h.spell h.targets e)
+    in
+    let (evt', tar') = castAll spells (evt, []) in
+    let evt'' = alter_event evt' ~spells:rs
+        ~turn:t' ~t_order:tlst "Turn incremented."
+    in
+    (evt'', tar')
 
 end

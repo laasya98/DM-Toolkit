@@ -19,13 +19,12 @@ module type Command = sig
     |Buy of (string * string *string)
     |Fight of (string * string)
     |Turn
-    |CreateEntity
+    |QuickBuild of string list
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
     |Roll of (string * string)
     |Invalid
-
   val parse : string -> command
 end
 
@@ -48,7 +47,7 @@ module Command = struct
     |Buy of (string * string *string)
     |Fight of (string * string)
     |Turn
-    |CreateEntity
+    |QuickBuild of string list
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
@@ -119,9 +118,15 @@ module Command = struct
         | _ -> Invalid
       else if (starts_with "buy" s) then
         let x = (remove_start "buy" s) in
-        let lst = String.split_on_char ' ' x in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         match lst with
         | c::i::q::[] -> Buy (c,i,q)
         | _ -> Invalid
+      else if (starts_with "quickbuild" s || starts_with "quick build" s) then
+        let x = String.sub s 11 (String.length s)  in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+        if List.length lst = 2 || List.length lst = 3 then
+          QuickBuild lst else Invalid
       else Invalid
+
 end
