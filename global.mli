@@ -66,6 +66,7 @@ type spelltype =
 type spell =
   {
     name:string;
+    stype: spelltype;
     level:int;
     targets: int;
     to_cast: int;
