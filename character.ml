@@ -84,9 +84,9 @@ module type Character = sig
   val add_skill :  c -> skill -> c
   val abilities :  c -> ability list
   val add_ability :  c -> ability -> c
-  val inv :  c -> item list
+  val inv :  c -> (item*int) list
   val add_item :  c -> item -> int -> c
-  val equipped :  c -> item list
+  val equipped :  c -> (item*int) list
   val equip :  c -> item -> int -> c
   val money :  c -> int
   val update_money :  c -> int -> c
@@ -193,8 +193,8 @@ module Character = struct
   let add_ability c a =
     let abilities = c.abilities in
     {c with abilities = a::abilities}
-  let inv c = fst c.inv
-  let equipped c = fst c.equipped
+  let inv c : (item*int) list = fst c.inv
+  let equipped c : (item*int) list= fst c.equipped
 
   let insert_qty i n l =
     if List.mem_assoc i l then

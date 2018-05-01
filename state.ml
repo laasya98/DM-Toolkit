@@ -48,6 +48,7 @@ module type State = sig
   val rooms : state -> string list
   val effects : state -> string list
   val event : state -> event
+  val give : state -> item -> character -> character -> state
   val action : Com.command -> state -> state
   val output : state -> string
 end
@@ -116,7 +117,7 @@ module State = struct
 
 
   (*still needs to add remove_item and support giving more than one item*)
-  let give st item p1 p2 ?(q=1) = failwith "unimplemented"
+  let give st item p1 p2 (* ?(q=1) *) = failwith "unimplemented"
       (* )
     let c1 = (List.find (fun x -> fst x = p1)) in
     let c1' = ((*C.remove_item*) fst c1, snd c1) in
@@ -136,8 +137,8 @@ let update_char c c' ?(r'=None) st =
 
 (** SHOP **)
 let buy c i q evt st =
-  let c' = C.add_item c i in (*TODO: add quantity, remove cost*)
-  let evt' = E.remove_item i.name q evt in
+  let c' = C.add_item c i q in (*TODO: add quantity, remove cost*)
+  let evt' = E.remove_item i.name (Int q) evt in
   alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
 
 let buy_item c name q evt st=
@@ -149,12 +150,12 @@ let buy_item c name q evt st=
     else
       match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
       | None -> alter_state st "Action Failed: That item is not available."
-      | Some (i, Infinity) -> buy c i (Int q) evt st
+      | Some (i, Infinity) -> buy c i q evt st
       | Some (i, Int n) ->
         if n<q then
           alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
         else
-          buy c i (Int n) evt st
+          buy c i n evt st
 
 
 (** COMBAT **)

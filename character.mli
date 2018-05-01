@@ -180,13 +180,13 @@ module type Character = sig
   val add_ability :  c -> ability -> c
 
   (* [inv character] is a list of the items a player has. *)
-  val inv :  c -> item list
+  val inv :  c -> (item*int) list
 
   (* [add_item character i] adds i to the characters inventory.*)
   val add_item :  c -> item -> int -> c
 
   (* [equipped character] is a list of the items a player has equipped. *)
-  val equipped :  c -> item list
+  val equipped :  c ->  (item*int) list
 
   (* [equip character e] adds e to the characters equpped items.
      Requires that e is present in the character's inventory*)

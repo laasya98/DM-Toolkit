@@ -106,19 +106,19 @@ let character_tests = [
   "xp" >:: (fun _ -> assert_equal 0 (Character.xp char1));
   "update xp" >:: (fun _ -> assert_equal 800
                       (Character.xp (Character.update_xp char1 800)));
-  "inv" >:: (fun _ -> assert_equal [item1] (Character.inv char1));
-  "add item" >:: (fun _ -> assert_equal [item1;item2]
+  "inv" >:: (fun _ -> assert_equal [(item1,1)] (Character.inv char1));
+  "add item" >:: (fun _ -> assert_equal [item1,1;item2,1]
                      (Character.inv (Character.add_item char1 item1 1)));
   "equipped stuff" >:: (fun _ -> assert_equal [] (Character.equipped char1));
-  "good equip" >:: (fun _ -> assert_equal [item2]
+  "good equip" >:: (fun _ -> assert_equal [item2,1]
                        (Character.equipped (Character.equip char1 item2 1)));
   "bad equip" >:: (fun _ -> assert_equal []
                       (Character.equipped (Character.equip char1 item1 1)));
 ]
 
-let evtC1 = Event.make_event "evtC1" Battle []
-let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)]
-let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)]
+let evtC1 = Event.make_event "evtC1" Battle [] []
+let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
+let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
 
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
@@ -140,8 +140,10 @@ let event_tests = [
 ]
 
 type state = State.state
-let st1:(state) = {locations=[]; characters=[(char1, PC); (char2,Hostile)]; event=evtC2; output=""}
-let st2:(state) = {locations=[]; characters=[(char1, PC)]; event=evtS; output=""}
+
+let loc:(State.location) = {name="loc1"; description=""; contents=[]; exits =[]}
+let st1:(state) = {locations=[]; characters=[(char1, PC); (char2,Hostile)]; event=evtC2; current_location=loc; output=""}
+let st2:(state) = {locations=[]; characters=[(char1, PC)]; event=evtS;current_location=loc; output=""}
 
 let state_tests = [
   (*Combat*)
