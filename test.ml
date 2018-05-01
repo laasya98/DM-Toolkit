@@ -125,8 +125,8 @@ let event_tests = [
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
   "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
-  "update_turn" >:: (fun _ -> assert_equal 0 (Event.turn evtC1 |> Event.get_turn));
-  "get_tlst" >:: (fun _ -> assert_equal ["A";"B"] (Event.get_turnlst evtC1));
+  "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> Event.get_turn));
+  "get_tlst" >:: (fun _ -> assert_equal ["A";"B";"C"] (Event.get_turnlst evtC1));
   "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |> Event.get_turnlst));
   "add_item1" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
   "add_item2" >:: (fun _ -> assert_equal [(item1,Int 5)] (Event.add_item item1 (Int 4) evtC2 |> Event.get_items));

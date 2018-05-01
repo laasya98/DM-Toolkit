@@ -16,6 +16,9 @@ module type Event = sig
   val get_items : t -> (item * quantity) list
   val change_form : form -> t -> t
   val attack: character -> character -> t -> (t * character)
+  val turn : t -> t
+  val get_turn : t -> int
+  val get_turnlst : t -> string list
 end
 
 module Event = struct
@@ -182,6 +185,8 @@ module Event = struct
       |h::t -> t @ [h]
     in
     alter_event evt ~turn:t' ~t_order:tlst "Turn incremented."
+
+  let get_turn evt = evt.turn
 
   let spell_damage s t =
     let d = roll_dice s.damage_die s.bonus_damage in
