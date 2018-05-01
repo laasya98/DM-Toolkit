@@ -29,12 +29,11 @@ module type State = sig
 (* [event] is the type of an event in event.mli *)
   type event = E.t
 
-(* [entity] is a general type for items, characters, and effects
+(* [entity] is a general type for items, events, and effects
    that may be on other entities. Entities are in rooms and constitute the what
    is able to interact in the gamespace.*)
   type entity =
     |Item of item
-    |Character of character
     |Effect of (entity * int)
     |Event of event
 
@@ -43,6 +42,7 @@ module type State = sig
   type location = {
     name : string;
     description : string;
+    characters : character list;
     contents : entity list;
     exits : ( string * location ) list (*(direction, location)*)
   }
@@ -50,7 +50,7 @@ module type State = sig
   (* [state] is the type of gamestate, which includes a list of locations, . *)
   type state = {
     locations : location list;
-    characters : (character * role) list;
+    party : (character * role) list;
     event : event;
     output :string;
     current_location : location;
@@ -60,11 +60,8 @@ module type State = sig
    from a database.*)
   val init_state : D.data -> state
 
-(* [current_room s] returns the current room that the DM Toolkit is focused on. *)
-  val current_room : state -> string
-
-(* [current_gamestate s] returns a description of the current gamestate. *)
-  val current_gamestate : state -> string
+(* [current_location s] returns the current location of the toolkit's focus. *)
+  val current_location : state -> string
 
 (* [current_room_characters s] is a list of characters in the current room. *)
   val current_room_characters : state -> string list
@@ -77,6 +74,10 @@ module type State = sig
 
 (* [event s] is a list of current events for the current gamespace. *)
   val event : state -> event list
+
+(** [move st dir] moves the focus of the toolkit to the direction dir of the
+    current room.*)
+  val move : state -> string -> state
 
 (** [give st item p1 p2 q] takes in a state, an item, a character to take an
     item from, a character to give the item to, and a quantity of items to give.
