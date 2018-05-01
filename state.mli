@@ -29,11 +29,6 @@ module type State = sig
 (* [event] is the type of an event in event.mli *)
   type event = E.t
 
-(* [state] is the type of a state*)
-  type state
-
-
-
 (* [entity] is a general type for items, characters, and effects
    that may be on other entities. Entities are in rooms and constitute the what
    is able to interact in the gamespace.*)
