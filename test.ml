@@ -106,11 +106,11 @@ let character_tests = [
   "xp" >:: (fun _ -> assert_equal 0 (Character.xp char1));
   "update xp" >:: (fun _ -> assert_equal 800
                       (Character.xp (Character.update_xp char1 800)));
-  "inv" >:: (fun _ -> assert_equal [item1] (Character.inv char1));
-  "add item" >:: (fun _ -> assert_equal [item1;item2]
+  "inv" >:: (fun _ -> assert_equal [(item1,1)] (Character.inv char1));
+  "add item" >:: (fun _ -> assert_equal [item1,1;item2,1]
                      (Character.inv (Character.add_item char1 item1 1)));
   "equipped stuff" >:: (fun _ -> assert_equal [] (Character.equipped char1));
-  "good equip" >:: (fun _ -> assert_equal [item2]
+  "good equip" >:: (fun _ -> assert_equal [item2,1]
                        (Character.equipped (Character.equip char1 item2 1)));
   "bad equip" >:: (fun _ -> assert_equal []
                       (Character.equipped (Character.equip char1 item1 1)));

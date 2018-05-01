@@ -100,16 +100,18 @@ module Event = struct
   let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
   let get_weapon c =
+    let equipment = List.fold_left (fun n (a,b) -> a::n) [] (C.equipped c) in
     let weapon =List.find (fun x ->
-        match x.i_type with | Weapon _ -> true |_-> false) (C.equipped c) in
+        match x.i_type with | Weapon _ -> true |_-> false) equipment in
     match weapon.i_type with
     | Weapon w -> w
     | _ -> failwith "No weapon"
 
   let get_armor c =
+    let equipment = List.fold_left (fun n (a,b) -> a::n) [] (C.equipped c) in
     let armor = List.find
         (fun x -> match x.i_type with | Armor _ -> true | _-> false)
-        (C.equipped c)
+        (equipment)
     in
     match armor.i_type with
     | Armor a -> a
