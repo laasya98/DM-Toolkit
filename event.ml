@@ -27,28 +27,31 @@ module Event = struct
 
   type t = {
     name: string;
-    form:form;
+    form: form;
     items: (item * quantity) list;
-    tagNum: int;
+    turn: int;
+    turn_order: string list;
     output: string;
   }
 
-  let make_event name form items =
+  let make_event name form items turn_order =
     {
       name=name;
       form = form;
       items = items;
-      tagNum = 0;
+      turn = 0;
+      turn_order = turn_order;
       output = "Event created.";
     }
 
-  let alter_event evt ?(name=evt.name) ?(form=evt.form)
-      ?(tag=evt.tagNum) ?(items = evt.items) output =
+  let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(items = evt.items)
+      ?(turn = evt.turn) ?(t_order = evt.turn_order) output =
     {
       name=name;
       form = form;
       items = items;
-      tagNum = tag;
+      turn = turn;
+      turn_order = t_order;
       output = output;
     }
 
@@ -160,9 +163,25 @@ module Event = struct
     if hit = 0 then target else
       deal_damage (damage_roll attacker (hit=2)) target
 
-(*TODO: add test for death, turn #, items becoming available, xp gain, etc *)
+(*TODO: add test for death, turn #, items becoming available, xp gain, etc
+
+  turn order List
+  turn command
+  timers for shit
+*)
   let attack a t evt =
     (evt, attack_t a t)
+
+  (* [0 1 (2) 3] *)
+  let get_turnlst evt = evt.turn_order
+
+  let turn evt =
+    let t' = evt.turn + 1 in
+    let tlst = match evt.turn_order with
+      |[] -> []
+      |h::t -> t @ [h]
+    in
+    alter_event evt ~turn:t' ~t_order:tlst "Turn incremented."
 
   let spell_damage s t =
     let d = roll_dice s.damage_die s.bonus_damage in

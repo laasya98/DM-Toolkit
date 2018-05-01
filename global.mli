@@ -38,13 +38,10 @@ type item = {
 }
 
 type damage_spell ={
-  name:string;
-  level: int;
   saving_stat: string;
   damage_die: int list;
   bonus_damage: int;
   range: int;
-  targets: int;
   multiple : bool;
 }
 
@@ -61,7 +58,16 @@ type damage_spell ={
    }
 *)
 
-type spell =
+type spelltype =
   | Damage of damage_spell
   | Conjuration
   | Transmutation
+
+type spell =
+  {
+    name:string;
+    level:int;
+    targets: int;
+    to_cast: int;
+    duration: int;
+  }
