@@ -121,15 +121,23 @@ let character_tests = [
 let evtC1 = Event.make_event "evtC1" Battle [] ["A";"B";"C"]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
+let spell1 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=3;
+              duration=0;}
+let spell2 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=1;
+              duration=0;}
 
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
   "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
-  "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> Event.get_turn));
+  "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> fst |> Event.get_turn));
   "get_tlst" >:: (fun _ -> assert_equal ["A";"B";"C"] (Event.get_turnlst evtC1));
-  "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |> Event.get_turnlst));
+  "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
+
+  "cast" >:: (fun _ -> assert_equal [(spell2, 1)] (Event.cast char1 spell2 [] evtC1 |> fst|> Event.get_waiting_spells));
+  "cast_d" >:: (fun _ -> assert_equal [] (Event.cast char1 spell2 [] evtC1 |> fst |> Event.turn |> fst|> Event.get_waiting_spells));
+
   "add_item1" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
   "add_item2" >:: (fun _ -> assert_equal [(item1,Int 5)] (Event.add_item item1 (Int 4) evtC2 |> Event.get_items));
   "add_item3" >:: (fun _ -> assert_equal [(item1,Infinity)] (Event.add_item item1 (Infinity) evtC1 |> Event.get_items));
@@ -141,7 +149,6 @@ let event_tests = [
   "remove_item5" >:: (fun _ -> assert_equal [(item1,Int 3)] (Event.remove_item "item2" (Infinity) evtS |> Event.get_items));
   "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 3); (item2, Infinity)] (Event.remove_item "item2" (Int 4) evtS |> Event.get_items));
   "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 1); (item2, Infinity)] (Event.remove_item "item1" (Int 2) evtS |> Event.get_items));
-
   "changeF" >:: (fun _ -> assert_equal (Interaction:Event.form) (Event.change_form Interaction evtC1 |> Event.get_form));
 ]
 

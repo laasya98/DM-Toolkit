@@ -136,6 +136,16 @@ let update_char c c' ?(r'=None) st =
   | Some r' ->
     List.map (fun (x,r) -> if x=c then (c',r') else (x,r)) st.characters
 
+let update_chars cs st =
+  let rec r cs lst =
+    match cs with
+    | [] -> lst
+    | c::t -> r t (List.map
+                     (fun (x,r) -> if C.name x = C.name c then (c,r)
+                       else (x,r)) lst)
+  in
+  r cs st.characters
+
 (** SHOP **)
 let buy c i q evt st =
   let c' = C.add_item c i q in (*TODO: add quantity, remove cost*)
@@ -174,6 +184,12 @@ let attack a t evt st:state =
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
 
+let turn evt st =
+  let (evt', t') = E.turn st.event in
+  let chars = update_chars t' st in
+  alter_state st ~evt:evt' ~chars:chars "Turn incremented"
+
+
 (*************************** KERRI STUFF ABOVE *****************************)
 
 let action (c:command) (st:state) =
@@ -183,6 +199,7 @@ let action (c:command) (st:state) =
       try buy_item ch i (int_of_string q) st.event st
       with _ -> alter_state st "Invalid item quantity."
     end
+  | Turn -> turn st.event st
   | _ -> failwith "unimplemented"
 
 let output st = st.output
