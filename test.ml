@@ -116,7 +116,7 @@ let character_tests = [
                       (Character.equipped (Character.equip char1 item1 1)));
 ]
 
-let evtC1 = Event.make_event "evtC1" Battle [] []
+let evtC1 = Event.make_event "evtC1" Battle [] ["A";"B";"C"]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
 
@@ -124,6 +124,10 @@ let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
+  "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
+  "update_turn" >:: (fun _ -> assert_equal 0 (Event.turn evtC1 |> Event.get_turn));
+  "get_tlst" >:: (fun _ -> assert_equal ["A";"B"] (Event.get_turnlst evtC1));
+  "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |> Event.get_turnlst));
   "add_item1" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
   "add_item2" >:: (fun _ -> assert_equal [(item1,Int 5)] (Event.add_item item1 (Int 4) evtC2 |> Event.get_items));
   "add_item3" >:: (fun _ -> assert_equal [(item1,Infinity)] (Event.add_item item1 (Infinity) evtC1 |> Event.get_items));
