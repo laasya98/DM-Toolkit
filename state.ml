@@ -86,14 +86,22 @@ module State = struct
     current_location : location;
   }
 
-  let init_state d = failwith "unimplemented"
-  let current_room st = failwith "unimplemented"
+  let init_state d = (*TODO: uuuJuUuh *)
+  let current_location st = st.current_location.name
   let current_gamestate st = failwith "unimplemented"
-  let current_room_characters st = failwith "unimplemented"
+  let current_room_characters st = 
   let rooms st = failwith "unimplemented"
   let effects st = failwith "unimplemented"
   let event st = st.event
-  let give st item p1 p2 q = failwith "unimplemented: requires method to remove items from inventory in character"
+
+  (*still needs to add remove_item and support giving more than one item*)
+  let give st item p1 p2 ?(q=1) =
+    let c1 = (List.find (fun x -> fst x = p1) in
+    let c1' = ((*C.remove_item*) fst c1, snd c1) in
+    let c2 = C.add_item (List.filter (fun x -> fst x = p2)) item in
+    let c2' = (C.add_item (fst c2) item, snd c2) in
+    let clist = (List.filter (fun x -> (fst x != c1) || (fst x != c2))) in
+    {st with characters = c1'::c2'::clist}
 
 (*************************** KERRI STUFF BELOW *****************************)
 

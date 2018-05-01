@@ -1,8 +1,8 @@
 (*
- * CS 3110 Sprin 2018 Final Project
+ * CS 3110 Spring 2018 Final Project
  * DM Toolkit
  * Authors: Allan Buchness, Kerri Diamond, Laasya Renganathan, Luke Ellert-Beck
- * NetID: lpr46
+ * NetID: ahb92, lpr46
  *
  *
  *
