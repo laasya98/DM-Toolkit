@@ -4,57 +4,6 @@ open Character
 open Command
 open Global
 
-(** A [State] is a representation of the state of the toolkit, including every
-    current location and entity, and any statuses or active effects for the
-    current gamespace.*)
-module type State = sig
-  module D : Database
-  module C : Character
-  module E : Event
-  module Com :Command
-
-  type role = Party | Hostile | Friendly | Neutral
-
-  type data = D.data
-  type character = Character.c
-  type event = Event.t
-  type command = Com.command
-
-  type entity =
-    |Item of item
-    |Effect of (entity * int)
-    |Event of event
-
-  type location = {
-    name : string;
-    description : string;
-    characters : (character * role) list;
-    contents : entity list;
-    exits : ( string * location ) list (*(direction, location)*)
-    }
-
-  type state = {
-    locations : location list;
-    characters : (character * role) list;
-    event : event;
-    output :string;
-    current_location : location;
-  }
-
-  val init_state : D.data -> state
-  val current_location : state -> string
-  val current_room_characters : state -> string list
-  val rooms : state -> string list
-  val effects : state -> string list
-  val event : state -> event
-  val give : state -> item -> character -> character -> state
-  val action : Com.command -> state -> state
-  val move : state -> string -> state
-  val output : state -> string
-
-end
-
-module State = struct
   module D = Database
   module C = Character
   module E = Event
@@ -198,5 +147,3 @@ let action (c:command) (st:state) =
   | _ -> failwith "unimplemented"
 
 let output st = st.output
-
-end
