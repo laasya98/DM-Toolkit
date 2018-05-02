@@ -1,13 +1,13 @@
 Class,Hit Die,Primary Ability,STP
-Barbarian,d12,Str,Str&&Con
-Bard,d8,Cha,Dex&&Cha
-Cleric,d8,Wis,Wis&&Cha
-Druid,d8,Wis,Int&&Wis
-Fighter,d10,Str||Dex,Str&&Con
-Monk,d8,Dex&&Wis,Str&&Dex
-Paladin,d10,Str&&Cha,Wis&&Cha
-Ranger,d10,Dex&&Wis,Str&&Dex
-Rogue,d8,Dex,Dex&&Int
-Sorcerer,d6,Cha,Con&&Cha
-Warlock,d8,Cha,Wis&&Cha
-Wizard,d6,Int,Int&&Wis
+Barbarian,12,Strength,Strength Constitution
+Bard,8,Charisma,Dexterity Charisma
+Cleric,8,Wisdom,Wisdom Charisma
+Druid,8,Wisdom,Intelligence Wisdom
+Fighter,10,Strength Dexterity,Strength Constitution
+Monk,8,Dexterity Wisdom,Strength Dexterity
+Paladin,10,Strength Charisma,Wisdom Charisma
+Ranger,10,Dexterity Wisdom,Strength Dexterity
+Rogue,8,Dexterity Wisdom,Dexterity Intelligence
+Sorcerer,6,Charisma,Constitution Charisma
+Warlock,8,Charisma,Wisdom Charisma
+Wizard,6,Intelligence,Intelligence Wisdom

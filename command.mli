@@ -1,3 +1,5 @@
+open Global
+
 (** A [Command] is a player input that calls an event, retrieves information,
     manipulates the state or characer, or otherwise causes the gamespace to
     begin changing according to the client's actions.*)
@@ -28,6 +30,8 @@ module type Command = sig
        |StateChange of (string * string)
        |ItemChange of (string * string)
        |Roll of (string * string)
+       (*inquiry commands*)
+       |GetCharacterList of role
        |Invalid
 
   (** [parse str] is the command parsed from the player input [str].
