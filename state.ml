@@ -65,6 +65,7 @@ module State = struct
   type command = Com.command
   type data = D.data
 
+
   type role = Party | Hostile | Friendly | Neutral
 
   type entity =
@@ -108,6 +109,7 @@ module State = struct
   let effects st = failwith "unimplemented"
   let event st = st.event
 
+(*TODO: update list of locations to reflect   *)
   let move st dir =
     if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
     then alter_state st "Not a direction"
@@ -116,11 +118,15 @@ module State = struct
       let newcharacters =
         (List.filter (fun x -> snd x = Party) st.characters)
         @ newlocation.characters in
-
-
-
       alter_state st ~currLoc:newlocation ~chars:newcharacters
         ("Party moves" ^dir)
+
+(** [character_list_filter ls role] returns a string delimited by commas
+    representing the characters in a list that match the given role *)
+  let character_list_filter ls role =
+    String.concat (", ") @@
+    ((List.filter (fun x -> snd x = role) ls)
+     |> List.map (fun x -> fst x))
 
 
   (*still needs to add remove_item and support giving more than one item*)
@@ -141,16 +147,6 @@ let update_char c c' ?(r'=None) st =
   | None -> List.map (fun (x,r) -> if x=c then (c',r) else (x,r)) st.characters
   | Some r' ->
     List.map (fun (x,r) -> if x=c then (c',r') else (x,r)) st.characters
-
-let update_chars cs st =
-  let rec r cs lst =
-    match cs with
-    | [] -> lst
-    | c::t -> r t (List.map
-                     (fun (x,r) -> if C.name x = C.name c then (c,r)
-                       else (x,r)) lst)
-  in
-  r cs st.characters
 
 (** SHOP **)
 let buy c i q evt st =
@@ -190,12 +186,6 @@ let attack a t evt st:state =
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
 
-let turn evt st =
-  let (evt', t') = E.turn st.event in
-  let chars = update_chars t' st in
-  alter_state st ~evt:evt' ~chars:chars "Turn incremented"
-
-
 (*************************** KERRI STUFF ABOVE *****************************)
 
 let action (c:command) (st:state) =
@@ -205,7 +195,6 @@ let action (c:command) (st:state) =
       try buy_item ch i (int_of_string q) st.event st
       with _ -> alter_state st "Invalid item quantity."
     end
-  | Turn -> turn st.event st
   | _ -> failwith "unimplemented"
 
 let output st = st.output
