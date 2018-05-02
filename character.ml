@@ -268,21 +268,24 @@ module Character = struct
     List.fold_left (fun a x -> x + a) 0 lst
 
   let minof lst : int=
-    List.fold_left (fun a x -> if x <= a then x else a) 0 lst
+    List.fold_left (fun a b -> if a <= b then a else b) (List.hd lst) lst
 
   let remove_min (lst : int list) : int list=
     let minval = minof lst in
       List.filter (fun x -> (x != minval)) lst
 
   let rec stat_lister acc : int list=
-    if List.length acc = 6 then acc else
-      let stat =  roll_dice [4;4;4;4;4] []  |> remove_min |> sum in
-      stat_lister (stat::acc)
+    if List.length acc = 6
+      then
+        acc |> List.sort compare |> List.rev
+      else
+        let stat =  roll_dice [6;6;6;6] []  |> remove_min |> sum in
+        stat_lister (stat::acc)
 
   let quickbuild c r =
 
     let stats = stat_lister [] in
-
+  
 
     {
       name = "Allan";
