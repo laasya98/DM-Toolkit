@@ -87,9 +87,6 @@ open Global
     let clist = (List.filter (fun x -> (fst x != c1) || (fst x != c2))) in
          {st with characters = c1'::c2'::clist} *)
 
-(*************************** KERRI STUFF BELOW *****************************)
-
-
 let update_char c c' ?(r'=None) st =
   match r' with
   | None -> List.map (fun (x,r) -> if x=c then (c',r) else (x,r)) st.characters
@@ -134,8 +131,6 @@ let attack a t evt st:state =
       let chars = update_char t t' st in
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
-
-(*************************** KERRI STUFF ABOVE *****************************)
 
 let action (c:command) (st:state) =
   match c with
