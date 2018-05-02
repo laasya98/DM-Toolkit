@@ -224,23 +224,35 @@ module Event = struct
     else
       (add_spell c s t evt, [])
 
+  let rec update_and_cast c s t evt (upc:character list) =
+    match upc with
+    | [] -> cast c s t evt
+    | h::tl -> if h.name = c.name then
+        update_and_cast h s t evt tl
+      else
+        let t' =
+          List.map (fun (x:character) -> if x.name = h.name then h else x) t
+        in
+        update_and_cast c s t' evt tl
+
+(* [castAll s (e, tar)] casts all spells in s with starting event e and list
+   of altered characters cs
+   Note that update_chars will process tar before t' so dups here don't matter.
+*)
+  let rec castAll s (e, tar) =
+    match s with
+    | [] -> (e,tar)
+    | h::t -> let (e', t') = update_and_cast h.castor h.spell h.targets e tar in
+    castAll t (e', tar @ t')
+
   let turn evt =
     let t' = evt.turn + 1 in
     let tlst = match evt.turn_order with
       |[] -> []
       |h::t -> t @ [h]
     in
-    let spells =
-      List.filter (fun (s:spellTimer) -> s.turn = t') evt.spells
-    in
-    let rs = List.filter (fun (s:spellTimer) -> s.turn <> t') evt.spells
-    in
-    (*TODO: cast all the spells woot woot*)
-    let rec castAll s (e, tar) =
-      match s with
-      | [] -> (e,tar)
-      | h::t -> (cast h.castor h.spell h.targets e)
-    in
+    let spells = List.filter (fun (s:spellTimer) -> s.turn = t') evt.spells in
+    let rs = List.filter (fun (s:spellTimer) -> s.turn <> t') evt.spells in
     let (evt', tar') = castAll spells (evt, []) in
     let evt'' = alter_event evt' ~spells:rs
         ~turn:t' ~t_order:tlst "Turn incremented."

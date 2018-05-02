@@ -99,25 +99,26 @@ let update_char c c' ?(r'=None) st =
 
 (** SHOP **)
 let buy c i q evt st =
-  let c' = C.add_item c i q in (*TODO: add quantity, remove cost*)
-  let evt' = E.remove_item i.name (Int q) evt in
-  alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
+  let m = i.value * q in
+  let cm = C.money c in
+  if cm < m then alter_state st "Character doesn't have enough money."
+  else
+    let c' = C.update_money (C.add_item c i q) (cm-m) in
+    let evt' = E.remove_item i.name (Int q) evt in
+    alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
 
 let buy_item c name q evt st=
   match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
   | None -> alter_state st "Action Failed: Invalid character name."
   | Some (c,_) ->
-    if Event.get_form evt <> Shop then
-      alter_state st "Action Failed: There is no shop here."
-    else
-      match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
-      | None -> alter_state st "Action Failed: That item is not available."
-      | Some (i, Infinity) -> buy c i q evt st
-      | Some (i, Int n) ->
-        if n<q then
-          alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
-        else
-          buy c i n evt st
+    match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
+    | None -> alter_state st "Action Failed: That item is not available."
+    | Some (i, Infinity) -> buy c i q evt st
+    | Some (i, Int n) ->
+      if n<q then
+        alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
+      else
+        buy c i q evt st
 
 
 (** COMBAT **)
@@ -139,10 +140,18 @@ let attack a t evt st:state =
 
 let action (c:command) (st:state) =
   match c with
-  | Fight (a,b) -> attack a b st.event st
+  | Fight (a,b) -> begin
+    match E.get_form st.event with
+    | Battle -> attack a b st.event st
+    | _ -> alter_state st "No battle event occurring."
+  end
   | Buy (ch,i,q) -> begin
-      try buy_item ch i (int_of_string q) st.event st
-      with _ -> alter_state st "Invalid item quantity."
+      match E.get_form st.event with
+      | Shop -> begin
+        try buy_item ch i (int_of_string q) st.event st
+        with _ -> alter_state st "Invalid item quantity."
+      end
+      |_ -> alter_state st "Action Failed: There is no shop here."
     end
   | _ -> failwith "unimplemented"
 
