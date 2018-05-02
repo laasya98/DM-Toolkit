@@ -8,13 +8,6 @@ open Global
     current location and entity, and any statuses or active effects for the
     current gamespace.*)
 
-  (* [role] is the role of a character.
-     Party signals a player character.
-     A Friendly npc will aid the characters in the event
-     A Hostile npc will oppose the characters in the event
-     A Neutral npc will do neither (ex: shopkeeper). *)
-  type role = Party | Hostile | Friendly | Neutral
-
 (* [data] is the type of data in database.mli *)
   type data = Database.data
 
@@ -35,7 +28,9 @@ open Global
     |Event of event
 
 (* TODO write a spec or something*)
-
+(* a [location] is a named structure containing a description, a character,
+   a list of characters, contents, and a list of exits which link to other
+   locations.*)
   type location = {
     name : string;
     description : string;
@@ -44,7 +39,9 @@ open Global
     exits : ( string * location ) list (*(direction, location)*)
   }
 
-  (* [state] is the type of gamestate, which includes a list of locations, . *)
+(* [state] is the game's current state. It contains a list of locations to
+   travel between, a list of currently-present characters, an active event status,
+   a current location, and an output to be used in printing by Main. *)
   type state = {
     locations : location list;
     characters : (character * role) list;

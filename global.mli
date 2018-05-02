@@ -1,23 +1,32 @@
+
+
 (* For now, just change a stat by set amount. *)
 type effect = {
   stat:string; (*TODO: temp. Coordinate with character.*)
   amount:int;
 }
 
+(* [quantity] is a type for that supports an infinite number of a thing.*)
 type quantity = Int of int | Infinity
 
+(* [wtype] is the type of a weapon, which is either Ranged or Melee.  *)
 type wtype = Ranged | Melee
 
+(* [weapontype] has a type (ranged or melee), a damage count, and a number of
+   dice to roll on a hit.*)
 type weapontype = {
   t : wtype;
   damage : int;
   dice : int list;
 }
 
+(* [armortype] contains the armor count for a piece of armor.*)
 type armortype = {
   ac : int
 }
 
+(* [itemtype] is a type of item that can be found in the game, on a character,
+   or in an inventory.*)
 type itemtype =
   | Weapon of weapontype
   | Shield
@@ -25,6 +34,8 @@ type itemtype =
   | Ring
   | Other
 
+(* [item] has a name, an item type, a description, a weight, an effect, a
+   quantity of uses, and a value.*)
 type item = {
   name:string;
   i_type:itemtype;
@@ -57,3 +68,10 @@ type spell =
     to_cast: int;
     duration: int;
   }
+
+(* [role] is the role of a character.
+   Party signals a player character.
+   A Friendly npc will aid the characters in the event
+   A Hostile npc will oppose the characters in the event
+   A Neutral npc will do neither (ex: shopkeeper). *)
+type role = Party | Hostile | Friendly | Neutral

@@ -1,8 +1,8 @@
+open Global
+
 (** A [Command] is a player input that calls an event, retrieves information,
     manipulates the state or characer, or otherwise causes the gamespace to
     begin changing according to the client's actions.*)
-
-module type Command = sig
 
   (* command is an imcomplete variant of command possibilities, which will be
      updated as more functionality is needed.  *)
@@ -28,6 +28,8 @@ module type Command = sig
        |StateChange of (string * string)
        |ItemChange of (string * string)
        |Roll of (string * string)
+       (*inquiry commands*)
+       |GetCharacterList of role
        |Invalid
 
   (** [parse str] is the command parsed from the player input [str].
@@ -37,6 +39,3 @@ module type Command = sig
       valid string parsed into a command may not be accepted by state if there
       is no valid way to use that command in State).*)
   val parse : string -> command
-end
-
-module Command:Command

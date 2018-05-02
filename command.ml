@@ -1,7 +1,5 @@
-module type Command = sig
+open Global
 
-  (* command is an imcomplete variant of command possibilities, which will be
-     updated as more functionality is needed.  *)
   type command =
     |Load of string
     |Save
@@ -18,40 +16,14 @@ module type Command = sig
     |Shop of string
     |Buy of (string * string *string)
     |Fight of (string * string)
+    |Cast of (string * string * string list)
     |Turn
     |QuickBuild of string list
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
     |Roll of (string * string)
-    |Invalid
-  val parse : string -> command
-end
-
-
-module Command = struct
-  type command =
-    |Load of string
-    |Save
-    |Quit
-    |Help
-    |Event of string
-    |Inquiry
-    |Move of (string *string)
-    |Use of (string * string)
-    |Inv
-    |Give of string
-    |Take of string
-    |Drop of string
-    |Shop of string
-    |Buy of (string * string *string)
-    |Fight of (string * string)
-    |Turn
-    |QuickBuild of string list
-    |CharacterAction
-    |StateChange of (string * string)
-    |ItemChange of (string * string)
-    |Roll of (string * string)
+    |GetCharacterList of role
     |Invalid
 
 
@@ -80,6 +52,7 @@ module Command = struct
     | "inventory" -> Inv
     | "inq" -> Inquiry
     | "inqury" -> Inquiry
+    | "turn" -> Turn
     | _ ->  if (starts_with "load" s) then Load (remove_start "load" s)
       else if (starts_with "event" s) then Event (remove_start "event" s)
       else if (starts_with "give" s) then Give (remove_start "give" s)
@@ -122,11 +95,15 @@ module Command = struct
         match lst with
         | c::i::q::[] -> Buy (c,i,q)
         | _ -> Invalid
+      else if (starts_with "cast" s) then
+        let x = (remove_start "cast" s) in
+        let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+        match lst with
+        | c::s::t -> Cast (c,s,t)
+        | _ -> Invalid
       else if (starts_with "quickbuild" s || starts_with "quick build" s) then
         let x = String.sub s 11 (String.length s)  in
         let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         if List.length lst = 2 || List.length lst = 3 then
           QuickBuild lst else Invalid
       else Invalid
-
-end

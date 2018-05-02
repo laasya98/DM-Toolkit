@@ -14,8 +14,6 @@ open Global
   type command = Com.command
   type data = D.data
 
-  type role = Party | Hostile | Friendly | Neutral
-
   type entity =
     |Item of item
     |Effect of (entity * int)
@@ -87,14 +85,21 @@ open Global
     let clist = (List.filter (fun x -> (fst x != c1) || (fst x != c2))) in
          {st with characters = c1'::c2'::clist} *)
 
-(*************************** KERRI STUFF BELOW *****************************)
-
-
 let update_char c c' ?(r'=None) st =
   match r' with
   | None -> List.map (fun (x,r) -> if x=c then (c',r) else (x,r)) st.characters
   | Some r' ->
     List.map (fun (x,r) -> if x=c then (c',r') else (x,r)) st.characters
+
+let update_chars cs st =
+  let rec r cs lst =
+  match cs with
+  | [] -> lst
+  | c::t -> r t (List.map
+     (fun (x,r) -> if C.name x = C.name c then (c,r)
+      else (x,r)) lst)
+  in
+  r cs st.characters
 
 (** SHOP **)
 let buy c i q evt st =
@@ -135,8 +140,6 @@ let attack a t evt st:state =
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
 
-(*************************** KERRI STUFF ABOVE *****************************)
-
 let action (c:command) (st:state) =
   match c with
   | Fight (a,b) -> begin
@@ -152,6 +155,9 @@ let action (c:command) (st:state) =
       end
       |_ -> alter_state st "Action Failed: There is no shop here."
     end
+  | Turn -> let (evt', t') = E.turn st.event in
+    let chars = update_chars t' st in
+    alter_state st ~evt:evt' ~chars:chars "Turn incremented"
   | _ -> failwith "unimplemented"
 
 let output st = st.output
