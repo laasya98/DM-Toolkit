@@ -4,8 +4,6 @@ open Global
     manipulates the state or characer, or otherwise causes the gamespace to
     begin changing according to the client's actions.*)
 
-module type Command = sig
-
   (* command is an imcomplete variant of command possibilities, which will be
      updated as more functionality is needed.  *)
      type command =
@@ -41,6 +39,3 @@ module type Command = sig
       valid string parsed into a command may not be accepted by state if there
       is no valid way to use that command in State).*)
   val parse : string -> command
-end
-
-module Command:Command
