@@ -1,108 +1,5 @@
 open Global
 
-module type Character = sig
-
-  type skill
-  type ability
-
-  (* type c_class is the types of classes of a character*)
-  type c_class =
-    | Barbarian
-    | Bard
-    | Cleric
-    | Druid
-    | Fighter
-    | Monk
-    | Paladin
-    | Ranger
-    | Rogue
-    | Sorcerer
-    | Warlock
-    | Wizard
-
-  (* type c_class is the types of races of a character*)
-  type race =
-    | Dwarf
-    | Elf
-    | Halfling
-    | Human
-    | Dragonborn
-    | Gnome
-    | Half_Elf
-    | Half_Orc
-    | Tiefling
-
-
-  type c = {
-    name:string;
-    race:race;
-    c_class:c_class;
-
-    armor_class: int ;
-
-    constitution: int;
-    charisma: int;
-    wisdom:int;
-    intel:int;
-    strength:int;
-    dexterity:int;
-
-    speed:int;
-    max_hp:int;
-    hp:int;
-
-    hd:int;
-    hd_qty:int;
-
-    xp:int;
-    level:int;
-
-    skills: skill list;
-    abilities: ability list;
-    equipped: ((item * int) list )* int;
-    inv: ((item * int) list )* int;
-    money: int;
-  }
-
-  val name :  c -> string
-  val wisdom :  c -> int
-  val update_wisdom :  c -> int ->  c
-  val armor_class :  c -> int
-  val update_ac :  c -> int -> c
-  val dex :  c -> int
-  val update_dex :  c -> int -> c
-  val intel :  c -> int
-  val update_intel :  c -> int -> c
-  val strength :  c -> int
-  val update_strength :  c -> int -> c
-  val speed :  c -> int
-  val update_speed :  c -> int -> c
-  val curr_hp :  c -> int
-  val update_hp :  c -> int -> c
-  val max_hp :  c -> int
-  val update_max_hp :  c -> int -> c
-  val xp :  c -> int
-  val update_xp :  c -> int -> c
-  val level :  c -> int
-  val level_up :  c -> int -> c
-  val skills :  c -> skill list
-  val add_skill :  c -> skill -> c
-  val abilities :  c -> ability list
-  val add_ability :  c -> ability -> c
-  val inv :  c -> (item*int) list
-  val add_item :  c -> item -> int -> c
-  val equipped :  c -> (item*int) list
-  val equip :  c -> item -> int -> c
-  val money :  c -> int
-  val update_money :  c -> int -> c
-  val const :  c -> int
-  val update_const :  c -> int -> c
-  val charisma :  c -> int
-  val update_charisma :  c -> int -> c
-
-end
-
-module Character = struct
   type item = Global.item
   type skill
   type ability
@@ -259,13 +156,37 @@ module Character = struct
       | "tiefling" -> Tiefling
       | _ -> failwith "not a race, spell better pls"
 
+  let rec roll_dice (dice:int list) (acc : int list)  =
+    match dice with
+    | [] -> acc
+    | h::t -> roll_dice t ((1 + (Random.int h))::acc)
+
+  let sum lst =
+    List.fold_left (fun a x -> x + a) 0 lst
+
+  let minof lst : int=
+    List.fold_left (fun a x -> if x <= a then x else a) 0 lst
+
+  let remove_min (lst : int list) : int list=
+    let minval = minof lst in
+      List.filter (fun x -> (x != minval)) lst
+
+  let rec stat_lister acc : int list=
+    if List.length acc = 6 then acc else
+      let stat =  roll_dice [4;4;4;4;4] []  |> remove_min |> sum in
+      stat_lister (stat::acc)
+
   let quickbuild c r =
+
+    let stats = stat_lister [] in
+
+
     {
       name = "Allan";
       race = r;
       c_class = c;
       armor_class = 0;
-      constitution = 0;
+      constitution = List.hd stats;
       charisma = 0;
       wisdom = 0;
       intel = 0;
@@ -277,12 +198,10 @@ module Character = struct
       hd = 0;
       hd_qty = 0;
       xp = 0;
-      level = 0;
+      level = 1;
       skills = [];
       abilities = [];
       equipped = [],0;
       inv = [],0;
       money = 0;
   }
-
-end

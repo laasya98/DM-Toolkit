@@ -4,57 +4,6 @@ open Character
 open Command
 open Global
 
-(** A [State] is a representation of the state of the toolkit, including every
-    current location and entity, and any statuses or active effects for the
-    current gamespace.*)
-module type State = sig
-  module D : Database
-  module C : Character
-  module E : Event
-  module Com :Command
-
-  type role = Party | Hostile | Friendly | Neutral
-
-  type data = D.data
-  type character = Character.c
-  type event = Event.t
-  type command = Com.command
-
-  type entity =
-    |Item of item
-    |Effect of (entity * int)
-    |Event of event
-
-  type location = {
-    name : string;
-    description : string;
-    characters : (character * role) list;
-    contents : entity list;
-    exits : ( string * location ) list (*(direction, location)*)
-    }
-
-  type state = {
-    locations : location list;
-    characters : (character * role) list;
-    event : event;
-    output :string;
-    current_location : location;
-  }
-
-  val init_state : D.data -> state
-  val current_location : state -> string
-  val current_room_characters : state -> string list
-  val rooms : state -> string list
-  val effects : state -> string list
-  val event : state -> event
-  val give : state -> item -> character -> character -> state
-  val action : Com.command -> state -> state
-  val move : state -> string -> state
-  val output : state -> string
-
-end
-
-module State = struct
   module D = Database
   module C = Character
   module E = Event
@@ -108,6 +57,7 @@ module State = struct
   let effects st = failwith "unimplemented"
   let event st = st.event
 
+(*TODO: update list of locations to reflect   *)
   let move st dir =
     if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
     then alter_state st "Not a direction"
@@ -116,11 +66,15 @@ module State = struct
       let newcharacters =
         (List.filter (fun x -> snd x = Party) st.characters)
         @ newlocation.characters in
-
-
-
       alter_state st ~currLoc:newlocation ~chars:newcharacters
         ("Party moves" ^dir)
+
+(** [character_list_filter ls role] returns a string delimited by commas
+    representing the characters in a list that match the given role *)
+  let character_list_filter ls role =
+    String.concat (", ") @@
+    ((List.filter (fun x -> snd x = role) ls)
+     |> List.map (fun x -> fst x))
 
 
   (*still needs to add remove_item and support giving more than one item*)
@@ -142,37 +96,28 @@ let update_char c c' ?(r'=None) st =
   | Some r' ->
     List.map (fun (x,r) -> if x=c then (c',r') else (x,r)) st.characters
 
-let update_chars cs st =
-  let rec r cs lst =
-    match cs with
-    | [] -> lst
-    | c::t -> r t (List.map
-                     (fun (x,r) -> if C.name x = C.name c then (c,r)
-                       else (x,r)) lst)
-  in
-  r cs st.characters
-
 (** SHOP **)
 let buy c i q evt st =
-  let c' = C.add_item c i q in (*TODO: add quantity, remove cost*)
-  let evt' = E.remove_item i.name (Int q) evt in
-  alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
+  let m = i.value * q in
+  let cm = C.money c in
+  if cm < m then alter_state st "Character doesn't have enough money."
+  else
+    let c' = C.update_money (C.add_item c i q) (cm-m) in
+    let evt' = E.remove_item i.name (Int q) evt in
+    alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
 
 let buy_item c name q evt st=
   match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
   | None -> alter_state st "Action Failed: Invalid character name."
   | Some (c,_) ->
-    if Event.get_form evt <> Shop then
-      alter_state st "Action Failed: There is no shop here."
-    else
-      match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
-      | None -> alter_state st "Action Failed: That item is not available."
-      | Some (i, Infinity) -> buy c i q evt st
-      | Some (i, Int n) ->
-        if n<q then
-          alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
-        else
-          buy c i n evt st
+    match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
+    | None -> alter_state st "Action Failed: That item is not available."
+    | Some (i, Infinity) -> buy c i q evt st
+    | Some (i, Int n) ->
+      if n<q then
+        alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
+      else
+        buy c i q evt st
 
 
 (** COMBAT **)
@@ -190,24 +135,23 @@ let attack a t evt st:state =
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
 
-let turn evt st =
-  let (evt', t') = E.turn st.event in
-  let chars = update_chars t' st in
-  alter_state st ~evt:evt' ~chars:chars "Turn incremented"
-
-
 (*************************** KERRI STUFF ABOVE *****************************)
 
 let action (c:command) (st:state) =
   match c with
-  | Fight (a,b) -> attack a b st.event st
+  | Fight (a,b) -> begin
+    match E.get_form st.event with
+    | Battle -> attack a b st.event st
+    | _ -> alter_state st "No battle event occurring."
+  end
   | Buy (ch,i,q) -> begin
-      try buy_item ch i (int_of_string q) st.event st
-      with _ -> alter_state st "Invalid item quantity."
+      match E.get_form st.event with
+      | Shop -> begin
+        try buy_item ch i (int_of_string q) st.event st
+        with _ -> alter_state st "Invalid item quantity."
+      end
+      |_ -> alter_state st "Action Failed: There is no shop here."
     end
-  | Turn -> turn st.event st
   | _ -> failwith "unimplemented"
 
 let output st = st.output
-
-end

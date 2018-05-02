@@ -7,21 +7,16 @@ open Global
 (** A [State] is a representation of the state of the toolkit, including every
     current location and entity, and any statuses or active effects for the
     current gamespace.*)
-module type State = sig
-  module D : Database
-  module C : Character
-  module E : Event
-  module Com :Command
 
   (* [role] is the role of a character.
-     PC signals a player character.
+     Party signals a player character.
      A Friendly npc will aid the characters in the event
      A Hostile npc will oppose the characters in the event
      A Neutral npc will do neither (ex: shopkeeper). *)
   type role = Party | Hostile | Friendly | Neutral
 
 (* [data] is the type of data in database.mli *)
-  type data = D.data
+  type data = Database.data
 
 (* [character] is the type of a character in character.mli *)
   type character = Character.c
@@ -29,7 +24,7 @@ module type State = sig
 (* [event] is the type of an event in event.mli *)
   type event = Event.t
 
-  type command = Com.command
+  type command = Command.command
 
 (* [entity] is a general type for items, events, and effects
    that may be on other entities. Entities are in rooms and constitute the what
@@ -60,7 +55,7 @@ module type State = sig
 
 (* [init_state s] is the initial state of the game loaded from a save file s
    from a database.*)
-  val init_state : D.data -> state
+  val init_state : data -> state
 
 (* [current_location s] returns the current location of the toolkit's focus. *)
   val current_location : state -> string
@@ -87,15 +82,12 @@ module type State = sig
 (* [action cmd state] takes in a command and a state and updates the state to
    reflect whatever command is input. This can involve calling events,
    characters, items, or database look-ups.*)
-  val action : Com.command -> state -> state
+  val action : command -> state -> state
 
 (** [move st dir] moves the focus of the toolkit to the direction dir of the
         current room.*)
   val move : state -> string -> state
 
+(* [output st] is the string output of state [st], for use in testing and
+   the REPL. *)
   val output : state -> string
-
-
-end
-
-module State : State

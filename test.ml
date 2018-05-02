@@ -11,7 +11,7 @@ let item1 = {
   weight = 1;
   effect = {stat=""; amount=0};
   uses = Int 0;
-  value=10;
+  value=5;
 }
 
 let item2 = {
@@ -21,7 +21,7 @@ let item2 = {
   weight = 1;
   effect = {stat=""; amount=0};
   uses = Int 0;
-  value=10;
+  value=0;
 }
 
 let char1:Character.c = {
@@ -170,7 +170,9 @@ let state_tests = [
   "shop invI" >:: (fun _ -> assert_equal "Action Failed: That item is not available." (State.action (Buy("char1","it","4")) st2 |> State.output));
   "shop invN" >:: (fun _ -> assert_equal "Action Failed: There are only 3 available." (State.action (Buy("char1","item1","4")) st2 |> State.output));
   "shop invE" >:: (fun _ -> assert_equal "Action Failed: There is no shop here." (State.action (Buy("char1","item1","2")) st1 |> State.output));
+
   "shop buy" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item1","2")) st2 |> State.output));
+  "shop buy2" >:: (fun _ -> assert_equal "Character doesn't have enough money." (State.action (Buy("char1","item1","3")) st2 |> State.output));
   "shop buyI" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item2","200")) st2 |> State.output));
 ]
 
