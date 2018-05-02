@@ -1,6 +1,5 @@
 open Global
 
-module type Character = sig
   (* type skill should be all the possible skill types a player can potentially have
      it stores an int as the modifier and a bool as whether or not the skill is proficient*)
   (*type corestat =
@@ -224,7 +223,3 @@ module type Character = sig
 
   (* [update_charisma character new_c] character with charisma = new_c.*)
   val update_charisma :  c -> int -> c
-
-end
-
-module Character : Character

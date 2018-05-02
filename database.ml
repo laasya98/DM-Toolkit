@@ -3,7 +3,7 @@ open Character
 open Global
 
 module type Database = sig
-  module C:Character
+
   (* [data] is the type of the data *)
   type data
 
@@ -19,7 +19,7 @@ module type Database = sig
 
   (** [get_char id] is an character object corresponding to [id] in a
     * data object *)
-  val get_npc : string -> C.c
+  val get_npc : string -> data
 
   (** [get_class id] is a D&D class corresponding to [id] in a
     * data object *)
