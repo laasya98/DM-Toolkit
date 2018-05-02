@@ -22,6 +22,7 @@ open Global
        |Shop of string
        |Buy of (string * string *string)
        |Fight of (string * string)
+       |Cast of (string * string * string list)
        |Turn
        |QuickBuild of string list
        |CharacterAction
