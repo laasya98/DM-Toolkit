@@ -14,7 +14,7 @@ module type State = sig
   module Com :Command
 
   (* [role] is the role of a character.
-     PC signals a player character.
+     Party signals a player character.
      A Friendly npc will aid the characters in the event
      A Hostile npc will oppose the characters in the event
      A Neutral npc will do neither (ex: shopkeeper). *)
