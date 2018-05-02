@@ -1,16 +1,13 @@
 open Character
 open Global
 
-(* An [Event] contains information and functions used to handle an
-   event in the game, such as a shop, quest, or battle. It allows the
-   state to interact with the options in the event. *)
-module type Event = sig
-  module C : Character
-
 (* [character] is the type of a character in character.mli *)
   type character = Character.c
 
-(* [t] is the type of an event. *)
+(* [t] is the type of an event.
+   An event contains information and functions used to handle an
+   event in the game, such as a shop, quest, or battle. It allows the
+   state to interact with the options in the event. *)
   type t
 
 (* [form] is the variety of an event. *)
@@ -79,6 +76,3 @@ module type Event = sig
 (* [get_waiting_spells evt] returns an association list of the waiting spells
    and the turn on which they will be cast. *)
   val get_waiting_spells : t -> (spell*int) list
-end
-
-module Event : Event

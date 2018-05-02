@@ -1,32 +1,7 @@
 open Character
 open Global
 
-module type Event = sig
-  module C : Character
-  type character = Character.c
-  type t
-  type form = Battle | Shop | Interaction
-
-  val init_event : string -> t
-  val make_event : string -> form -> (item * quantity) list -> string list -> t
-  val get_form : t -> form
-  val get_name : t -> string
-  val get_output : t -> string
-  val add_item : item -> quantity -> t -> t
-  val remove_item : string -> quantity -> t -> t
-  val get_items : t -> (item * quantity) list
-  val change_form : form -> t -> t
-  val attack: character -> character -> t -> (t * character)
-  val turn : t -> (t * character list)
-  val get_turn : t -> int
-  val get_turnlst : t -> string list
-  val cast : character -> spell -> character list -> t -> (t * character list)
-  val get_waiting_spells : t -> (spell*int) list
-end
-
-module Event = struct
   module C = Character
-
   type character = Character.c
 
   type form = Battle | Shop | Interaction
@@ -258,5 +233,3 @@ module Event = struct
         ~turn:t' ~t_order:tlst "Turn incremented."
     in
     (evt'', tar')
-
-end
