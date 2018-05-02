@@ -1,3 +1,4 @@
+open Global
 module type Command = sig
 
   (* command is an imcomplete variant of command possibilities, which will be
@@ -24,6 +25,8 @@ module type Command = sig
     |StateChange of (string * string)
     |ItemChange of (string * string)
     |Roll of (string * string)
+    (*inquiry commands*)
+    |GetCharacterList of role
     |Invalid
   val parse : string -> command
 end
@@ -52,6 +55,7 @@ module Command = struct
     |StateChange of (string * string)
     |ItemChange of (string * string)
     |Roll of (string * string)
+    |GetCharacterList of role
     |Invalid
 
 

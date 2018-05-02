@@ -14,8 +14,6 @@ open Global
   type command = Com.command
   type data = D.data
 
-  type role = Party | Hostile | Friendly | Neutral
-
   type entity =
     |Item of item
     |Effect of (entity * int)
