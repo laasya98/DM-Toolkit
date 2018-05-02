@@ -1,0 +1,21 @@
+Level,Proficiency Bonus,Abilities,Rages,Rage Damage
+1,2,Rage Unarmored_Defense,2,2
+2,2,Reckless_Attack Danger_Sense,2,2
+3,2,Primal_Path,3,2
+4,2,Ability_Score_Improvement,3,2
+5,3,Extra_Attack Fast_Movement,3,2
+6,3,Path_feature,4,2
+7,3,Feral_Instinct,4,2
+8,3,Ability_Score_Improvement,4,2
+9,4,Brutal_Critical,4,3
+10,4,Path_feature,4,3
+11,4,Relentless_Rage,4,3
+12,4,Ability_Score_Improvement,5,3
+13,5,Brutal_Critical,5,3
+14,5,Path_feature,5,3
+15,5,Persistent_Rage,5,3
+16,5,Ability_Score_Improvement,5,4
+17,6,Brutal_Critical,6,4
+18,6,Indomitable_Might,6,4
+19,6,Ability_Score_Improvement,6,4
+20,6,Primal_Champion,Unlimited,4

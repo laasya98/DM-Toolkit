@@ -1,0 +1,21 @@
+Level,Proficiency_Bonus,Abilities
+1,2,Spellcasting Bardic_Inspiration_d6
+2,2,Jack_of_All_Trades Song_of_Rest_d6
+3,2,Bard_College Expertise
+4,2,Ability_Score_Improvement
+5,3,Bardic_Inspiration_d8 Font_of_Inspiration
+6,3,Countercharm Bard_College_feature
+7,3,_
+8,3,Ability_Score_Improvement
+9,4,Song_of_Rest_d8
+10,4,Bardic_Inspiration_d10 Expertise Magical_Secrets
+11,4,_
+12,4,Ability_Score_Improvement
+13,5,Song_of_Rest_d10
+14,5,Magical_Secrets Bard_College_feature
+15,5,Bardic_Inspiration_d12
+16,5,Ability_Score_Improvement
+17,6,Song_of_Rest_d12
+18,6,Magical_Secrets
+19,6,Ability_Score_Improvement
+20,6,Superior_Inspiration
