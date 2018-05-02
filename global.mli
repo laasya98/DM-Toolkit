@@ -1,3 +1,5 @@
+
+
 (* For now, just change a stat by set amount. *)
 type effect = {
   stat:string; (*TODO: temp. Coordinate with character.*)
@@ -57,3 +59,10 @@ type spell =
     to_cast: int;
     duration: int;
   }
+
+(* [role] is the role of a character.
+   Party signals a player character.
+   A Friendly npc will aid the characters in the event
+   A Hostile npc will oppose the characters in the event
+   A Neutral npc will do neither (ex: shopkeeper). *)
+type role = Party | Hostile | Friendly | Neutral
