@@ -179,6 +179,8 @@ open Global
         let stat =  roll_dice [6;6;6;6] []  |> remove_min |> sum in
         stat_lister (stat::acc)
 
+let int_of_die d = int_of_string (String.sub d 1 (String.length d) )
+
 let blank_char = {
   name = "Allan";
   race = Human;
@@ -295,8 +297,9 @@ let blank_char = {
                      strength = List.nth stats 4;
                      dexterity = List.nth stats 5; }
     in
-    let hit = Database.get_hd c in
-    let step2 = (* non core stats*)
+    (* let hit = Database.get_hd c in
+    let mod = 0 in (* modifier calculation*)
+    let step2 = (* non core stats, speed, armor class*)
                 {step1 with
                  hd = hit;
                  hd_qty = 1;
@@ -304,5 +307,7 @@ let blank_char = {
                  hp = int_of_die hit;
                  speed = Database.get_speed r;
                 }
-    in
+
+      in
+      let step3 = step2 in (*initializing skills and items*)*)
     step1
