@@ -179,32 +179,130 @@ open Global
         let stat =  roll_dice [6;6;6;6] []  |> remove_min |> sum in
         stat_lister (stat::acc)
 
+let blank_char = {
+  name = "Allan";
+  race = Human;
+  c_class = Barbarian;
+  armor_class = 0;
+  constitution = 0;
+  charisma = 0;
+  wisdom = 0;
+  intel = 0;
+  strength = 0;
+  dexterity = 0;
+  speed = 0;
+  max_hp = 0;
+  hp = 0;
+  hd = 0;
+  hd_qty = 0;
+  xp = 0;
+  level = 1;
+  skills = [];
+  abilities = [];
+  equipped = [],0;
+  inv = [],0;
+  money = 0;
+}
+
+
+
   let quickbuild c r =
-
     let stats = stat_lister [] in
-  
-
-    {
-      name = "Allan";
-      race = r;
-      c_class = c;
-      armor_class = 0;
-      constitution = List.hd stats;
-      charisma = 0;
-      wisdom = 0;
-      intel = 0;
-      strength = 0;
-      dexterity = 0;
-      speed = 0;
-      max_hp = 0;
-      hp = 0;
-      hd = 0;
-      hd_qty = 0;
-      xp = 0;
-      level = 1;
-      skills = [];
-      abilities = [];
-      equipped = [],0;
-      inv = [],0;
-      money = 0;
-  }
+    let step1 = (*core stats*)
+      match c with
+        | Barbarian -> {blank_char with
+                        constitution = List.hd stats;
+                        charisma = List.nth stats 1;
+                        wisdom = List.nth stats 2;
+                        intel = List.nth stats 3;
+                        strength = List.nth stats 4;
+                        dexterity = List.nth stats 5; }
+        | Bard -> {blank_char with
+                   constitution = List.hd stats;
+                   charisma = List.nth stats 1;
+                   wisdom = List.nth stats 2;
+                   intel = List.nth stats 3;
+                   strength = List.nth stats 4;
+                   dexterity = List.nth stats 5; }
+        | Cleric -> {blank_char with
+                     constitution = List.hd stats;
+                     charisma = List.nth stats 1;
+                     wisdom = List.nth stats 2;
+                     intel = List.nth stats 3;
+                     strength = List.nth stats 4;
+                     dexterity = List.nth stats 5; }
+        | Druid -> {blank_char with
+                    constitution = List.hd stats;
+                    charisma = List.nth stats 1;
+                    wisdom = List.nth stats 2;
+                    intel = List.nth stats 3;
+                    strength = List.nth stats 4;
+                    dexterity = List.nth stats 5; }
+        | Fighter -> {blank_char with
+                      constitution = List.hd stats;
+                      charisma = List.nth stats 1;
+                      wisdom = List.nth stats 2;
+                      intel = List.nth stats 3;
+                      strength = List.nth stats 4;
+                      dexterity = List.nth stats 5; }
+        | Monk -> {blank_char with
+                   constitution = List.hd stats;
+                   charisma = List.nth stats 1;
+                   wisdom = List.nth stats 2;
+                   intel = List.nth stats 3;
+                   strength = List.nth stats 4;
+                   dexterity = List.nth stats 5; }
+        | Paladin -> {blank_char with
+                      constitution = List.hd stats;
+                      charisma = List.nth stats 1;
+                      wisdom = List.nth stats 2;
+                      intel = List.nth stats 3;
+                      strength = List.nth stats 4;
+                      dexterity = List.nth stats 5; }
+        | Ranger -> {blank_char with
+                     constitution = List.hd stats;
+                     charisma = List.nth stats 1;
+                     wisdom = List.nth stats 2;
+                     intel = List.nth stats 3;
+                     strength = List.nth stats 4;
+                     dexterity = List.nth stats 5; }
+        | Rogue -> {blank_char with
+                    constitution = List.hd stats;
+                    charisma = List.nth stats 1;
+                    wisdom = List.nth stats 2;
+                    intel = List.nth stats 3;
+                    strength = List.nth stats 4;
+                    dexterity = List.nth stats 5; }
+        | Sorcerer -> {blank_char with
+                       constitution = List.hd stats;
+                       charisma = List.nth stats 1;
+                       wisdom = List.nth stats 2;
+                       intel = List.nth stats 3;
+                       strength = List.nth stats 4;
+                       dexterity = List.nth stats 5; }
+        | Warlock -> {blank_char with
+                      constitution = List.hd stats;
+                      charisma = List.nth stats 1;
+                      wisdom = List.nth stats 2;
+                      intel = List.nth stats 3;
+                      strength = List.nth stats 4;
+                      dexterity = List.nth stats 5; }
+        | Wizard -> {blank_char with
+                     constitution = List.hd stats;
+                     charisma = List.nth stats 1;
+                     wisdom = List.nth stats 2;
+                     intel = List.nth stats 3;
+                     strength = List.nth stats 4;
+                     dexterity = List.nth stats 5; }
+    in
+    let hit = Database.get_hd c in
+    let step2 = (* non core stats*)
+                {step1 with
+                 hd = hit;
+                 hd_qty = 1;
+                 max_hp = int_of_die hit;
+                 hp = int_of_die hit;
+                 speed = Database.get_speed r;
+                }
+    in
+    step1
