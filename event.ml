@@ -15,6 +15,7 @@ open Global
     turn: int;
     turn_order: string list;
     spells: spellTimer list;
+    v_out: string;
     output: string;
   }
 
@@ -26,6 +27,7 @@ open Global
       turn = 0;
       turn_order = turn_order;
       spells=[];
+      v_out = "";
       output = "Event created.";
     }
 
@@ -37,21 +39,32 @@ open Global
       turn = 0;
       turn_order = [];
       spells=[];
+      v_out = "";
       output = "Event created.";
     }
 
   let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(items = evt.items)
       ?(turn = evt.turn) ?(t_order = evt.turn_order)
-      ?(spells = evt.spells) output =
+      ?(spells = evt.spells) ?(v=evt.v_out) output =
     {
       name=name;
       form = form;
       items = items;
       turn = turn;
       turn_order = t_order;
+      v_out = v;
       output = output;
       spells = spells;
     }
+
+let clear_vout evt = alter_event evt ~v:"" "Verbose cleared."
+
+let add_vout s evt = alter_event evt ~v:(evt.v_out^"\n"^s) "Verbose updated."
+
+let rec add_vout_lst s lst evt =
+  match lst with
+  | [] -> add_vout s evt
+  | h::t -> add_vout_lst (s^"\n"^h) t evt
 
   let get_form evt = evt.form
 
@@ -151,24 +164,30 @@ open Global
     with _ -> C.strength attacker in
       ability + roll_dice dice 0
 
-  let deal_damage amount target =
-    let hp = C.curr_hp target in
-    C.update_hp target (hp - amount)
+  let deal_damage a t =
+    let hp = C.curr_hp t in
+    C.update_hp t (hp - a)
 
-  (* returns the new state of the target after being hit*)
-  let attack_t attacker target =
-    let hit = attack_roll attacker target in
-    if hit = 0 then target else
-      deal_damage (damage_roll attacker (hit=2)) target
-
+(* returns the event and new state of the target after being hit*)
+  let attack a t evt =
+    let hit = attack_roll a t in
+    if hit = 0 then (add_vout "Attack missed." evt, t)
+    else if hit=2 then
+      let d = damage_roll a true in
+      let v = (C.name a)^" critically hit "^(C.name t)
+              ^" for "^(string_of_int d)^" damage." in
+      (add_vout v evt, deal_damage d t)
+    else
+      let d = damage_roll a false in
+      let v = (C.name a)^" hit "^(C.name t)
+              ^" for "^(string_of_int d)^" damage." in
+      (add_vout v evt, deal_damage d t)
 (*TODO: add test for death, turn #, items becoming available, xp gain, etc
 
   turn order List
   turn command
   timers for shit
 *)
-  let attack a t evt =
-    (evt, attack_t a t)
 
   (* [0 1 (2) 3] *)
   let get_turnlst evt = evt.turn_order
@@ -181,7 +200,9 @@ open Global
   let add_spell c s t evt =
     let turn = evt.turn + s.to_cast in
     let spell = {turn=turn; castor=c; spell=s; targets=t} in
-    alter_event evt ~spells:(spell::evt.spells) "Spell timer added."
+    let v = (C.name c)^" began casting "^s.name^"! It will cast in "^
+            (string_of_int s.to_cast)^" turns." in
+    alter_event evt ~spells:(spell::evt.spells) ~v:v "Spell timer added."
 
 (* [count_dups lst] is the list of tuples of each element of the list and
    how many times it appeared in the original list. It contains no duplicate
@@ -199,12 +220,17 @@ let count_dups lst =
   in
   count [] lst
 
-let rec spell_damage s (t,n) =
+let spell_damage s (t,n) =
+  let rec dam s n acc =
     if n>0 then
       let d = roll_dice s.damage_die s.bonus_damage in
-      spell_damage s (deal_damage d t, n-1)
+      dam s (n-1) (acc+d)
     else
-      t
+      acc
+  in
+  let d = dam s n 0 in
+  let v = (C.name t)^" took "^(string_of_int d)^" damage!" in
+  (deal_damage d t, v)
 
 let cast_damage c s t evt =
   if s.multiple then
@@ -212,12 +238,20 @@ let cast_damage c s t evt =
     List.map (fun n -> spell_damage s n) t'
   else
     let d = roll_dice s.damage_die s.bonus_damage in
-    List.map (fun n -> deal_damage d n) t
+    List.map (fun n -> (deal_damage d n, (C.name n)^" took "^
+                                         (string_of_int d)^" damage!")) t
 
   let cast c s t evt =
     if s.to_cast = 0 then
       match s.stype with (*TODO*)
-      | Damage d -> (evt, cast_damage c d t evt)
+      | Damage d -> begin
+          let v = (C.name c)^" cast "^s.name^"!" in
+          let c = cast_damage c d t (add_vout v evt) in
+          let t' = List.map (fun x -> fst x) c in
+          let v' = List.map (fun x -> snd x) c in
+          let evt' = add_vout_lst "" v' evt in
+          (evt', t')
+      end
       | Conjuration -> (evt, [])
       | Status -> (evt, [])
     else
