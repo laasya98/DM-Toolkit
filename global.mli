@@ -57,7 +57,7 @@ type damage_spell ={
 type spelltype =
   | Damage of damage_spell
   | Conjuration
-  | Transmutation
+  | Status
 
 type spell =
   {

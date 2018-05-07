@@ -140,12 +140,40 @@ let attack a t evt st:state =
       alter_state st ~evt:evt' ~chars:chars
         ((C.name a)^" attacked "^(C.name t)^"!")
 
+let char_by_name s st =
+  let c = List.find_opt (fun (x,_) -> C.name x = s) st.characters in
+  match c with
+  | None -> None
+  | Some (x,_) -> Some x
+
+
+let cast c s t evt st =
+  let c' = char_by_name c st in
+  let s' = failwith "match s with a spell in char spells" in
+  try
+    let find s = List.find (fun (x,_) -> C.name x = s) st.characters in
+    let t' = List.map (fun s -> fst (find s)) t in
+    match c' with
+    | None -> alter_state st "The castor name is invalid."
+    | Some c ->
+      let (evt', t') = E.cast c s' t' evt in
+      let chars = update_chars t' st in
+      alter_state st ~evt:evt' ~chars:chars
+        ((C.name c)^" cast "^(s)^"!")
+  with _ -> alter_state st "One or more target names invalid."
+
+
 let action (c:command) (st:state) =
   match c with
   | Fight (a,b) -> begin
     match E.get_form st.event with
     | Battle -> attack a b st.event st
     | _ -> alter_state st "No battle event occurring."
+  end
+  | Cast (c,s,t) -> begin
+    match E.get_form st.event with
+    | Battle -> cast c s t st.event st
+    | _ -> alter_state st "No battle event occurring." (*TODO: change for non-attack *)
   end
   | Buy (ch,i,q) -> begin
       match E.get_form st.event with

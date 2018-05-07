@@ -183,19 +183,43 @@ open Global
     let spell = {turn=turn; castor=c; spell=s; targets=t} in
     alter_event evt ~spells:(spell::evt.spells) "Spell timer added."
 
-  let spell_damage s t =
-    let d = roll_dice s.damage_die s.bonus_damage in
-    deal_damage d t
+(* [count_dups lst] is the list of tuples of each element of the list and
+   how many times it appeared in the original list. It contains no duplicate
+   elements.
+   Ex: [count_dups [1;2;1;1]] is [(1,3);(2,1)]*)
+let count_dups lst =
+  let rec count acc lst =
+    match lst with
+    | [] -> acc
+    | h::t ->
+      let t' = List.filter (fun x -> x<>h) t in
+      let n = List.length t - List.length t' in
+      let acc' = (h, n+1)::acc in
+      count acc' t'
+  in
+  count [] lst
 
-  let cast_damage c s t evt =
-    List.map (fun n -> spell_damage s n) t
+let rec spell_damage s (t,n) =
+    if n>0 then
+      let d = roll_dice s.damage_die s.bonus_damage in
+      spell_damage s (deal_damage d t, n-1)
+    else
+      t
+
+let cast_damage c s t evt =
+  if s.multiple then
+    let t' = count_dups t in
+    List.map (fun n -> spell_damage s n) t'
+  else
+    let d = roll_dice s.damage_die s.bonus_damage in
+    List.map (fun n -> deal_damage d n) t
 
   let cast c s t evt =
     if s.to_cast = 0 then
       match s.stype with (*TODO*)
-      | Damage d -> (evt, [])
+      | Damage d -> (evt, cast_damage c d t evt)
       | Conjuration -> (evt, [])
-      | Transmutation -> (evt, [])
+      | Status -> (evt, [])
     else
       (add_spell c s t evt, [])
 
