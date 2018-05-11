@@ -10,30 +10,24 @@ open Global
     | Constitution
     | Dexterity*)
 
-  type skill
-      (*{
+  type skill= {
     name:string;
     prof:bool;
     modifier:int;
-    corestat:corestat;
-        } *)
+    corestat:string;
+    }
 
   (* type skill should be all the possible spells a player can potentially use *)
-  type ability
-
-  (*type dwarf_sub =
-   | Plain
+  type ability =
    | Hill
    | Mountain
 
    type elf_sub =
-    | Plain
     | High
     | Wood
     | Dark
 
   type half_sub =
-   | Plain
    | Lightfoot
    | Stout
 
@@ -50,9 +44,8 @@ open Global
     | White
 
   type gnome_sub =
-   | Plain
    | Forest
-   | Rock *)
+   | Rock
 
 
 
@@ -83,7 +76,6 @@ open Global
     | Half_Orc
     | Tiefling
 
-  (* use wisdom*)
 
   (* type t is the character type. this should contain a record of information
      about a character in the game. this record can be updated by state and events *)
@@ -91,15 +83,24 @@ open Global
     name:string;
     race:race;
     c_class:c_class;
+    (*alignment:Global.alignment;*)
 
     armor_class: int ;
+    prof_bonus: int;
+    passive_wisdom: int;
 
     constitution: int;
+    cons_mod: int;
     charisma: int;
+    char_mod: int;
     wisdom:int;
+    wis_mod:int;
     intel:int;
+    int_mod:int;
     strength:int;
+    str_mod:int;
     dexterity:int;
+    dex_mod:int;
 
     speed:int;
     max_hp:int;

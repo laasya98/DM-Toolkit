@@ -1,4 +1,5 @@
 open Global
+open Database
 
   type item = Global.item
   type skill
@@ -29,36 +30,45 @@ open Global
     | Half_Orc
     | Tiefling
 
-  type c = {
-    name:string;
-    race:race;
-    c_class:c_class;
+type c = {
+  name:string;
+  race:race;
+  c_class:c_class;
+  (*alignment:Global.alignment;*)
 
-    armor_class: int ;
+  armor_class: int ;
+  prof_bonus: int;
+  passive_wisdom: int;
 
-    constitution: int;
-    charisma: int;
-    wisdom:int;
-    intel:int;
-    strength:int;
-    dexterity:int;
+  constitution: int;
+  cons_mod: int;
+  charisma: int;
+  char_mod: int;
+  wisdom:int;
+  wis_mod:int;
+  intel:int;
+  int_mod:int;
+  strength:int;
+  str_mod:int;
+  dexterity:int;
+  dex_mod:int;
 
-    speed:int;
-    max_hp:int;
-    hp:int;
+  speed:int;
+  max_hp:int;
+  hp:int;
 
-    hd:int;
-    hd_qty:int;
+  hd:int;
+  hd_qty:int;
 
-    xp:int;
-    level:int;
+  xp:int;
+  level:int;
 
-    skills: skill list;
-    abilities: ability list;
-    equipped: ((item * int) list )* int;
-    inv: ((item * int) list )* int;
-    money: int;
-  }
+  skills: skill list;
+  abilities: ability list;
+  equipped: ((item * int) list )* int;
+  inv: ((item * int) list )* int;
+  money: int;
+}
 
   let name  c = c.name
   let race  c = c.race
@@ -179,19 +189,32 @@ open Global
         let stat =  roll_dice [6;6;6;6] []  |> remove_min |> sum in
         stat_lister (stat::acc)
 
+let ability_mod a =
+  let b = a - 10 in
+  if (mod b 2) = 0
+  then b/2 else (b-1)/2
+
 let int_of_die d = int_of_string (String.sub d 1 (String.length d) )
 
 let blank_char = {
   name = "Allan";
   race = Human;
   c_class = Barbarian;
+  prof_bonus = 0;
+  passive_wisdom = 0;
   armor_class = 0;
   constitution = 0;
+  cons_mod = 0;
   charisma = 0;
+  char_mod = 0;
   wisdom = 0;
+  wis_mod = 0;
   intel = 0;
+  int_mod = 0;
   strength = 0;
+  str_mod = 0;
   dexterity = 0;
+  dex_mod = 0;
   speed = 0;
   max_hp = 0;
   hp = 0;
@@ -208,7 +231,7 @@ let blank_char = {
 
 
 
-  let quickbuild c r =
+  let quickbuild n c r =
     let stats = stat_lister [] in
     let step1 = (*core stats*)
       match c with
@@ -298,9 +321,16 @@ let blank_char = {
                      dexterity = List.nth stats 5; }
     in
     (* let hit = Database.get_hd c in
-    let mod = 0 in (* modifier calculation*)
     let step2 = (* non core stats, speed, armor class*)
                 {step1 with
+                 name = n;
+                 cons_mod = ability_mod step1.constitution;
+                 char_mod = ability_mod step1.charisma ;
+                 wis_mod = ability_mod step1.wisdom;
+                 int_mod = ability_mod step1.intel ;
+                 str_mod = ability_mod step1.strength;
+                 dex_mod = ability_mod step1.dexterity;
+                 prof_bonus = 2
                  hd = hit;
                  hd_qty = 1;
                  max_hp = int_of_die hit;

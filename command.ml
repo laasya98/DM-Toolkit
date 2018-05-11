@@ -18,7 +18,7 @@ open Global
     |Fight of (string * string)
     |Cast of (string * string * string list)
     |Turn
-    |QuickBuild of string list
+    |QuickBuild of string list (* command entered: [name, class, race, (sub_race)]*)
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
@@ -104,6 +104,6 @@ open Global
       else if (starts_with "quickbuild" s || starts_with "quick build" s) then
         let x = String.sub s 11 (String.length s)  in
         let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
-        if List.length lst = 2 || List.length lst = 3 then
+        if List.length lst = 3 || List.length lst = 4 then
           QuickBuild lst else Invalid
       else Invalid
