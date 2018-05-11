@@ -89,9 +89,9 @@ let rec add_vout_lst s lst evt =
       | Int n ->
         match q with
         | Int q -> alter_event evt
-                     ~items:(change_item_q i (Int (n+q)) evt.items) "Item added."
+                ~items:(change_item_q i (Int (n+q)) evt.items) "Item added."
         | Infinity -> alter_event evt
-                     ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
+                ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
 
   let remove_item name q evt =
     match List.find_opt (fun ((x:item),q) -> x.name=name) evt.items with
@@ -183,10 +183,6 @@ let rec add_vout_lst s lst evt =
               ^" for "^(string_of_int d)^" damage." in
       (add_vout v evt, deal_damage d t)
 (*TODO: add test for death, turn #, items becoming available, xp gain, etc
-
-  turn order List
-  turn command
-  timers for shit
 *)
 
   (* [0 1 (2) 3] *)

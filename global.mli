@@ -1,5 +1,3 @@
-
-
 (* For now, just change a stat by set amount. *)
 type effect = {
   stat:string; (*TODO: temp. Coordinate with character.*)

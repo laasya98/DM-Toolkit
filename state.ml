@@ -158,8 +158,7 @@ let cast c s t evt st =
     | Some c ->
       let (evt', t') = E.cast c s' t' evt in
       let chars = update_chars t' st in
-      alter_state st ~evt:evt' ~chars:chars
-        ((C.name c)^" cast "^(s)^"!")
+      alter_state st ~evt:evt' ~chars:chars ((C.name c)^" cast "^(s)^"!")
   with _ -> alter_state st "One or more target names invalid."
 
 
