@@ -15,7 +15,12 @@ open Global
 
 (* [init_event n] returns a basic empty event with initial fields and
    form Interaction. *)
-  val init_event : string -> t
+val init_event : string -> t
+
+(* [parse_event datalst] parses an event from associative list [datalst].
+   raises: "Invalid Event Data" if the list doesn't contain the requred
+    information. *)
+   val parse_event : (string*string) list -> t
 
 (* [make_event n f is ts] returns an event with name [n], form [f], items [is],
    and turn order [ts]. Output is set to "Event created."
