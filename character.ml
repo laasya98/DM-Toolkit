@@ -8,7 +8,7 @@ open Database
     modifier:int;
     corestat:string;
   }
-  type spells
+  type spell = Global.spell
 
   type c_class =
     | Barbarian
@@ -108,9 +108,6 @@ type c = {
     }
   (* TODO: whatever algorithm updates strength/skills/speed based off of level/chartype*)
   let skills c =  c.skills
-  let add_skill c s =
-    let skills = c.skills in
-    {c with skills = s::skills}
   let spells c = c.spells
   let add_spell c s =
     let spells = c.spells in

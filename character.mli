@@ -9,8 +9,8 @@ open Global
     modifier:int;
     corestat:string;
     }
- (*type ability encompasses spells and attacks*)
-  type ability
+ (*type spell is a global*)
+  type spell = Global.spell
 
   (* not thinking abt subclasses right now
  type elf_sub =
@@ -104,7 +104,7 @@ open Global
     level:int;
 
     skills: skill list;
-    abilities: ability list;
+    spells: spell list;
     equipped: ((item * int) list )* int;
     inv: ((item * int) list )* int;
     money: int;
@@ -176,14 +176,11 @@ open Global
   (* [skills character] is a list of skills a player has. *)
   val skills :  c -> skill list
 
-  (* [add_skill character skill] adds skill to character's skill list. *)
-  val add_skill :  c -> skill -> c
+  (* [spells character] all the spells a character can perform *)
+  val spells :  c -> spell list
 
-  (* [abilities character] c with xp = new_xp. *)
-  val abilities :  c -> ability list
-
-  (* [add_skill character skill] adds ability to the abilities a character can perform. *)
-  val add_ability :  c -> ability -> c
+  (* [add_spell character spell] adds spell to the spells a character can perform. *)
+  val add_spell :  c -> spell -> c
 
   (* [inv character] is a list of the items a player has. *)
   val inv :  c -> (item*int) list

@@ -35,9 +35,9 @@ type state = {
   current_location : location;
 }
 
-let empty_location = {
+(*let empty_location = {
 
-}
+  }*)
 let empty_state = {
 locations = [];
 characters = [];
@@ -56,7 +56,7 @@ let alter_state st ?(currLoc=st.current_location)
     event=evt;
     characters=chars;
     output=output;
-  }
+  } 
 
 let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
 
