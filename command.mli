@@ -29,9 +29,11 @@ open Global
        |StateChange of (string * string)
        |ItemChange of (string * string)
        |Roll of (string * string)
+       |UseItem of (string*string)
        (*inquiry commands*)
        |GetCharacterList of role
        |Invalid
+
 
   (** [parse str] is the command parsed from the player input [str].
       [parse] requires any string, which will be parsed into one of the commands

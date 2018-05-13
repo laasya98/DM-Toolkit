@@ -23,8 +23,10 @@ open Global
     |StateChange of (string * string)
     |ItemChange of (string * string)
     |Roll of (string * string)
+    |UseItem of (string*string)
     |GetCharacterList of role
     |Invalid
+
 
 
   (* [starts_with start str] returns true if str begins with with start,

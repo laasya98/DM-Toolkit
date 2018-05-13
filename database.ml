@@ -1,5 +1,3 @@
-open Event
-open Character
 open Global
 
 module type Database = sig

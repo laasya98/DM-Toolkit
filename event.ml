@@ -102,7 +102,7 @@ let parse_event dlist =
     in
     let (_,i) = List.find (fun (x,y) -> x="Name") dlist in
     let i' = parse_itemlst i in
-    make_event n f' i'
+    make_event n f' i' [] (*TODO: turn order*)
   with _ -> raise (Failure "Invalid Event Data")
 
 let clear_vout evt = alter_event evt ~v:"" "Verbose cleared."
@@ -292,9 +292,12 @@ let cast_status c s t evt =
     (*TODO: consolidate*)
 let use_item (i:item) c evt =
   let v = (C.name c)^" used "^i.name^"!" in
-  let c = cast_status c i.effect [c] (add_vout v evt) in
-  let t' = List.map (fun x -> fst x) c in
-  let v' = List.map (fun x -> snd x) c in
+  (* TODO let i' = match i.uses with
+    | Infinity -> i
+    | Int q -> {i with uses = Int (q-1)} in *)
+  let c' = cast_status c i.effect [c] (add_vout v evt) in
+  let t' = List.map (fun x -> fst x) c' in
+  let v' = List.map (fun x -> snd x) c' in
   let evt' = add_vout_lst "" v' evt in
   (evt', t')
 
