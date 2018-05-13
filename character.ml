@@ -8,7 +8,7 @@ open Database
     modifier:int;
     corestat:string;
   }
-  type spells
+  type spell = Global.spell
 
   type c_class =
     | Barbarian
@@ -108,13 +108,12 @@ type c = {
     }
   (* TODO: whatever algorithm updates strength/skills/speed based off of level/chartype*)
   let skills c =  c.skills
-  let add_skill c s =
-    let skills = c.skills in
-    {c with skills = s::skills}
   let spells c = c.spells
   let add_spell c s =
     let spells = c.spells in
     {c with spells = s::spells}
+  let abilities c = failwith "Unimplemented"
+  let add_ability c a = failwith "Unimplemented"
   let inv c : (item*int) list = fst c.inv
   let equipped c : (item*int) list= fst c.equipped
 
@@ -135,7 +134,8 @@ type c = {
     let items = fst (c.inv) in
     let cap = snd c.inv in
     if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
-      else c
+    else c
+  let remove_item c i n = failwith "Unimplemented"
   let money c = c.money
   let update_money c m = {c with money = m}
   let charisma c = c.charisma

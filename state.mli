@@ -49,13 +49,18 @@ open Global
     output :string;
     current_location : location;
   }
+(* [empty_location] is an location with default record values.  *)
+val empty_location : location
+
+(* [empty_state] is a state with default record values.  *)
+  val empty_state : state
 
 (* [init_state s] is the initial state of the game loaded from a save file s
    from a database.*)
   val init_state : data -> state
 
-(* [current_location s] returns the current location of the toolkit's focus. *)
-  val current_location : state -> string
+(* [current_location s] returns state with an output of current location of the toolkit's focus. *)
+  val current_location : state -> state
 
 (* [current_room_characters s] is a list of characters in the current room. *)
   val current_room_characters : state -> string list
@@ -74,7 +79,7 @@ open Global
     Outputs an error message if the p1 does not have the item in the correct
     quantity in their inventory, if p2 cannot hold the additional weight, or
     there is less than one item being given.*)
-  val give : state -> item -> character -> character -> state
+  val give : state -> ?q:int -> item -> character -> character -> state
 
 (* [action cmd state] takes in a command and a state and updates the state to
    reflect whatever command is input. This can involve calling events,

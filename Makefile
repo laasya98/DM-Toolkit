@@ -7,6 +7,9 @@ compile-i:
 compile:
 	ocamlbuild -use-ocamlfind event.cmo state.cmo character.cmo
 
+play:
+	ocamlbuild -use-ocamlfind main.byte && ./main.byte
+
 check:
 	bash checkenv.sh
 
