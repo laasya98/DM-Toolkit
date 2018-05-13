@@ -46,7 +46,7 @@ open Global
     creations??*)
 
   let parse s =
-    match (String.lowercase_ascii s) with
+    match (String.lowercase_ascii s |> String.trim) with
     | "save" -> Save
     | "quit" -> Quit
     | "help" -> Help

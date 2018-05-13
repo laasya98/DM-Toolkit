@@ -227,6 +227,6 @@ end
 | Turn -> let (evt', t') = E.turn st.event in
   let chars = update_chars t' st in
   alter_state st ~evt:evt' ~chars:chars "Turn incremented"
-| _ -> failwith "unimplemented"
+| _ -> alter_state st "Invalid move. Try again?"
 
 let output st = st.output
