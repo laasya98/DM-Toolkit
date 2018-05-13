@@ -2,13 +2,6 @@ open Global
 
   (* type skill should be all the possible skill types a player can potentially have
      it stores an int as the modifier and a bool as whether or not the skill is proficient*)
-  (*type corestat =
-    | Strength
-    | Wisdom
-    | Intelligence
-    | Charisma
-    | Constitution
-    | Dexterity*)
 
   type skill= {
     name:string;
@@ -16,13 +9,11 @@ open Global
     modifier:int;
     corestat:string;
     }
+ (*type ability encompasses spells and attacks*)
+  type ability
 
-  (* type skill should be all the possible spells a player can potentially use *)
-  type ability =
-   | Hill
-   | Mountain
-
-   type elf_sub =
+  (* not thinking abt subclasses right now
+ type elf_sub =
     | High
     | Wood
     | Dark
@@ -45,7 +36,7 @@ open Global
 
   type gnome_sub =
    | Forest
-   | Rock
+   | Rock*)
 
 
 

@@ -2,8 +2,13 @@ open Global
 open Database
 
   type item = Global.item
-  type skill
-  type ability
+  type skill = {
+    name:string;
+    prof:bool;
+    modifier:int;
+    corestat:string;
+  }
+  type spells
 
   type c_class =
     | Barbarian
@@ -64,7 +69,7 @@ type c = {
   level:int;
 
   skills: skill list;
-  abilities: ability list;
+  spells: spell list;
   equipped: ((item * int) list )* int;
   inv: ((item * int) list )* int;
   money: int;
@@ -106,10 +111,10 @@ type c = {
   let add_skill c s =
     let skills = c.skills in
     {c with skills = s::skills}
-  let abilities c = c.abilities
-  let add_ability c a =
-    let abilities = c.abilities in
-    {c with abilities = a::abilities}
+  let spells c = c.spells
+  let add_spell c s =
+    let spells = c.spells in
+    {c with spells = s::spells}
   let inv c : (item*int) list = fst c.inv
   let equipped c : (item*int) list= fst c.equipped
 
@@ -191,10 +196,149 @@ type c = {
 
 let ability_mod a =
   let b = a - 10 in
-  if (mod b 2) = 0
+  if (b/2)*2 = b
   then b/2 else (b-1)/2
 
 let int_of_die d = int_of_string (String.sub d 1 (String.length d) )
+
+let all_skills = (*Database.allskills*)
+  {
+    name="acrobatics";
+    prof=false;
+    modifier=0;
+    corestat = "dex";
+  } ::
+  {
+    name="arcana";
+    prof=false;
+    modifier=0;
+    corestat = "int";
+  } ::
+  {
+    name="animal handling";
+    prof=false;
+    modifier=0;
+    corestat = "wis";
+  } ::
+  {
+    name="athletics";
+    prof=false;
+    modifier=0;
+    corestat = "str";
+  } ::
+  {
+    name="deception";
+    prof=false;
+    modifier=0;
+    corestat = "cha";
+  } ::
+  {
+    name="history";
+    prof=false;
+    modifier=0;
+    corestat = "int";
+  } ::
+  {
+    name="insight";
+    prof=false;
+    modifier=0;
+    corestat = "wis";
+  } ::
+  {
+    name="acrobatics";
+    prof=false;
+    modifier=0;
+    corestat = "dex";
+  } ::
+  {
+    name="intimidation";
+    prof=false;
+    modifier=0;
+    corestat = "cha";
+  } ::
+  {
+    name="medicine";
+    prof=false;
+    modifier=0;
+    corestat = "wis";
+  } ::
+  {
+    name="investigation";
+    prof=false;
+    modifier=0;
+    corestat = "int";
+  } ::
+  {
+    name="nature";
+    prof=false;
+    modifier=0;
+    corestat = "int";
+  } ::
+  {
+    name="perception";
+    prof=false;
+    modifier=0;
+    corestat = "wis";
+  } ::
+  {
+    name="performance";
+    prof=false;
+    modifier=0;
+    corestat = "cha";
+  } ::
+  {
+    name="persuasion";
+    prof=false;
+    modifier=0;
+    corestat = "cha";
+  } ::
+  {
+    name="religion";
+    prof=false;
+    modifier=0;
+    corestat = "int";
+  } ::
+  {
+    name="sleight of hand";
+    prof=false;
+    modifier=0;
+    corestat = "dex";
+  } ::
+  {
+    name="stealth";
+    prof=false;
+    modifier=0;
+    corestat = "dex";
+  } ::
+  {
+    name="survival";
+    prof=false;
+    modifier=0;
+    corestat = "wis";
+  } ::
+  []
+
+let rec skill_set c (s:skill list) =
+  match s with
+  | [] -> []
+  | h::t -> let skill1 = if h.corestat = "str" then
+                let new_mod = h.modifier+c.str_mod in
+                {h with modifier = new_mod } else
+              if h.corestat = "dex" then
+                let new_mod = h.modifier+c.dex_mod in
+                {h with modifier = new_mod } else
+              if h.corestat = "cha" then
+                let new_mod = h.modifier+c.char_mod in
+                {h with modifier = new_mod } else
+              if h.corestat = "int" then
+                let new_mod = h.modifier+c.int_mod in
+                {h with modifier = new_mod } else
+              if h.corestat = "wis" then
+                let new_mod = h.modifier+c.wis_mod in
+                {h with modifier = new_mod } else h in
+    let skill2 = if skill1.prof then let newer_mod = skill1.modifier+c.prof_bonus in
+        {skill1 with modifier = newer_mod} else h
+in skill2::(skill_set c t)
 
 let blank_char = {
   name = "Allan";
@@ -222,8 +366,8 @@ let blank_char = {
   hd_qty = 0;
   xp = 0;
   level = 1;
-  skills = [];
-  abilities = [];
+  skills = all_skills;
+  spells = [];
   equipped = [],0;
   inv = [],0;
   money = 0;
@@ -320,8 +464,8 @@ let blank_char = {
                      strength = List.nth stats 4;
                      dexterity = List.nth stats 5; }
     in
-    (* let hit = Database.get_hd c in
-    let step2 = (* non core stats, speed, armor class*)
+    let hit = (*Database.get_hd c*) "d10" in
+    let step2 = (* non core stats, speed, ability modifiers*)
                 {step1 with
                  name = n;
                  cons_mod = ability_mod step1.constitution;
@@ -330,14 +474,19 @@ let blank_char = {
                  int_mod = ability_mod step1.intel ;
                  str_mod = ability_mod step1.strength;
                  dex_mod = ability_mod step1.dexterity;
-                 prof_bonus = 2
-                 hd = hit;
+                 prof_bonus = 2;
+                 hd = int_of_die hit;
                  hd_qty = 1;
                  max_hp = int_of_die hit;
                  hp = int_of_die hit;
-                 speed = Database.get_speed r;
+                 speed = (*Database.get_speed r*) 40;
                 }
 
       in
-      let step3 = step2 in (*initializing skills and items*)*)
-    step1
+      let step3 = {step2 with
+                   spells = []; (*Database.get_spells c*)
+                   skills = skill_set step2 all_skills;
+                   armor_class = 10+step2.dex_mod;
+
+                  }in (*initializing skills and items*)
+    step3
