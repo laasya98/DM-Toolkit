@@ -9,11 +9,10 @@
  *)
 open State
 open Command
-open ANSITerminal
 
 (* [repl s] updates the state of the adventure *)
 let rec repl state =
-  print_string  "\n> ";
+  ANSITerminal.(print_string [red]  "\n> ");
   let cmd =  read_line () |> parse  in
   let s' = action cmd state  in
   if cmd = Invalid
@@ -22,10 +21,10 @@ let rec repl state =
   let () = match cmd with
     |Quit -> exit 0
     |Help -> ANSITerminal.(print_string [blue] "some rules and such");
-    |Event x ->  ANSITerminal.(print_string [green] "Current event is "^ s'.event);
+    |Event x ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
       print_endline s'.output;
       (*)|Inquiry -> *)
-    |Move x-> ANSITerminal.(print_string [green] "You're now in "^ s'.current_location);
+    |Move x-> (*ANSITerminal.(print_string [green] "You're now in "^ s'.current_location)*)
       print_endline (s'.output);
     |Use x -> print_endline (s'.output);
     |Give x-> print_endline (s'.output);
@@ -50,15 +49,14 @@ repl s'
 
 (* [play_game f] plays the game in adventure file [f]. *)
 let start_game f =
-  try (repl init_state)
+  try (repl empty_state)
   with _ -> print_endline (" Invalid D&D File. Try again?")
 
 (* [main ()] starts the REPL, which prompts for a game to play.
  * You are welcome to improve the user interface, but it must
  * still prompt for a game to play rather than hardcode a game file. *)
 let main () =
-  ANSITerminal.(print_string [red]
-    "\n\nWelcome to the DM toolkit\n");
+  ANSITerminal.(print_string [red] "\n\nWelcome to the DM toolkit\n");
   print_endline "Please enter the name of the game file you want to load.\n";
   print_string  "> ";
   match read_line () with

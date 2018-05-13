@@ -1,5 +1,3 @@
-open Event
-open Character
 open Global
 
 module type Database = sig
@@ -27,7 +25,6 @@ module type Database = sig
 end
 
 module Database = struct
-  module C = Character
   type data
 
   let load_data s = failwith "unimplemented"
