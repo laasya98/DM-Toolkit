@@ -35,6 +35,8 @@ open Database
     | Half_Orc
     | Tiefling
 
+type ability
+
 type c = {
   name:string;
   race:race;
@@ -70,6 +72,7 @@ type c = {
 
   skills: skill list;
   spells: spell list;
+  abilities: ability list;
   equipped: ((item * int) list )* int;
   inv: ((item * int) list )* int;
   money: int;
@@ -115,6 +118,8 @@ type c = {
   let add_spell c s =
     let spells = c.spells in
     {c with spells = s::spells}
+  let abilities c = failwith "Unimplemented"
+  let add_ability c a = failwith "Unimplemented"
   let inv c : (item*int) list = fst c.inv
   let equipped c : (item*int) list= fst c.equipped
 
@@ -135,7 +140,8 @@ type c = {
     let items = fst (c.inv) in
     let cap = snd c.inv in
     if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
-      else c
+    else c
+  let remove_item c i n = failwith "Unimplemented"
   let money c = c.money
   let update_money c m = {c with money = m}
   let charisma c = c.charisma
@@ -368,6 +374,7 @@ let blank_char = {
   level = 1;
   skills = all_skills;
   spells = [];
+  abilities = [];
   equipped = [],0;
   inv = [],0;
   money = 0;

@@ -104,6 +104,7 @@ open Global
     level:int;
 
     skills: skill list;
+    spells: spell list;
     abilities: ability list;
     equipped: ((item * int) list )* int;
     inv: ((item * int) list )* int;
@@ -188,8 +189,12 @@ open Global
   (* [inv character] is a list of the items a player has. *)
   val inv :  c -> (item*int) list
 
-  (* [add_item character i] adds i to the characters inventory.*)
+  (* [add_item character i ] adds n amount of i to the characters inventory.*)
   val add_item :  c -> item -> int -> c
+
+  (* TODO: [remove_item character i n] removes n amount of i from the character's
+   inventory*)
+  val remove_item : c -> item -> int -> c
 
   (* [equipped character] is a list of the items a player has equipped. *)
   val equipped :  c ->  (item*int) list

@@ -36,14 +36,20 @@ type state = {
 }
 
 let empty_location = {
-
+  name = "empty";
+  description = "no description";
+  characters = [];
+  contents = [];
+  exits = [];
 }
+
 let empty_state = {
 locations = [];
 characters = [];
 event = init_event "";
 output = "";
-current_location =
+current_location = empty_location;
+}
 
 
 (** [alter_state] st currLoc evt chars output is a function for conveniently
@@ -60,7 +66,7 @@ let alter_state st ?(currLoc=st.current_location)
 
 let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
 
-let current_location st = st.current_location.name
+let current_location st = alter_state st st.current_location.name
 let current_room_characters st = failwith "unimplemented"
 let rooms st = failwith "unimplemented"
 let effects st = failwith "unimplemented"
@@ -87,14 +93,16 @@ let character_list_filter ls role =
 
 
 (*still needs to add remove_item and support giving more than one item*)
-let give st item p1 p2 (* ?(q=1) *) = failwith "unimplemented"
-    (* )
-  let c1 = (List.find (fun x -> fst x = p1)) in
-  let c1' = ((*C.remove_item*) fst c1, snd c1) in
-  let c2 = C.add_item (List.filter (fun x -> fst x = p2)) item in
-  let c2' = (C.add_item (fst c2) item, snd c2) in
-  let clist = (List.filter (fun x -> (fst x != c1) || (fst x != c2))) in
-       {st with characters = c1'::c2'::clist} *)
+let give st ?(q=1) item p1 p2 =
+  try
+    let c1 = (List.find (fun x -> fst x = p1) st.characters) in
+    let c1' = (C.remove_item (fst c1) item q), snd c1 in
+    let c2 = (List.find (fun x -> fst x = p2) st.characters) in
+    let c2' = (C.add_item (fst c2) item q), snd c2 in
+    let clist = (List.filter (fun x -> (fst x <> p1)) st.characters) in
+    let clist' = (List.filter (fun x -> (fst x != p2)) clist) in
+    alter_state {st with characters = c1'::c2'::clist'} (item.name ^ "given")
+  with _ -> alter_state st ("One or more items or characters missing")
 
 let update_char c c' ?(r'=None) st =
 match r' with
@@ -171,7 +179,7 @@ let cast c s t evt st =
       let chars = update_chars t' st in
       alter_state st ~evt:evt' ~chars:chars ((C.name c)^" cast "^(s)^"!")
   with _ -> alter_state st "One or more target names invalid."
-
+              (*
 let use_item i t evt st =
   let t' = char_by_name t st in
   try
@@ -182,7 +190,8 @@ let use_item i t evt st =
       let (evt', t') = E.cast c s' t' evt in
       let chars = update_chars t' st in
       alter_state st ~evt:evt' ~chars:chars ((C.name c)^" cast "^(s)^"!")
-  with _ -> alter_state st "Item not found in character inventory."
+      with _ -> alter_state st "Item not found in character inventory."
+              *)
 
 let action (c:command) (st:state) =
 match c with
@@ -196,9 +205,6 @@ end
   | Battle -> cast c s t st.event st
   | _ -> alter_state st "No battle event occurring." (*TODO: change for non-attack *)
 end
-| UseItem (c,i) -> begin
-  failwith "Unimplemented"
-end
 | Buy (ch,i,q) -> begin
     match E.get_form st.event with
     | Shop -> begin
@@ -206,8 +212,7 @@ end
       with _ -> alter_state st "Invalid item quantity."
     end
     |_ -> alter_state st "Action Failed: There is no shop here."
-  end
-  |_ -> alter_state st "Action Failed: There is no shop here."
+end
 | Turn -> let (evt', t') = E.turn st.event in
   let chars = update_chars t' st in
   alter_state st ~evt:evt' ~chars:chars "Turn incremented"
