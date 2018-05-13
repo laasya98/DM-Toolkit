@@ -25,7 +25,6 @@ module type Database = sig
 end
 
 module Database = struct
-  module C = Character
   type data
 
   let load_data s = failwith "unimplemented"
