@@ -162,11 +162,20 @@ let rec add_vout_lst s lst evt =
       if (get_weapon attacker).t = Ranged then C.dex attacker
       else C.strength attacker
     with _ -> C.strength attacker in
-      ability + roll_dice dice 0
+    ability + roll_dice dice 0
 
-  let deal_damage a t =
-    let hp = C.curr_hp t in
-    C.update_hp t (hp - a)
+(*TODO: don't change bases? *)
+let apply_effect s a t =
+  match s with
+  | Constitution -> C.update_const t (C.const t + a)
+  | Charisma -> C.update_charisma t (C.charisma t + a)
+  | Wisdom -> C.update_wisdom t (C.wisdom t + a)
+  | Intel -> C.update_intel t (C.intel t + a)
+  | Str -> C.update_strength t (C.strength t + a)
+  | Dex -> C.update_dex t (C.dex t + a)
+  | HP -> C.update_hp t (C.curr_hp t + a)
+
+let deal_damage a t = apply_effect HP (-1 *a) t
 
 (* returns the event and new state of the target after being hit*)
   let attack a t evt =
@@ -237,8 +246,33 @@ let cast_damage c s t evt =
     List.map (fun n -> (deal_damage d n, (C.name n)^" took "^
                                          (string_of_int d)^" damage!")) t
 
+let string_of_stat s =
+  match s with
+  | Constitution -> "Constitution"
+  | Charisma -> "Charisma"
+  | Wisdom -> "Wisdom"
+  | Intel -> "Intelligence"
+  | Str -> "Strength"
+  | Dex -> "Dexterity"
+  | HP -> "HP"
+
+let cast_status c s t evt =
+  let d = roll_dice s.die s.bonus in
+  List.map (fun n -> (apply_effect s.stat d n,
+                      (C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
+                      (string_of_int d)^"!")) t
+
+    (*TODO: consolidate*)
+let use_item (i:item) c evt =
+  let v = (C.name c)^" used "^i.name^"!" in
+  let c = cast_status c i.effect [c] (add_vout v evt) in
+  let t' = List.map (fun x -> fst x) c in
+  let v' = List.map (fun x -> snd x) c in
+  let evt' = add_vout_lst "" v' evt in
+  (evt', t')
+
   let cast c s t evt =
-    if s.to_cast = 0 then
+    if s.to_cast = 0 || evt.form <> Battle then
       match s.stype with (*TODO*)
       | Damage d -> begin
           let v = (C.name c)^" cast "^s.name^"!" in
@@ -249,7 +283,14 @@ let cast_damage c s t evt =
           (evt', t')
       end
       | Conjuration -> (evt, [])
-      | Status -> (evt, [])
+      | Status d -> begin
+          let v = (C.name c)^" cast "^s.name^"!" in
+          let c = cast_status c d t (add_vout v evt) in
+          let t' = List.map (fun x -> fst x) c in
+          let v' = List.map (fun x -> snd x) c in
+          let evt' = add_vout_lst "" v' evt in
+          (evt', t')
+      end
     else
       (add_spell c s t evt, [])
 

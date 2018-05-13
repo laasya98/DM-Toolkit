@@ -75,4 +75,6 @@ open Global
 
 (* [get_waiting_spells evt] returns an association list of the waiting spells
    and the turn on which they will be cast. *)
-  val get_waiting_spells : t -> (spell*int) list
+val get_waiting_spells : t -> (spell*int) list
+
+val use_item: item -> character -> t -> (t * character list)

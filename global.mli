@@ -1,7 +1,17 @@
+type stat =
+  | Constitution
+  | Charisma
+  | Wisdom
+  | Intel
+  | Str
+  | Dex
+  | HP
+
 (* For now, just change a stat by set amount. *)
 type effect = {
-  stat:string; (*TODO: temp. Coordinate with character.*)
-  amount:int;
+  stat:stat;
+  die:int list;
+  bonus: int;
 }
 
 (* [quantity] is a type for that supports an infinite number of a thing.*)
@@ -55,7 +65,7 @@ type damage_spell ={
 type spelltype =
   | Damage of damage_spell
   | Conjuration
-  | Status
+  | Status of effect
 
 type spell =
   {
