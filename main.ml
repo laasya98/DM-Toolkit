@@ -9,14 +9,48 @@
  *)
 open State
 open Command
+open ANSITerminal
 
 (* [repl s] updates the state of the adventure *)
 let rec repl state =
-  print_string  "\n> "; ()
+  print_string  "\n> ";
+  let cmd =  read_line () |> parse  in
+  let s' = action cmd state  in
+  if cmd = Invalid
+  then
+    let () = print_endline ("Invalid move. Try again.") in repl s' else
+  let () = match cmd with
+    |Quit -> exit 0
+    |Help -> ANSITerminal.(print_string [blue] "some rules and such");
+    |Event x ->  ANSITerminal.(print_string [green] "Current event is "^ s'.event);
+      print_endline s'.output;
+      (*)|Inquiry -> *)
+    |Move x-> ANSITerminal.(print_string [green] "You're now in "^ s'.current_location);
+      print_endline (s'.output);
+    |Use x -> print_endline (s'.output);
+    |Give x-> print_endline (s'.output);
+    |Take x-> print_endline (s'.output);
+    |Drop x -> print_endline (s'.output);
+    |Shop x-> print_endline (s'.output);
+    |Buy x -> print_endline (s'.output);
+    |Fight x -> print_endline (s'.output);
+    |Cast x -> print_endline (s'.output);
+    |Inv -> print_endline (s'.output);
+    |Turn -> print_endline (s'.output);
+    |QuickBuild x -> print_endline (s'.output);
+    |CharacterAction -> print_endline (s'.output);
+    |StateChange x -> print_endline (s'.output);
+    |ItemChange x -> print_endline (s'.output);
+    |Roll x -> print_endline (s'.output);
+    |GetCharacterList ox -> print_endline (s'.output);
+    |Invalid
+    | _ -> ()
+  in
+repl s'
 
 (* [play_game f] plays the game in adventure file [f]. *)
 let start_game f =
-  try ()
+  try (repl init_state)
   with _ -> print_endline (" Invalid D&D File. Try again?")
 
 (* [main ()] starts the REPL, which prompts for a game to play.
