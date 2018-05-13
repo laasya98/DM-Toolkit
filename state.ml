@@ -192,12 +192,18 @@ match c with
   | _ -> alter_state st "No battle event occurring."
 end
 | Cast (c,s,t) -> begin
-  match E.get_form st.event with
-  | Battle -> cast c s t st.event st
-  | _ -> alter_state st "No battle event occurring." (*TODO: change for non-attack *)
+    match s.stype with
+    | Conjuration -> failwith "Unimplemented"
+    | Status -> cast c s t st.event st
+    | Damage d ->
+      match E.get_form st.event with
+      | Battle -> cast c s t st.event st
+      | _ -> alter_state st "No battle event occurring."
 end
 | UseItem (c,i) -> begin
-  failwith "Unimplemented"
+  let (evt', t') = E.use_item i c st.event in
+  let chars = update_chars t' st in
+  alter_state st ~evt:evt' ~chars:chars "Item used."
 end
 | Buy (ch,i,q) -> begin
     match E.get_form st.event with

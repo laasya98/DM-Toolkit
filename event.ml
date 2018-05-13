@@ -1,5 +1,6 @@
 open Character
 open Global
+open Database
 
   module C = Character
   type character = Character.c
@@ -57,6 +58,53 @@ open Global
       spells = spells;
     }
 
+let change_item_q i q lst =
+  let gz n = match n with
+    |Infinity -> true
+    |Int n -> n>0
+  in
+  List.map (fun (a,b) -> if a=i then (a,q) else (a,b)) lst
+  |> List.filter (fun (_,n) -> gz n)
+
+let add_item (i:item) q evt =
+  match List.find_opt (fun ((x:item),q) -> x.name=i.name) evt.items with
+  | None -> alter_event evt ~items:((i,q)::evt.items) "Item added."
+  | Some (x,n) ->
+    match n with
+    | Infinity -> alter_event evt "There are already infinite."
+    | Int n ->
+      match q with
+      | Int q -> alter_event evt
+                ~items:(change_item_q i (Int (n+q)) evt.items) "Item added."
+      | Infinity -> alter_event evt
+                      ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
+
+let parse_itemlst ilst =
+  let ilst' = String.split_on_char '+' ilst in
+  let get_item str =
+    match String.split_on_char '-' ilst with
+    | i::q::t -> begin
+        let q' = try Int (int_of_string q) with _ -> Infinity in
+        (Database.get_item i, q')
+    end
+    | _ -> failwith "Invalid?"
+  in
+  List.map get_item ilst'
+
+let calc_turn_order c evt = failwith "unimplemented"
+
+let parse_event dlist =
+  try
+    let (_,n) = List.find (fun (x,y) -> x="Name") dlist in
+    let (_,f) = List.find (fun (x,y) -> x="Form") dlist in
+    let f' =
+      if f="Battle" then Battle else if f="Shop" then Shop else Interaction
+    in
+    let (_,i) = List.find (fun (x,y) -> x="Name") dlist in
+    let i' = parse_itemlst i in
+    make_event n f' i'
+  with _ -> raise (Failure "Invalid Event Data")
+
 let clear_vout evt = alter_event evt ~v:"" "Verbose cleared."
 
 let add_vout s evt = alter_event evt ~v:(evt.v_out^"\n"^s) "Verbose updated."
@@ -71,27 +119,6 @@ let rec add_vout_lst s lst evt =
   let get_name evt = evt.name
 
   let get_output evt = evt.output
-
-  let change_item_q i q lst =
-    let gz n = match n with
-      |Infinity -> true
-      |Int n -> n>0
-    in
-    List.map (fun (a,b) -> if a=i then (a,q) else (a,b)) lst
-    |> List.filter (fun (_,n) -> gz n)
-
-  let add_item i q evt =
-    match List.find_opt (fun (x,q) -> x=i) evt.items with
-    | None -> alter_event evt ~items:((i,q)::evt.items) "Item added."
-    | Some (x,n) ->
-      match n with
-      | Infinity -> alter_event evt "There are already infinite."
-      | Int n ->
-        match q with
-        | Int q -> alter_event evt
-                ~items:(change_item_q i (Int (n+q)) evt.items) "Item added."
-        | Infinity -> alter_event evt
-                ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
 
   let remove_item name q evt =
     match List.find_opt (fun ((x:item),q) -> x.name=name) evt.items with
