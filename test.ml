@@ -37,17 +37,27 @@ let char1:Character.c = {
   money = 10;
   intel=0;
   strength=2;
+  int_mod = 0;
+  wis_mod = 0;
+  char_mod = 0;
+  cons_mod = 0;
+  str_mod = 0;
+  dex_mod = 0;
+  prof_bonus = 2;
+  passive_wisdom = 0;
   dexterity=1;
+
   speed=1;
   max_hp=10;
   hp=10;
   xp=0;
   level=1;
   skills=[];
-  abilities=[];
+  spells=[];
   equipped=[],3;
   inv=[item2,1],3;
 }
+
 
 let char2:Character.c = {
   name="char2";
@@ -63,13 +73,21 @@ let char2:Character.c = {
   intel=0;
   strength=2;
   dexterity=1;
+  int_mod = 0;
+  wis_mod = 0;
+  char_mod = 0;
+  cons_mod = 0;
+  str_mod = 0;
+  dex_mod = 0;
+  prof_bonus = 2;
+  passive_wisdom = 0;
   speed=1;
   max_hp=10;
   hp=5;
   xp=0;
   level=1;
   skills=[];
-  abilities=[];
+  spells=[];
   equipped=[],3;
   inv=[item1,2],3;
 }

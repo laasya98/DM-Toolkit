@@ -8,7 +8,7 @@ open Database
     modifier:int;
     corestat:string;
   }
-  type spells
+  type spell = Global.spell
 
   type c_class =
     | Barbarian
@@ -34,8 +34,6 @@ open Database
     | Half_Elf
     | Half_Orc
     | Tiefling
-
-type ability
 
 type c = {
   name:string;
@@ -72,7 +70,6 @@ type c = {
 
   skills: skill list;
   spells: spell list;
-  abilities: ability list;
   equipped: ((item * int) list )* int;
   inv: ((item * int) list )* int;
   money: int;
@@ -111,9 +108,6 @@ type c = {
     }
   (* TODO: whatever algorithm updates strength/skills/speed based off of level/chartype*)
   let skills c =  c.skills
-  let add_skill c s =
-    let skills = c.skills in
-    {c with skills = s::skills}
   let spells c = c.spells
   let add_spell c s =
     let spells = c.spells in
@@ -374,7 +368,6 @@ let blank_char = {
   level = 1;
   skills = all_skills;
   spells = [];
-  abilities = [];
   equipped = [],0;
   inv = [],0;
   money = 0;
