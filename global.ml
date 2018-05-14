@@ -100,7 +100,7 @@ try
   else accum + total
 with _ ->  raise (Bad_dice "cannot read dice input")
 
-let roll_dice str =
+let roll_dice_string str =
   let str' = str|>String.trim|>String.lowercase_ascii in
   dice_helper str' 0
 

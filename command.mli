@@ -29,9 +29,10 @@ open Global
        |CharacterAction
        |StateChange of (string * string)
        |ItemChange of (string * string)
-       |Roll of (string * string)
+       |Roll of (string)
        |UseItem of (string*string)
        |GetCharacterList of role
+       |GetExits
        |Invalid
 
 
