@@ -252,11 +252,13 @@ let action (c:command) (st:state) =
   end
   |GetExits -> alter_state st (String.concat ", " (get_exits st))
   |Roll d -> alter_state st (string_of_int (Global.roll_dice_string d))
-  |QuickBuild lst -> alter_state st "Unimplemented"(*let n = List.hd in let c = List.hd (List.tl lst) in
+  |QuickBuild lst -> (*alter_state st "Unimplemented"*)
+    let n = List.hd lst in
+    let c = List.hd (List.tl lst) in
     let r = List.nth lst 2 in
     let newchar = C.quickbuild n c r in
     let newcharls = ((newchar,Party) :: st.characters) in
-                       alter_state st ~chars:newcharls "New Character, " ^ n ^ ", added to party!"*)
+    alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
   | _ -> alter_state st "Invalid move. Try again?"
 
 let output st = st.output

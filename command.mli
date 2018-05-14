@@ -11,7 +11,7 @@ open Global
        |Load of string
        |Save
        |Quit
-       |Help
+       |Help of string
        |Event of string
        |Inquiry
        |Move of (string *string)
