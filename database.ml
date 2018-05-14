@@ -72,30 +72,32 @@ module Database = struct
   let save_data f d = failwith "UNIMPLEMENTED"
 
   (** []  *)
-  let get typ ind field file =
-    let d = load_data file in
+  let get_lst typ ind file =
+    let d = load_data (Hashtbl.find files file) in
     let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
     List.find (fun l -> idk (List.assoc typ l)  = idk ind) d
-        |> List.assoc field
 
-  let hit_die c = let l = (Hashtbl.find files "class_data") in
-    get "class" c "hit_die" l
+  let get typ ind field file =
+    get_lst typ ind file |> List.assoc field
+
+  let hit_die c =
+    get "class" c "hit_die" "class_data"
                   |> int_of_string
 
   let tup_from_list l =
     ((try List.nth l 0 with _ -> ""), (try List.nth l 1 with _ -> ""))
 
-  let primary_stat c = let l = (Hashtbl.find files "class_data") in
-    get "class" c "primary" l
+  let primary_stat c =
+    get "class" c "primary" "class_data"
                        |> String.split_on_char ' '
                        |> tup_from_list
 
-  let speed_of r = let l = Hashtbl.find files "race_data" in
-    get "race" r "speed" l
+  let speed_of r =
+    get "race" r "speed" "race_data"
                        |> int_of_string
 
   let get_item s = failwith "unimplemented"
   let get_location s = failwith "unimplemented"
-  let get_event s = failwith "unimplemented"
+  let get_event s = get_lst "name" s "event_data"
   let get_char s = failwith "unimplemented"
 end
