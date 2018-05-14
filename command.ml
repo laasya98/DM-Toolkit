@@ -31,6 +31,7 @@ open Global
     (* GETTERS  *)
     |GetCharacterList of role
     |GetExits
+    |Whois of string
     |Invalid
 
 
@@ -131,5 +132,7 @@ let parse s =
         | _ -> Invalid end
     |"quickbuild" -> let x = (remove_start "quickbuild" s)  in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
-        QuickBuild lst
+      QuickBuild lst
+    | "who" -> let x = (remove_start "who is" s) in Whois x
+    | "whomst" -> let x = (remove_start "whomst" s) in Whois x
     |_ -> Invalid

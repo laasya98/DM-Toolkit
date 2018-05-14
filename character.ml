@@ -176,6 +176,21 @@ let ability_mod a =
     | "wizard" -> Wizard
     | _ -> failwith "don't do that"
 
+let string_of_class c =
+  match c with
+  | Barbarian -> "Barbarian"
+  | Bard -> "Bard"
+  | Cleric -> "Cleric"
+  | Druid -> "Druid"
+  | Fighter -> "Fighter"
+  | Monk-> "Monk"
+  | Paladin -> "Paladin"
+  | Ranger -> "Ranger"
+  | Rogue -> "Rogue"
+  | Sorcerer -> "Sorcerer"
+  | Warlock -> "Warlock"
+  | Wizard -> "Wizard"
+
   let race_of_string s =
     match s |> String.lowercase_ascii  |> String.trim with
       | "dwarf" -> Dwarf
@@ -188,15 +203,17 @@ let ability_mod a =
       | "halforc" | "half-orc" -> Half_Orc
       | "tiefling" -> Tiefling
       | _ -> failwith "not a race, spell better pls"
-
-
-  let rec stat_lister acc : int list=
-    if List.length acc = 6
-      then
-        acc |> List.sort compare |> List.rev
-      else
-        let stat =  Global.roll_dice_int 4 6 3 in
-        stat_lister (stat::acc)
+let string_of_race r =
+  match r with
+  | Dwarf -> "Dwarf"
+  | Elf -> "Elf"
+  | Halfling -> "Halfling"
+  | Human -> "Human"
+  | Dragonborn -> "Dragonborn"
+  | Gnome -> "Gnome"
+  | Half_Elf -> "Half-Elf"
+  | Half_Orc -> "Half-Orc"
+  | Tiefling -> "Tiefling"
 
 let all_skills = (*Database.allskills*)
   {
@@ -314,6 +331,14 @@ let all_skills = (*Database.allskills*)
     corestat = "wis";
   } ::
   []
+
+  let rec stat_lister acc : int list=
+    if List.length acc = 6
+      then
+        acc |> List.sort compare |> List.rev
+      else
+        let stat =  Global.roll_dice_int 4 6 3 in
+        stat_lister (stat::acc)
 
 let rec skill_set c (s:skill list) =
   match s with
@@ -450,4 +475,16 @@ let quickbuild n c r =
                    armor_class = 10+step2.dex_mod;
                   }
       in
-    step3
+      step3
+
+let details c =
+  "Character " ^ c.name ^ ":\n" ^
+    "Class: " ^ (c.c_class |> string_of_class) ^ "\n" ^
+    "Race: " ^ (c.race|> string_of_race)  ^ "\n" ^
+    "HP: " ^ (c.hp |> string_of_int)  ^ "\n" ^
+    "Strength: " ^ (c.strength |> string_of_int)  ^ "\n" ^
+    "Wisdom: " ^ (c.wisdom |> string_of_int)  ^ "\n" ^
+    "Intelligence: " ^ (c.intel |> string_of_int) ^  "\n" ^
+    "Dexterity: " ^ (c.dexterity |> string_of_int)  ^ "\n" ^
+    "Constitution: " ^ (c.constitution |> string_of_int)  ^ "\n" ^
+    "Charisma: " ^ (c.charisma |> string_of_int)  ^ "\n"

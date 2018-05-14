@@ -65,6 +65,7 @@ type spell =
     to_cast: int;
   }
 
+
 (* [role] is the role of a character.
    Party signals a player character.
    A Friendly npc will aid the characters in the event
@@ -88,3 +89,5 @@ val roll_dice_int : int -> int -> int -> int
 val parse_item : (string*string) list -> item
 
 val parse_spell : (string * string) list -> spell
+
+val find_assoc : string -> (string*string)list -> string

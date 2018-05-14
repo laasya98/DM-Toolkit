@@ -33,6 +33,7 @@ type state = {
   event : event;
   output :string;
   current_location : location;
+  files:(string*string) list;
 }
 
 let empty_location = {
@@ -45,10 +46,11 @@ let empty_location = {
 
 let empty_state = {
   locations = [];
-characters = [];
-event = init_event "";
-output = "";
-current_location = empty_location;
+  characters = [];
+  event = init_event "";
+  output = "";
+  current_location = empty_location;
+  files = [];
 }
 
 
@@ -62,6 +64,7 @@ let alter_state st ?(currLoc=st.current_location)
     event=evt;
     characters=chars;
     output=output;
+    files=st.files;
   }
 
 let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
@@ -320,7 +323,14 @@ let action (c:command) (st:state) =
       let c = List.map fst st.characters in
       let evt = E.make_event n f' [] c in
       alter_state st ~evt:evt "Event started."
-  end
+    end
+  | Whois x -> begin
+      let s =
+      match char_by_name x st with
+        | Some c -> C.details c
+        | None -> "Invalid move. That's not a character"
+      in alter_state st s
+    end
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
 
 let output st = st.output
