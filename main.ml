@@ -38,29 +38,12 @@ let rec repl state =
     |Quit -> exit 0
     |Help s -> let print = if (s = "") then help_file else (List.assoc s helps) in
       ANSITerminal.(print_string [blue] print);
-    |Event x ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
+    |Event ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
       print_endline s'.output;
       (*)|Inquiry -> *)
     |Move x-> (*ANSITerminal.(print_string [green] "You're now in "^ s'.current_location)*)
       print_endline (s'.output);
-    |Use x -> print_endline (s'.output);
-    |Give x-> print_endline (s'.output);
-    |Take x-> print_endline (s'.output);
-    |Drop x -> print_endline (s'.output);
-    |Shop x-> print_endline (s'.output);
-    |Buy x -> print_endline (s'.output);
-    |Fight x -> print_endline (s'.output);
-    |Cast x -> print_endline (s'.output);
-    |Inv -> print_endline (s'.output);
-    |Turn -> print_endline (s'.output);
-    |QuickBuild x -> print_endline (s'.output);
-    |CharacterAction -> print_endline (s'.output);
-    |StateChange x -> print_endline (s'.output);
-    |ItemChange x -> print_endline (s'.output);
-    |Roll x -> print_endline (s'.output);
-    |GetCharacterList ox -> print_endline (s'.output);
-    |Invalid -> print_endline "Invalid Command";
-    | _ -> ()
+    | _ -> print_endline (s'.output);
   in
 repl s'
 

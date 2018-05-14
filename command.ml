@@ -6,7 +6,9 @@ open Global
     |Save
     |Quit
     |Help of string
-    |Event of string
+    |Event
+    |LoadEvent of string
+    |QuickEvent of (string*string)
     |Inquiry
     |Move of (string *string)
     |Use of (string * string)
@@ -71,7 +73,7 @@ let parse s =
     (* Multiple Word Commands. "rest" is the remainder of the string.*)
     match first with
     |"load" -> Load rest
-    |"event" -> Event rest
+    |"loadevent" -> LoadEvent rest
     |"give" -> Give rest
     |"take" -> Take rest
     |"drop" -> Drop rest
@@ -113,6 +115,11 @@ let parse s =
       begin match lst with
       | a::t::_ -> Fight (a,t)
       | _ -> Invalid end
+    |"quickevent" -> let x = (remove_start "quickevent" s) in
+      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+      begin match lst with
+        | a::b::_ -> QuickEvent (a,b)
+        | _ -> Invalid end
     |"buy" -> let x = (remove_start "buy" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       begin match lst with

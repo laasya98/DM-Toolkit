@@ -259,6 +259,16 @@ let action (c:command) (st:state) =
     let newchar = C.quickbuild n c r in
     let newcharls = ((newchar,Party) :: st.characters) in
     alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
+  |QuickEvent (n,f) -> begin
+      let f' = match f with
+      |"battle" -> Battle
+      |"shop" -> Shop
+      | _ -> Interaction
+      in
+      let c = List.map fst st.characters in
+      let evt = E.make_event n f' [] c in
+      alter_state st ~evt:evt "Event started."
+  end
   | _ -> alter_state st "Invalid move. Try again?"
 
 let output st = st.output
