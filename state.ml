@@ -331,13 +331,15 @@ let char_by_name s st =
 
 let cast c s t evt st =
   let c' = char_by_name c st in
-  let s' = failwith "match s with a spell in char spells" in
   try
     let find s = List.find (fun (x,_) -> C.name x = s) st.characters in
     let t' = List.map (fun s -> fst (find s)) t in
     match c' with
     | None -> alter_state st "The castor name is invalid."
     | Some c ->
+      match List.find_opt (fun (x:spell) -> x.name=s) (C.spells c) with
+      | None -> alter_state st "That castor doesn't know that spell."
+      | Some s' -> 
       let (evt', t') = E.cast c s' t' evt in
       let chars = update_chars t' st in
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
@@ -420,6 +422,7 @@ let gen_printout st =
 
 let action (c:command) (st:state) =
   E.clear_vout st.event;
+  try
   match c with
   | Fight (a,b) -> begin
     match E.get_form st.event with
@@ -477,6 +480,8 @@ let action (c:command) (st:state) =
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
   | Look -> alter_state st ""
   | Kill c -> kill_char c st
+  | Save -> save_game st; alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
+  with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
 
 let output st = st.output
