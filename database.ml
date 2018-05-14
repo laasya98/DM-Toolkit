@@ -65,7 +65,7 @@ module Database = struct
     Hashtbl.add files "race_data" "./data/races.csv";
     Hashtbl.add files "level_data" "./data/level_up.csv";
     Hashtbl.add files "spell_data" "./data/spells.csv";
-    Hashtbl.add files "loc_data" "./data/loc_data.csv";
+    Hashtbl.add files "loc_data" "./data/locations.csv";
     Hashtbl.add files "char_data" "./data/char_data.csv";
     Hashtbl.add files "event_data" "./data/events.csv"
 
