@@ -4,11 +4,8 @@ module type Database = sig
   (* [data] is the format of the data *)
   type data
 
-  (** [newdata] is the format of data with headers *)
-  type newdata
-
   (* [load_data f] is the data object retrieved from file [f] *)
-  val load_data : string -> newdata
+  val load_data : string -> data
 
   (** [save_data d f] writes a data object to a file [f]  *)
   val save_data : string -> data -> unit
@@ -49,13 +46,12 @@ end
 module Database = struct
 
   (** [data] mirrors the structure of the Csv library's
-      abstract type
+      abstract type with headers
       elements of inner list will be delimited by commas
       inner lists themselves will be delimited by newlines
   *)
-  type data = string list list
+  type data = (string * string) list list
 
-  type newdata = (string * string) list list
   (** [index] stores two association lists
 
   *)
@@ -74,9 +70,9 @@ module Database = struct
     (field, new_file)::(List.remove_assoc field index.files)
 
   let load_data s = let tab = Csv.load s in
-    Csv. associate (List.hd tab) (List.tl tab)
+    Csv.associate (List.hd tab) (List.tl tab)
 
-  let save_data f d = Csv.save f d
+  let save_data f d = failwith "UNIMPLEMENTED"
 
   (** []  *)
   let get typ index field file =
