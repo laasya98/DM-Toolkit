@@ -55,19 +55,17 @@ module Database = struct
   (** [index] stores two association lists
 
   *)
-  type index = {
-        files : (string * string) list;
-        other : (string * string) list;
-  }
+  type index = (string * string) list
 
-  let index = {
-                files = [("init_state", "data/init_state.csv")];
-                other = [("class_data", "data/classes.csv");
-                         ("race_data", "data/races.csv")];
-              }
+  let files = [
+                ("init_state", "data/init_state.csv");
+                ("class_data", "data/classes.csv");
+                ("race_data", "data/races.csv")
+              ]
+
 
   let change_file field new_file =
-    (field, new_file)::(List.remove_assoc field index.files)
+    (field, new_file)::(List.remove_assoc field files)
 
   let load_data s = let tab = Csv.load s in
     Csv.associate (List.hd tab) (List.tl tab)
@@ -81,19 +79,19 @@ module Database = struct
     List.find (fun l -> idk (List.assoc typ l)  = idk index) d
         |> List.assoc field
 
-  let hit_die c = let l = (List.assoc "class_data" index.other) in
+  let hit_die c = let l = (List.assoc "class_data" files) in
     get "class" c "hit_die" l
                   |> int_of_string
 
   let tup_from_list l =
     ((try List.nth l 0 with _ -> ""), (try List.nth l 1 with _ -> ""))
 
-  let primary_stat c = let l = (List.assoc "class_data" index.other) in
+  let primary_stat c = let l = (List.assoc "class_data" files) in
     get "class" c "primary" l
                        |> String.split_on_char ' '
                        |> tup_from_list
 
-  let speed_of r = let l = List.assoc "race_data" index.other in
+  let speed_of r = let l = List.assoc "race_data" files in
     get "race" r "speed" l
                        |> int_of_string
 
