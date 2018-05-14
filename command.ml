@@ -23,9 +23,11 @@ open Global
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
-    |Roll of (string * string)
+    |Roll of (string)
     |UseItem of (string*string)
+    (* GETTERS  *)
     |GetCharacterList of role
+    |GetExits
     |Invalid
 
 
@@ -87,6 +89,7 @@ let parse s =
         |"friendly" -> GetCharacterList (Friendly)
         |"neutral" -> GetCharacterList (Neutral)
         |_ -> GetCharacterList (All) end
+      |"exits" -> GetExits
       |_ -> Invalid end
     |"move" -> let x = (remove_start "move" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
@@ -102,13 +105,7 @@ let parse s =
         | a::b::[] -> Use (a,b)
         | _ -> Invalid
       else Invalid
-    |"roll" -> let x = (remove_start "roll" s) in
-      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
-      if List.length lst = 2 then
-        match lst with
-        | a::b::[] -> Roll (a,b)
-        | _ -> Invalid
-      else Invalid
+    |"roll" -> let x = (remove_start "roll" s) in Roll x
     |"fight" -> let x = (remove_start "fight" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       begin match lst with
