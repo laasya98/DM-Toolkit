@@ -86,7 +86,7 @@ let parse_characters data =
   in
   List.map (fun s -> split_char s) cs
   |>List.map (fun (x,r) -> (D.get_char x,r))
-  |> List.map (fun (c,r) -> (parse_char c,role r))
+  |> List.map (fun (c,r) -> (C.parse_char c,role r))
 
 let add_data data =
   add_filename "class_data" data;
@@ -140,7 +140,7 @@ let alter_state st ?(currLoc=st.current_location)
     output=output;
   }
 
-let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
+let init_state = D.load_data "state" |> D.flatten |> parse_state
 
 let current_location st = alter_state st st.current_location.name
 let current_room_characters st = failwith "unimplemented"

@@ -8,6 +8,8 @@ module type Database = sig
   (** [index] stores a mapping from keywords to filenames *)
   type index
 
+  val flatten : data -> (string * string) list
+
   (* [load_data f] is the data object retrieved from file [f] *)
   val load_data : string -> data
 
@@ -61,6 +63,8 @@ module Database = struct
 
   let change_file field new_file =
     Hashtbl.add files field new_file
+
+  let flatten d = List.flatten
 
   let load_data s = let tab = Csv.load s in
     Csv.associate (List.hd tab) (List.tl tab)
