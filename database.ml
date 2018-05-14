@@ -79,9 +79,11 @@ module Database = struct
 
   let save_data f d = Csv.save f d
 
+  (** []  *)
   let get typ index field file =
     let d = load_data file in
-      List.find (fun l -> List.assoc typ l = index) d
+    let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
+    List.find (fun l -> idk (List.assoc typ l)  = idk index) d
         |> List.assoc field
 
   let hit_die c = let l = (List.assoc "class_data" index.other) in
