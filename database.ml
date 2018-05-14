@@ -47,7 +47,7 @@ module Database = struct
   }
 
   let index = {
-                files = [("init_state", "init_state.csv")];
+                files = [("init_state", "data/init_state.csv")];
                 other = [];
               }
 
