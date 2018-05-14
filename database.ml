@@ -1,5 +1,6 @@
 open Csv
 open Hashtbl
+open
 module type Database = sig
 
   (* [data] is the format of the data *)
@@ -69,7 +70,8 @@ module Database = struct
   let load_data s = let tab = Csv.load s in
     Csv.associate (List.hd tab) (List.tl tab)
 
-  let save_data f d = failwith "UNIMPLEMENTED"
+  let save_data f d =
+    Unix.mkdir "save" 0o640
 
   (** []  *)
   let get_lst typ ind file =
@@ -96,8 +98,8 @@ module Database = struct
     get "race" r "speed" "race_data"
                        |> int_of_string
 
-  let get_item s = failwith "unimplemented"
-  let get_location s = failwith "unimplemented"
+  let get_item s = get_lst "name" s "item_data"
+  let get_location s = get_lst "name" s "loc_data"
   let get_event s = get_lst "name" s "event_data"
-  let get_char s = failwith "unimplemented"
+  let get_char s = get_lst "name" s "char_data"
 end
