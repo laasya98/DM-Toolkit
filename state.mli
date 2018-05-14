@@ -57,7 +57,9 @@ val empty_location : location
 
 (* [init_state s] is the initial state of the game loaded from a save file s
    from a database.*)
-  val init_state : data -> state
+val init_state : data -> state
+
+(*------------------GETTERS-------------------*)
 
 (* [current_location s] returns state with an output of current location of the toolkit's focus. *)
   val current_location : state -> state

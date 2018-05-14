@@ -81,5 +81,6 @@ type spell =
    Party signals a player character.
    A Friendly npc will aid the characters in the event
    A Hostile npc will oppose the characters in the event
-   A Neutral npc will do neither (ex: shopkeeper). *)
-type role = Party | Hostile | Friendly | Neutral
+   A Neutral npc will do neither (ex: shopkeeper).
+   "All" is not a role and is used for matching to all.*)
+type role = All | Party | Hostile | Friendly | Neutral

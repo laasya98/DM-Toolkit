@@ -42,7 +42,7 @@ let rec repl state =
     |ItemChange x -> print_endline (s'.output);
     |Roll x -> print_endline (s'.output);
     |GetCharacterList ox -> print_endline (s'.output);
-    |Invalid
+    |Invalid -> print_endline "Invalid Command";
     | _ -> ()
   in
 repl s'

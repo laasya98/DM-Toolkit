@@ -3,6 +3,7 @@ open Event
 open Character
 open Global
 open State
+open Command
 
 let item1 = {
   name="item1";
@@ -204,12 +205,28 @@ let state_tests = [
   "shop buyI" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item2","200")) st2 |> State.output));
 ]
 
+let command_tests = [
+  (*parsing*)
+  "save" >:: (fun _ -> assert_equal Save (Command.parse "save"));
+  "quit" >:: (fun _ -> assert_equal Quit (Command.parse "quit"));
+  "load x" >:: (fun _ -> assert_equal (Load ("x")) (Command.parse "load x"));
+  "get characters" >:: (fun _ -> assert_equal (GetCharacterList (All)) (Command.parse "get characters"));
+  "get characters afkewlf" >:: (fun _ -> assert_equal (GetCharacterList (All)) (Command.parse "get characters aej2i"));
+  "get characters party" >:: (fun _ -> assert_equal (GetCharacterList (Party)) (Command.parse "get characters party"));
+  "get characters hostile" >:: (fun _ -> assert_equal (GetCharacterList (Hostile)) (Command.parse "get characters hostile"));
+  "get characters friendly" >:: (fun _ -> assert_equal (GetCharacterList (Friendly)) (Command.parse "get characters friendly"));
+  "get characters neutral" >:: (fun _ -> assert_equal (GetCharacterList (Neutral)) (Command.parse "get characters neutral"));
+
+
+]
+
 let suite =
   "Adventure test suite"
   >::: List.flatten [
     event_tests;
     state_tests;
     character_tests;
+    command_tests;
   ]
 
 let _ = run_test_tt_main suite

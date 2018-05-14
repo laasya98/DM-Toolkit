@@ -87,9 +87,13 @@ let move st dir =
 (** [character_list_filter ls role] returns a string delimited by commas
   representing the characters in a list that match the given role *)
 let character_list_filter ls role =
-  String.concat (", ") @@
   ((List.filter (fun x -> snd x = role) ls)
-   |> List.map (fun x -> fst x))
+   |> List.map (fun x -> C.name (fst x)))
+
+let character_list_string ?role:(r = All) st =
+  match r with
+  |All -> (List.map (fun (x,y) -> C.name x) st.characters) |> String.concat ", "
+  |role -> character_list_filter st.characters role |> String.concat ", "
 
 
 (*still needs to add remove_item and support giving more than one item*)
@@ -227,6 +231,13 @@ end
 | Turn -> let (evt', t') = E.turn st.event in
   let chars = update_chars t' st in
   alter_state st ~evt:evt' ~chars:chars "Turn incremented"
-| _ -> alter_state st "Invalid move. Try again?"
+| GetCharacterList r -> begin
+    let lst = begin match r with
+    |All -> character_list_string  st
+    |role -> character_list_string ~role:role st
+    end
+  in alter_state st lst
+end
+| _ -> failwith "unimplemented"
 
 let output st = st.output

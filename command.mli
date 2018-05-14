@@ -7,6 +7,7 @@ open Global
   (* command is an imcomplete variant of command possibilities, which will be
      updated as more functionality is needed.  *)
      type command =
+       |Nothing
        |Load of string
        |Save
        |Quit
@@ -30,7 +31,6 @@ open Global
        |ItemChange of (string * string)
        |Roll of (string * string)
        |UseItem of (string*string)
-       (*inquiry commands*)
        |GetCharacterList of role
        |Invalid
 
