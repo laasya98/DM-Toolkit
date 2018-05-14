@@ -220,56 +220,5 @@ let use_item i c evt st =
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
     with _ -> alter_state st "Item not found in character inventory."
 
-let action (c:command) (st:state) =
-  E.clear_vout st.event;
-  match c with
-  | Roll d -> alter_state st (string_of_int (Global.roll_dice_string d))
-  | Fight (a,b) -> begin
-    match E.get_form st.event with
-  | Shop -> begin
-      try buy_item ch i (int_of_string q) st.event st
-      with _ -> alter_state st "Invalid item quantity."
-    end
-    |_ -> alter_state st "Action Failed: There is no shop here."
-  end
-  | Turn -> let (evt', t') = E.turn st.event in
-    let chars = update_chars t' st in
-    alter_state st ~evt:evt' ~chars:chars "Turn incremented"
-  | GetCharacterList r -> begin
-    let lst = begin match r with
-    |All -> character_list_string  st
-    |role -> character_list_string ~role:role st
-    end
-    in alter_state st lst
-  end
-  |GetExits -> alter_state st (String.concat ", " (get_exits st))
-  |QuickBuild lst -> alter_state st "Unimplemented"(*let n = List.hd in let c = List.hd (List.tl lst) in
-  let r = List.nth lst 2 in
-  let newchar = C.quickbuild n c r in
-  let newcharls = ((newchar,Party) :: st.characters) in
-                     alter_state st ~chars:newcharls "New Character, " ^ n ^ ", added to party!"*)
-  (*| Battle -> attack a b st.event st*)
-  (*| _ -> alter_state st "No battle event occurring."*)
-  | Cast (c,s,t) -> cast c s t st.event st
-  | UseItem (c,i) -> use_item i c st.event st
-  | Buy (ch,i,q) -> begin
-      match E.get_form st.event with
-      | Shop -> begin
-        try buy_item ch i (int_of_string q) st.event st
-        with _ -> alter_state st "Invalid item quantity."
-      end
-      |_ -> alter_state st "Action Failed: There is no shop here."
-  end
-  | Turn -> let (evt', t') = E.turn st.event in
-    let chars = update_chars t' st in
-    alter_state st ~evt:evt' ~chars:chars "Turn incremented"
-  | GetCharacterList r -> begin
-      let lst = begin match r with
-      |All -> character_list_string  st
-      |role -> character_list_string ~role:role st
-      end
-    in alter_state st lst
-  end
-  | _ -> alter_state st "Invalid move. Try again?"
 
 let output st = st.output
