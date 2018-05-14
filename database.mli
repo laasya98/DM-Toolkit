@@ -36,7 +36,7 @@ module type Database = sig
   val get_item : string -> (string * string) list
   val get_location : string -> (string * string) list
   val get_event : string -> (string * string) list
-
+  val get_char : string -> (string * string) list
 end
 
 module Database:Database

@@ -16,6 +16,7 @@ type data = D.data
 
 type entity =
   |Item of item
+  |Effect of (entity * int)
   |Event of event
 
 type location = {
@@ -31,7 +32,7 @@ type state = {
   locations : location list;
   characters : (character * role) list;
   event : event;
-  output :string;
+  output : string;
   current_location : location;
 }
 
@@ -41,15 +42,27 @@ let add_filename n data :unit =
     D.change_file n f
   with _ -> ()
 
-(* TODO let parse_loc dlist =
+let list_of_string s =
+  String.sub s 1 (String.length s - 2) |> String.split_on_char ';'
+
+let parse_char s = failwith ""
+let item_of_string s = failwith ""
+let event_of_string s = failwith ""
+let exits_of_string s = failwith ""
+
+let parse_loc dlist =
   try
     let n = find_assoc "Name" dlist in
     let d = find_assoc "Description" dlist in
-    let cs = find_assoc "Characters" dlist in
-    let is = find_assoc "Items" dlist in
-    let e = find_assoc "Event" dlist in
-    let exits = find_assoc "Exits" dlist in
-  with _ -> raise (Failure "Invalid Save File.") *)
+    let cs = list_of_string (find_assoc "Characters" dlist) |> parse_char in
+    let is = list_of_string (find_assoc "Items" dlist) |> item_of_string in
+    let e = list_of_string (find_assoc "Event" dlist) |> event_of_string in
+    let exits = list_of_string (find_assoc "Exits" dlist) |> exits_of_string in
+    {name=n; description=d; characters=cs; items=is; event=e; exits=exits}
+  with _ -> raise (Failure "Invalid Save File.")
+
+(*TODO find out where effects came from*)
+let effects st = []
 
 let parse_locations data =
   let cs = String.split_on_char ' ' data in
@@ -73,7 +86,7 @@ let parse_characters data =
   in
   List.map (fun s -> split_char s) cs
   |>List.map (fun (x,r) -> (D.get_char x,r))
-  |> List.map (fun (c,r) -> (C.parse_char c,role r))
+  |> List.map (fun (c,r) -> (parse_char c,role r))
 
 let add_data data =
   add_filename "class_data" data;

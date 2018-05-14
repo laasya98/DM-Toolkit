@@ -38,6 +38,7 @@ module type Database = sig
   val get_item : string -> (string * string) list
   val get_location : string -> (string * string) list
   val get_event : string -> (string * string) list
+  val get_char : string -> (string * string) list
 end
 
 module Database = struct
@@ -49,9 +50,7 @@ module Database = struct
   *)
   type data = (string * string) list list
 
-  (** [index] stores two association lists
-
-  *)
+  (** [index] is a hash table of association  *)
   type index = (string, string) Hashtbl.t
 
   let files = create 3
@@ -94,4 +93,5 @@ module Database = struct
   let get_item s = failwith "unimplemented"
   let get_location s = failwith "unimplemented"
   let get_event s = failwith "unimplemented"
+  let get_char s = failwith "unimplemented"
 end
