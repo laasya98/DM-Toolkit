@@ -11,6 +11,10 @@ open State
 open Command
 
 let helps = [
+  ("commands",
+"-Commands-
+help - roll - 
+");
   ("help",
 "-Help-
 Help prints help for any command. Help alone prints help for every command.
