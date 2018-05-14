@@ -44,7 +44,16 @@ let add_filename n data :unit =
 let list_of_string s =
   String.sub s 1 (String.length s - 2) |> String.split_on_char ';'
 
-let exits_of_string s = failwith ""
+let exits_of_string data =
+  let es = String.split_on_char ' ' data in
+  let split_char s =
+    let indxget = String.index s ':' in
+    let c = String.sub s 0 indxget in
+    let r = (String.sub s (indxget+1) ((String.length s) - indxget-1))
+            |>String.trim in
+    (c,r)
+  in
+  List.map split_char es
 
 let parse_characters data =
     let role r = match r with
@@ -57,7 +66,7 @@ let parse_characters data =
   let split_char s =
     let indxget = String.index s ':' in
     let c = String.sub s 0 indxget in
-    let r = (String.sub s (indxget) ((String.length s) - indxget))
+    let r = (String.sub s (indxget+1) ((String.length s) - indxget-1))
             |>String.trim in
     (c,r)
   in
@@ -71,18 +80,21 @@ let parse_characters data =
     in
     List.map get_item ilst'
 
+let parse_event s =
+  E.parse_event (D.get_event s)
+
   let parse_loc dlist =
     try
       let n = find_assoc "Name" dlist in
       let d = find_assoc "Description" dlist in
       let cs = (find_assoc "Characters" dlist) |> check_none parse_characters [] in
       let is = find_assoc "Items" dlist |> check_none parse_itemlst [] in
-      let e = find_assoc "Event" dlist |> D.get_event |> E.parse_event in
-      let exits = list_of_string (find_assoc "Exits" dlist) |> exits_of_string in
+      let e = find_assoc "Event" dlist |> check_none parse_event (E.init_event "") in
+      let exits = find_assoc "Exits" dlist |> exits_of_string in
       {name=n; description=d; characters=cs; items=is; event=e; exits=exits}
-    with x -> raise (Failure "Invalid Location File")
+    with x -> raise x
 
-  let parse_locations data =
+let parse_locations data =
     let cs = String.split_on_char ' ' data in
     let csd = List.map (fun x -> D.get_location x) cs in
     List.map (fun c -> parse_loc c) csd
@@ -91,7 +103,7 @@ let add_data data =
   add_filename "class_data" data;
   add_filename "race_data" data;
   add_filename "item_data" data;
-  add_filename "location_data" data;
+  add_filename "loc_data" data;
   add_filename "spell_data" data;
   add_filename "char_data" data;
   add_filename "event_data" data
@@ -112,9 +124,6 @@ let empty_state = {
   output = "Empty State Loaded.";
   current_location = empty_location;
 }
-
-let parse_event s =
-    E.parse_event (D.get_event s)
 
 let parse_curr_l l s =
   List.find (fun l -> l.name=s) l
@@ -158,20 +167,19 @@ let get_exits st =
    from the original current_room. It leaves all non-party characters in the
    previous room. It's output is "Party moves *dir*" with a description*)
 let move_dir st dir =
-  if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
-  then alter_state st "Not a direction"
-  else
+  try
     let newlocation =
       snd (List.find (fun x -> fst x = dir) st.current_location.exits) in
     let nl = List.find_opt (fun l -> l.name = newlocation) st.locations in
     match nl with
-    | None -> alter_state st "Not a valid direction."
+    |None -> alter_state st newlocation
     |Some loc ->
     let newcharacters =
       (List.filter (fun x -> snd x = Party) st.characters)
       @ loc.characters in
     alter_state st ~currLoc:loc ~chars:newcharacters
-      ("Party moves" ^dir ^"\n\n\n" ^ loc.description)
+      ("Party moves " ^dir ^"\n\n\n" ^ loc.description)
+with _ -> alter_state st "Not a direction."
 
 (** [character_list_filter ls role] returns a string delimited by commas
   representing the characters in a list that match the given role *)
@@ -349,16 +357,29 @@ let print_chars_short st =
   List.map print_char_short st.characters
   |> List.fold_left (fun x a-> x^"\n"^a) ""
 
+let print_spells evt =
+  let lst = get_waiting_spells evt in
+  match lst with
+  |[] -> ""
+  |_ ->
+    let lst' =
+      List.map
+      (fun ((s:spell ),t) -> s.name^" will cast on turn "^(string_of_int t)^".")
+      lst
+    in
+    "Waiting Spells:\n"^List.fold_left (^) "\n" lst'
+
 let gen_printout st =
   let evt = st.event in
   match E.get_form evt with
   |Battle ->
     (st.output)^
     "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
-    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^
+    (print_spells evt)^(print_chars_short st)
   |Shop ->
     (st.output)^
-    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_names evt))
+    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_details evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =
@@ -396,11 +417,12 @@ let action (c:command) (st:state) =
     let c = List.hd (List.tl lst) in
     let r = List.nth lst 2 in
     let newchar = C.quickbuild n c r in
+    let x c = () in (x newchar);
     let newcharls = ((newchar,Party) :: st.characters) in
     alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
       with _-> alter_state st "Failed. Your arguments might be off." end
   |QuickEvent (n,f) -> begin
-      let f' = match f with
+      let f' = match String.lowercase_ascii f with
       |"battle" -> Battle
       |"shop" -> Shop
       | _ -> Interaction
@@ -417,6 +439,7 @@ let action (c:command) (st:state) =
       in alter_state st s
     end
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
+  | Kill c -> kill_char c st
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
 
 let output st = st.output

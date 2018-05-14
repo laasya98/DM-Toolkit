@@ -28,8 +28,12 @@ val init_event : string -> t
 val make_event : string -> form -> (item * quantity) list ->
   character list -> t
 
+(* [verbose evt] returns a more in-depth output from [evt]. Used for the REPL,
+   but not for testing. *)
 val verbose : t -> string
 
+(* [clear_vout evt] sets the verbose output of [evt] to an empty string.
+   To be used between commands to prevent redundant information. *)
 val clear_vout : t -> unit
 
 (* [get_form evt] is the form of the event. *)
@@ -87,8 +91,14 @@ val clear_vout : t -> unit
    and the turn on which they will be cast. *)
 val get_waiting_spells : t -> (spell*int) list
 
+(* [use_item i c evt] calculates the result of character [c] using
+   item [i], and returns the new states of [evt] and [t]. *)
 val use_item: item -> character -> t -> (t * character list)
 
+(* [remove_char n evt] removes the character with name [n] from the turn
+   order. *)
 val remove_char : string -> t -> t
 
-val get_item_names : t -> string list
+(* [get_item_details evt] returns a list of strings containing the name and
+   quantity of each item in the event. *)
+val get_item_details : t -> string list

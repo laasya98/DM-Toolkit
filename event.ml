@@ -154,7 +154,7 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
 
 let get_items evt = evt.items
 
-let get_item_names evt =
+let get_item_details evt =
   List.map (fun ((i:item ),q) ->
       i.name^": "^(match q with |Infinity -> "inf" | Int q -> string_of_int q))
     evt.items
