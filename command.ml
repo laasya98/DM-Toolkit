@@ -5,7 +5,7 @@ open Global
     |Load of string
     |Save
     |Quit
-    |Help
+    |Help of string
     |Event of string
     |Inquiry
     |Move of (string *string)
@@ -57,7 +57,7 @@ let parse s =
     begin match str with
     | "save" -> Save
     | "quit" -> Quit
-    | "help" -> Help
+    | "help" -> Help ("")
     | "inv" -> Inv
     | "inventory" -> Inv
     | "inq" -> Inquiry

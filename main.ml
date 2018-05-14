@@ -10,6 +10,12 @@
 open State
 open Command
 
+let helps = [
+
+]
+
+let help_file = String.concat "\n \n" helps
+
 (* [repl s] updates the state of the adventure *)
 let rec repl state =
   ANSITerminal.(print_string [red]  "\n> ");
@@ -20,7 +26,8 @@ let rec repl state =
     let () = print_endline ("Invalid move. Try again.") in repl s' else
   let () = match cmd with
     |Quit -> exit 0
-    |Help -> ANSITerminal.(print_string [blue] "some rules and such \n");
+    |Help s -> let print = if s = "" then help_file else (List.assoc s helps) in
+      ANSITerminal.(print_endline [blue] print);
     |Event x ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
       print_endline s'.output;
       (*)|Inquiry -> *)
