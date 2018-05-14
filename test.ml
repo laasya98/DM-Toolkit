@@ -11,7 +11,6 @@ let item1 = {
   description = "item1 desc";
   weight = 1;
   effect = {stat=Str; die=[]; bonus=0};
-  uses = Int 0;
   value=5;
 }
 
@@ -21,7 +20,6 @@ let item2 = {
   description = "item2 desc";
   weight = 1;
   effect = {stat=Str; die=[]; bonus=0};
-  uses = Int 0;
   value=0;
 }
 

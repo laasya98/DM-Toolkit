@@ -41,7 +41,6 @@ type item = {
   description:string;
   weight:int;
   effect:effect;
-  uses:quantity;
   value:int;
 }
 

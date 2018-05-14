@@ -306,14 +306,11 @@ let cast_status c s t evt =
   in
   List.map f t
 
-    (*TODO: consolidate*)
 let use_item (i:item) c evt =
   add_vout ((C.name c)^" used "^i.name^"!") evt;
-  (*TODO let i' = match i.uses with
-    | Infinity -> i
-    | Int q -> {i with uses = Int (q-1)} in *)
-  let c' = cast_status c i.effect [c] evt in
-  (evt, c')
+  let c' = C.remove_item c i 1 in
+  let t' = cast_status c' i.effect [c'] evt in
+  (evt, t')
 
   let cast c s t evt =
     if s.to_cast = 0 || evt.form <> Battle then
