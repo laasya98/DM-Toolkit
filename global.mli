@@ -91,6 +91,10 @@ type role = All | Party | Hostile | Friendly | Neutral
     string str. roll_dice accepts strings of the form "ndn" or ndntn"
     where the first n is the number of dice, the second n is the value of those
     dice, and the final n is the number of the rolled dice to "take", the rest
-    to be discarded starting with the lowest roll. They can be added with a '+',
-    e.g. "2d6t1 + 6d4 + 1d20"."*)
+    to be discarded starting with the lowest roll. They can be added separating
+    them by a space. e.g. "2d6t1 6d4 1d20"."*)
 val roll_dice : string -> int
+
+(* [roll_dice_int n d t] rolls n dice of type d and takes t of them, starting
+   with the lowest roll dropped first. e.g. roll_dice 1 1 1 returns 1.  *)
+val roll_dice_int : int -> int -> int -> int
