@@ -84,7 +84,8 @@ let ability_mod a =
   let race  c = c.race
   let class_of  c = c.c_class
   let wisdom  c = c.wis_mod
-  let update_wisdom  c w = {c with wisdom = w}
+let update_wisdom  c w = {c with wisdom = w;
+                         wis_mod = ability_mod w}
   let const  c = c.cons_mod
   let update_const  c o = {c with constitution = o;
                         cons_mod = ability_mod o}
@@ -215,6 +216,7 @@ let string_of_race r =
   | Half_Orc -> "Half-Orc"
   | Tiefling -> "Tiefling"
 
+
 let all_skills = (*Database.allskills*)
   {
     name="acrobatics";
@@ -332,6 +334,8 @@ let all_skills = (*Database.allskills*)
   } ::
   []
 
+
+
   let rec stat_lister acc : int list=
     if List.length acc = 6
       then
@@ -340,7 +344,7 @@ let all_skills = (*Database.allskills*)
         let stat =  Global.roll_dice_int 4 6 3 in
         stat_lister (stat::acc)
 
-let rec skill_set c (s:skill list) =
+let rec skill_set (s:skill list) c  =
   match s with
   | [] -> []
   | h::t -> let skill1 = if h.corestat = "str" then
@@ -360,7 +364,76 @@ let rec skill_set c (s:skill list) =
                 {h with modifier = new_mod } else h in
     let skill2 = if skill1.prof then let newer_mod = skill1.modifier+c.prof_bonus in
         {skill1 with modifier = newer_mod} else skill1
-in skill2::(skill_set c t)
+in skill2::(skill_set t c)
+
+
+let parse_char clist =
+  try
+    let n = find_assoc "Name" clist in
+    let cls = (find_assoc "Class" clist) |> class_of_string in
+    let r = (find_assoc "Race" clist) |> race_of_string in
+    let ac = (find_assoc "Armor Class" clist) |> int_of_string in
+    let pw = (find_assoc "Passive Wisdom" clist) |> int_of_string  in
+    let pb = (find_assoc "Prof Bonus" clist) |> int_of_string  in
+    let co = (find_assoc "Constitution" clist) |> int_of_string  in
+    let com = (find_assoc "Cons Mod" clist) |> int_of_string  in
+    let ch = (find_assoc "Charisma" clist) |> int_of_string  in
+    let chm = (find_assoc "Char Mod" clist) |> int_of_string  in
+    let dex = (find_assoc "Dexterity" clist) |> int_of_string  in
+    let dm = (find_assoc "Dex Mod" clist) |> int_of_string  in
+    let wis = (find_assoc "Wisdom" clist) |> int_of_string  in
+    let wm = (find_assoc "Wis Mod" clist) |> int_of_string  in
+    let intl = (find_assoc "Intelligence" clist) |> int_of_string  in
+    let im = (find_assoc "Int Mod" clist) |> int_of_string  in
+    let st = (find_assoc "Strength" clist) |> int_of_string  in
+    let sm = (find_assoc "Str Mod" clist) |> int_of_string  in
+    let sp = (find_assoc "Speed" clist) |> int_of_string  in
+    let mhp = (find_assoc "Max HP" clist) |> int_of_string  in
+    let hp = (find_assoc "HP" clist) |> int_of_string  in
+    let hd = (find_assoc "HD" clist) |> int_of_string  in
+    let hdq = (find_assoc "HD qty" clist) |> int_of_string  in
+    let xp = (find_assoc "XP" clist) |> int_of_string  in
+    let lvl = (find_assoc "Level" clist) |> int_of_string  in
+    let cash = (find_assoc "Money" clist) |> int_of_string  in
+
+    (*let t' = match t with
+      |"Weapon" -> Weapon (parse_weapon dlist)
+      |"Armor" -> Armor (int_of_string (find_assoc "AC" dlist))
+      |_ -> Other
+      in*)
+
+    { name=n;
+      race=r;
+      c_class=cls;
+      armor_class=ac;
+      prof_bonus=pb;
+      passive_wisdom=pw;
+      constitution = co;
+      cons_mod=com;
+      charisma=ch;
+      char_mod=chm;
+      wisdom=wis;
+      wis_mod=wm;
+      intel=intl;
+      int_mod=im;
+      strength=st;
+      str_mod=sm;
+      dexterity=dex;
+      dex_mod=dm;
+      speed=sp;
+      max_hp=mhp;
+      hp=hp;
+      hd=hd;
+      hd_qty=hdq;
+      xp=xp;
+      level=lvl;
+      skills= all_skills;
+      spells= [];
+      equipped= [],0;
+      inv= [],0;
+      money=cash;
+    } |> skill_set all_skills
+  with _ -> raise (Failure "Invalid Character Data")
 
 let blank_char = {
   name = "Allan";
@@ -470,7 +543,7 @@ let quickbuild n c r =
       let step3 =  (*initializing skills and items*)
               {step2 with
                    spells = []; (*Database.get_spells c*)
-                   skills = skill_set step2 all_skills;
+                   skills = skill_set all_skills step2;
                    passive_wisdom = 10 + step2.wis_mod + step2.prof_bonus;
                    armor_class = 10+step2.dex_mod;
                   }
