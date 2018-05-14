@@ -216,3 +216,6 @@ open Global
 
   (* [update_charisma character new_c] character with charisma = new_c.*)
   val update_charisma :  c -> int -> c
+
+(* [quickbuild n c r] creates a new character with from the name, class, and race (ncr)*)
+val quickbuild :  string -> string -> string -> c

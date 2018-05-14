@@ -128,8 +128,9 @@ let parse s =
         begin match lst with
         | c::s::t -> Cast (c,s,t)
         | _ -> Invalid end
-    |"quickbuild" | "build" |"quick" -> let x = String.sub s 11 (String.length s)  in
+    |"quickbuild" |"quick" ->
+      let x = (remove_start "quickbuild" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
-      if List.length lst = 3 || List.length lst = 4 then
+      if List.length lst = 3 (*)|| List.length lst = 4*) then
         QuickBuild lst else Invalid
     |_ -> Invalid
