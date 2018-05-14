@@ -94,4 +94,4 @@ val init_state : data -> state
 
 (* [output st] is the string output of state [st], for use in testing and
    the REPL. *)
-  val output : state -> string
+val output : state -> string

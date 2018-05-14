@@ -105,8 +105,8 @@ open Global
 
     skills: skill list;
     spells: spell list;
-    equipped: ((item * int) list )* int;
-    inv: ((item * int) list )* int;
+    equipped: ((item * quantity) list )* int;
+    inv: ((item * quantity) list )* int;
     money: int;
   }
 
@@ -183,7 +183,7 @@ open Global
   val add_spell :  c -> spell -> c
 
   (* [inv character] is a list of the items a player has. *)
-  val inv :  c -> (item*int) list
+  val inv :  c -> (item* quantity) list
 
   (* [add_item character i ] adds n amount of i to the characters inventory.*)
   val add_item :  c -> item -> int -> c
@@ -193,7 +193,7 @@ open Global
   val remove_item : c -> item -> int -> c
 
   (* [equipped character] is a list of the items a player has equipped. *)
-  val equipped :  c ->  (item*int) list
+  val equipped :  c ->  (item*quantity) list
 
   (* [equip character e] adds e to the characters equpped items.
      Requires that e is present in the character's inventory*)

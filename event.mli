@@ -27,6 +27,10 @@ val init_event : string -> t
    All other fields are initialized to default values. *)
   val make_event : string -> form -> (item * quantity) list -> string list-> t
 
+val verbose : t -> string
+
+val clear_vout : t -> unit
+
 (* [get_form evt] is the form of the event. *)
   val get_form : t -> form
 
