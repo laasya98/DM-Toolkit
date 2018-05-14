@@ -4,3 +4,4 @@ B _build/src
 PKG oUnit
 PKG str
 PKG unix
+PKG csv
