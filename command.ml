@@ -59,6 +59,7 @@ let parse s =
     | "inq" -> Inquiry
     | "inquiry" -> Inquiry
     | "turn" -> Turn
+    | "characters" -> GetCharacterList (All)
     | _ -> Invalid end
   else let indx = (String.index str ' ') in
     let first = (String.sub str 0 indx) in
@@ -71,7 +72,8 @@ let parse s =
     |"take" -> Take rest
     |"drop" -> Drop rest
     |"shop" -> Shop rest
-    |"get" -> let indxget = if (String.contains rest ' ')
+    |"get" ->
+      let indxget = if (String.contains rest ' ')
               then (String.index rest ' ') else String.length rest in
       let firstget = String.sub rest 0 indxget in
       let restget = (String.sub rest (indxget) ((String.length rest) - indxget))

@@ -238,6 +238,11 @@ end
     end
   in alter_state st lst
 end
-| _ -> failwith "unimplemented"
+|QuickBuild lst -> alter_state st "Unimplemented"(*let n = List.hd in let c = List.hd (List.tl lst) in
+  let r = List.nth lst 2 in
+  let newchar = C.quickbuild n c r in
+  let newcharls = ((newchar,Party) :: st.characters) in
+                     alter_state st ~chars:newcharls "New Character, " ^ n ^ ", added to party!"*)
+| _ -> alter_state st "Unimplemented"
 
 let output st = st.output

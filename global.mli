@@ -1,3 +1,5 @@
+open Str
+
 type stat =
   | Constitution
   | Charisma
@@ -84,3 +86,11 @@ type spell =
    A Neutral npc will do neither (ex: shopkeeper).
    "All" is not a role and is used for matching to all.*)
 type role = All | Party | Hostile | Friendly | Neutral
+
+(* [roll_dice] str is the value of the randomly rolled dice represented by
+    string str. roll_dice accepts strings of the form "ndn" or ndntn"
+    where the first n is the number of dice, the second n is the value of those
+    dice, and the final n is the number of the rolled dice to "take", the rest
+    to be discarded starting with the lowest roll. They can be added with a '+',
+    e.g. "2d6t1 + 6d4 + 1d20"."*)
+val roll_dice : string -> int
