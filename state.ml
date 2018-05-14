@@ -220,7 +220,6 @@ let use_item i c evt st =
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
     with _ -> alter_state st "Item not found in character inventory."
 
-<<<<<<< HEAD
 let action (c:command) (st:state) =
   E.clear_vout st.event;
   match c with
@@ -257,7 +256,5 @@ let action (c:command) (st:state) =
     let newcharls = ((newchar,Party) :: st.characters) in
                        alter_state st ~chars:newcharls "New Character, " ^ n ^ ", added to party!"*)
   | _ -> alter_state st "Invalid move. Try again?"
-=======
->>>>>>> 1c0876102e52934a32060cf8d7f655b3721a8da4
 
 let output st = st.output
