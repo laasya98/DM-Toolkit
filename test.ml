@@ -93,6 +93,40 @@ let char2:Character.c = {
   inv=[item1, Int 2],3;
 }
 
+let char3:Character.c = {
+  name="char3";
+  race = Human;
+  c_class = Barbarian;
+  armor_class=0;
+  hd = 10;
+  hd_qty = 1;
+  wisdom=0;
+  charisma=0;
+  constitution = 0;
+  money = 10;
+  intel=0;
+  strength=2;
+  int_mod = 0;
+  wis_mod = 0;
+  char_mod = 0;
+  cons_mod = 0;
+  str_mod = 0;
+  dex_mod = 0;
+  prof_bonus = 2;
+  passive_wisdom = 0;
+  dexterity=1;
+
+  speed=1;
+  max_hp=10;
+  hp=10;
+  xp=0;
+  level=1;
+  skills=[];
+  spells=[];
+  equipped=[],3;
+  inv=[item1, Int 5; item2, Infinity],3;
+}
+
 let character_tests = [
   "name" >:: (fun _ -> assert_equal "char2" (Character.name char2));
   "wisdom" >:: (fun _ -> assert_equal 0 (Character.wisdom char1));
@@ -186,7 +220,7 @@ type state = State.state
 
 let loc:(State.location) = {name="loc1"; description=""; characters=[]; contents=[]; exits =[]}
 let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""}
-let st2:(state) = {locations=[]; characters=[(char1, Party)]; event=evtS;current_location=loc; output=""}
+let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""}
 
 let state_tests = [
   (*Combat*)
@@ -202,6 +236,10 @@ let state_tests = [
   "shop buy" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item1","2")) st2 |> State.output));
   "shop buy2" >:: (fun _ -> assert_equal "Character doesn't have enough money." (State.action (Buy("char1","item1","3")) st2 |> State.output));
   "shop buyI" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item2","200")) st2 |> State.output));
+
+  "shop sell" >:: (fun _ -> assert_equal "Items sold." (State.action (Sell("char3","item1","1")) st2 |> State.output));
+
+  "shop sellI" >:: (fun _ -> assert_equal "Items sold." (State.action (Sell("char3","item2","200")) st2 |> State.output));
 ]
 
 let command_tests = [

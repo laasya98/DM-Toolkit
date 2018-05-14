@@ -22,6 +22,7 @@ open Global
        |Drop of string
        |Shop of string
        |Buy of (string * string *string)
+       |Sell of (string * string *string)
        |Fight of (string * string)
        |Cast of (string * string * string list)
        |Turn
