@@ -64,6 +64,8 @@ open Database
       spells = spells;
     }
 
+let verbose evt = evt.v_out
+
 let change_item_q i q lst =
   let gz n = match n with
     |Infinity -> true

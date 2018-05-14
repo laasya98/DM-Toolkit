@@ -70,8 +70,8 @@ type c = {
 
   skills: skill list;
   spells: spell list;
-  equipped: ((item * int) list )* int;
-  inv: ((item * int) list )* int;
+  equipped: ((item * quantity) list )* int;
+  inv: ((item * quantity) list )* int;
   money: int;
 }
 
@@ -114,13 +114,21 @@ type c = {
     {c with spells = s::spells}
   let abilities c = failwith "Unimplemented"
   let add_ability c a = failwith "Unimplemented"
-  let inv c : (item*int) list = fst c.inv
-  let equipped c : (item*int) list= fst c.equipped
+  let inv c : (item*quantity) list = fst c.inv
+  let equipped c : (item*quantity) list= fst c.equipped
 
   let insert_qty i n l =
     if List.mem_assoc i l then
-      List.map(fun (a,b) -> if i = a then (i,b+n) else (a,b)) l else
-      (i,n)::l
+      let f (a,b) =
+        if i=a then
+          match b with
+          |Infinity -> (a,b)
+          |Int b' -> (a, Int (b'+n))
+        else
+          (a,b)
+      in
+      List.map f l else
+      (i, Int n)::l
   (*let remove_qty i n l =
     if List.mem_assoc i l then
       List.map(fun (a,b) -> if i = a then (i,b-n) else (a,b)) l else

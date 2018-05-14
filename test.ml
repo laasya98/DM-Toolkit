@@ -56,7 +56,7 @@ let char1:Character.c = {
   skills=[];
   spells=[];
   equipped=[],3;
-  inv=[item2,1],3;
+  inv=[item2, Int 1],3;
 }
 
 
@@ -90,7 +90,7 @@ let char2:Character.c = {
   skills=[];
   spells=[];
   equipped=[],3;
-  inv=[item1,2],3;
+  inv=[item1, Int 2],3;
 }
 
 let character_tests = [
@@ -127,11 +127,11 @@ let character_tests = [
   "xp" >:: (fun _ -> assert_equal 0 (Character.xp char1));
   "update xp" >:: (fun _ -> assert_equal 800
                       (Character.xp (Character.update_xp char1 800)));
-  "inv" >:: (fun _ -> assert_equal [(item2,1)] (Character.inv char1));
-  "add item" >:: (fun _ -> assert_equal [item1,1;item2,1]
+  "inv" >:: (fun _ -> assert_equal [(item2, Int 1)] (Character.inv char1));
+  "add item" >:: (fun _ -> assert_equal [item1, Int 1;item2, Int 1]
                      (Character.inv (Character.add_item char1 item1 1)));
   "equipped stuff" >:: (fun _ -> assert_equal [] (Character.equipped char1));
-  "good equip" >:: (fun _ -> assert_equal [item2,1]
+  "good equip" >:: (fun _ -> assert_equal [item2, Int 1]
                        (Character.equipped (Character.equip char1 item2 1)));
   "bad equip" >:: (fun _ -> assert_equal []
                       (Character.equipped (Character.equip char1 item1 1)));
@@ -192,7 +192,6 @@ let state_tests = [
   (*Combat*)
   "comb invA" >:: (fun _ -> assert_equal "Action Failed: Invalid Attacker Name" (State.action (Fight ("nop","char2")) st1 |> State.output));
   "comb invT" >:: (fun _ -> assert_equal "Action Failed: Invalid Target Name" (State.action (Fight ("char1","nop")) st1 |> State.output));
-  "comb att" >:: (fun _ -> assert_equal "char1 attacked char2!" (State.action (Fight ("char1","char2")) st1 |> State.output));
 
   (*Shop*)
   "shop invQ" >:: (fun _ -> assert_equal "Invalid item quantity." (State.action (Buy("char1","item1","nope")) st2 |> State.output));

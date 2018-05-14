@@ -125,6 +125,7 @@ in
 r cs st.characters
 
 (** SHOP **)
+
 let buy c i q evt st =
   let m = i.value * q in
   let cm = C.money c in
@@ -134,33 +135,38 @@ let buy c i q evt st =
     let evt' = E.remove_item i.name (Int q) evt in
     alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
 
-let buy_item c name q evt st=
+let sell c i q evt st =
+  let m = i.value * q /10 in
+  let c' = C.update_money (C.remove_item c i q) ((C.money c) +m) in
+  let evt' = E.add_item i (Int q) evt in
+  alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items sold."
+
+let use c i q evt st =
+  match i.uses with
+  | Int q when q<1 -> alter_state st "That item has no remaining uses."
+  | _ -> let (evt', t') = E.use_item i c evt in
+    let chars = update_chars t' st in
+    alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
+
+let item_helper c i q inv f evt st =
   match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
   | None -> alter_state st "Action Failed: Invalid character name."
   | Some (c,_) ->
-    match List.find_opt (fun ((x:item),_) -> x.name =name) (E.get_items evt) with
-    | None -> alter_state st "Action Failed: That item is not available."
-    | Some (i, Infinity) -> buy c i q evt st
+    let stock = if inv then C.inv c else E.get_items evt in
+    match List.find_opt (fun ((x:item),_) -> x.name =i) stock with
+    | None ->  alter_state st "Action Failed: That item is not available."
+    | Some (i, Infinity) -> f c i q evt st
     | Some (i, Int n) ->
       if n<q then
         alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
       else
-        buy c i q evt st
+        f c i q evt st
 
-let use_item i c evt st=
-  match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
-  | None -> alter_state st "Action Failed: Invalid character name."
-  | Some (c,_) ->
-    match List.find_opt (fun ((x:item),_) -> x.name =i) (C.inv c) with
-    | None -> alter_state st "Action Failed: That item is not in inventory."
-    | Some (i,_) ->
-      match i.uses with
-      | Int q when q<1 -> alter_state st "That item has no remaining uses."
-      | _ -> let (evt', t') = E.use_item i c evt in
-        let chars = update_chars t' st in
-        alter_state st ~evt:evt' ~chars:chars
-          ((C.name c)^" used "^(i.name)^"!")
+let sell_item c i q evt st = item_helper c i q true sell evt st
 
+let buy_item c i q evt st= item_helper c i q false buy evt st
+
+let use_item i c evt st= item_helper c i 1 true use evt st
 
 (** COMBAT **)
 
@@ -174,8 +180,7 @@ let attack a t evt st:state =
     | None -> alter_state st "Action Failed: Invalid Target Name"
     | Some (t,_) -> let (evt', t') = E.attack a t evt in
       let chars = update_char t t' st in
-      alter_state st ~evt:evt' ~chars:chars
-        ((C.name a)^" attacked "^(C.name t)^"!")
+      alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
 
 let char_by_name s st =
   let c = List.find_opt (fun (x,_) -> C.name x = s) st.characters in
@@ -194,7 +199,7 @@ let cast c s t evt st =
     | Some c ->
       let (evt', t') = E.cast c s' t' evt in
       let chars = update_chars t' st in
-      alter_state st ~evt:evt' ~chars:chars ((C.name c)^" cast "^(s)^"!")
+      alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
   with _ -> alter_state st "One or more target names invalid."
 
 let use_item i c evt st =
@@ -206,10 +211,11 @@ let use_item i c evt st =
       let (i',_) = List.find (fun ((x:item ),n) -> x.name=i) (C.inv c) in
       let (evt', t') = E.use_item i' c evt in
       let chars = update_chars t' st in
-      alter_state st ~evt:evt' ~chars:chars ((C.name c)^" used the "^(i)^"!")
+      alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
     with _ -> alter_state st "Item not found in character inventory."
 
 let action (c:command) (st:state) =
+  E.clear_vout st.event;
   match c with
   | Fight (a,b) -> begin
     match E.get_form st.event with
