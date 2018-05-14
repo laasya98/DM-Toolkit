@@ -1,0 +1,21 @@
+Level ,Proficiency,Abilities,Cantrips
+1,2,Spellcasting Divine_Domain,3
+2,2,Channel_Divinity Domain_Feature,3
+3,2,_,3
+4,2,Ability_Score_Improvement,4
+5,3,Destroy_Undead,4
+6,3,Channel_Divinity Domain_Feature,4
+7,3,_,4
+8,3,Ability_Score_Improvement Destroy_Undead Domain_Feature,4
+9,4,_,4
+10,4,Divine_Intervention,5
+11,4,Destroy_Undead,5
+12,4,Ability_Score_Improvement,5
+13,5,_,5
+14,5,Destroy_Undead,5
+15,5,_,5
+16,5,Ability_Score_Improvement,5
+17,6,Destroy_Undead Domain_Feature,5
+18,6,Channel_Divinity,5
+19,6,Ability_Score_Improvement,5
+20,6,Divine_Intervention,5
