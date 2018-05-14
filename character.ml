@@ -112,8 +112,6 @@ type c = {
   let add_spell c s =
     let spells = c.spells in
     {c with spells = s::spells}
-  let abilities c = failwith "Unimplemented"
-  let add_ability c a = failwith "Unimplemented"
   let inv c : (item*quantity) list = fst c.inv
   let equipped c : (item*quantity) list= fst c.equipped
 
@@ -129,10 +127,12 @@ type c = {
       in
       List.map f l else
       (i, Int n)::l
+
   (*let remove_qty i n l =
     if List.mem_assoc i l then
       List.map(fun (a,b) -> if i = a then (i,b-n) else (a,b)) l else
       l *)
+
   let equip c e n =
     let equipment =  fst (c.equipped) in
     let cap = snd c.equipped in
