@@ -298,16 +298,6 @@ let cast_damage c s t evt =
     in
     List.map f t
 
-let string_of_stat s =
-  match s with
-  | Constitution -> "Constitution"
-  | Charisma -> "Charisma"
-  | Wisdom -> "Wisdom"
-  | Intel -> "Intelligence"
-  | Str -> "Strength"
-  | Dex -> "Dexterity"
-  | HP -> "HP"
-
 let cast_status c s t evt =
   let d = roll_dice_string s.die in
   let f n =

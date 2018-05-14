@@ -565,10 +565,12 @@ let details c =
   "Character " ^ c.name ^ ":\n" ^
     "Class: " ^ (c.c_class |> string_of_class) ^ "\n" ^
     "Race: " ^ (c.race|> string_of_race)  ^ "\n" ^
-    "HP: " ^ (c.hp |> string_of_int)  ^ "\n" ^
+  "HP: " ^ (c.hp |> string_of_int)  ^ "\n" ^
+  "Max HP" ^ (c.max_hp |> string_of_int)  ^ "\n" ^
     "Strength: " ^ (c.strength |> string_of_int)  ^ "\n" ^
     "Wisdom: " ^ (c.wisdom |> string_of_int)  ^ "\n" ^
     "Intelligence: " ^ (c.intel |> string_of_int) ^  "\n" ^
     "Dexterity: " ^ (c.dexterity |> string_of_int)  ^ "\n" ^
     "Constitution: " ^ (c.constitution |> string_of_int)  ^ "\n" ^
-    "Charisma: " ^ (c.charisma |> string_of_int)  ^ "\n"
+  "Charisma: " ^ (c.charisma |> string_of_int)  ^ "\n" ^
+  "Money: " ^ (c.money |>string_of_int)^"\n"
