@@ -207,8 +207,6 @@ let ability_mod a =
   if (b/2)*2 = b
   then b/2 else (b-1)/2
 
-let int_of_die d = int_of_string (String.sub d 1 (String.length d) )
-
 let all_skills = (*Database.allskills*)
   {
     name="acrobatics";
@@ -383,10 +381,12 @@ let blank_char = {
 
 
 
-  let quickbuild n c r =
+let quickbuild n c r =
+  let cls = class_of_string c in
+  let race = race_of_string r in
     let stats = stat_lister [] in
     let step1 = (*core stats*)
-      match c with
+      match cls with
         | Barbarian -> {blank_char with
                         constitution = List.hd stats;
                         charisma = List.nth stats 1;
@@ -472,10 +472,11 @@ let blank_char = {
                      strength = List.nth stats 4;
                      dexterity = List.nth stats 5; }
     in
-    let hit = (*Database.get_hd c*) "d10" in
+    let hit = (*Database.get_hd c*) 10 in
     let step2 = (* non core stats, speed, ability modifiers*)
                 {step1 with
                  name = n;
+                 race = race;
                  cons_mod = ability_mod step1.constitution;
                  char_mod = ability_mod step1.charisma ;
                  wis_mod = ability_mod step1.wisdom;
@@ -483,10 +484,10 @@ let blank_char = {
                  str_mod = ability_mod step1.strength;
                  dex_mod = ability_mod step1.dexterity;
                  prof_bonus = 2;
-                 hd = int_of_die hit;
+                 hd = hit;
                  hd_qty = 1;
-                 max_hp = int_of_die hit;
-                 hp = int_of_die hit;
+                 max_hp = hit;
+                 hp = hit;
                  speed = (*Database.get_speed r*) 40;
                 }
 
