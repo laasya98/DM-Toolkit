@@ -67,7 +67,8 @@ module Database = struct
 
   let index = {
                 files = [("init_state", "data/init_state.csv")];
-                other = [("class_data", "data/classes.csv")];
+                other = [("class_data", "data/classes.csv");
+                         ("race_data", "data/races.csv")];
               }
 
   let change_file field new_file =
@@ -83,14 +84,21 @@ module Database = struct
       List.find (fun l -> List.assoc typ l = index) d
         |> List.assoc field
 
-  let hit_die c = get "class" c "hit_die" "class_data" |> int_of_string
+  let hit_die c = let l = (List.assoc "class_data" index.other) in
+    get "class" c "hit_die" l
+                  |> int_of_string
 
   let tup_from_list l =
     ((try List.nth l 0 with _ -> ""), (try List.nth l 1 with _ -> ""))
 
-  let primary_stat c = get "class" c "" "" |> String.split_on_char ' '
+  let primary_stat c = let l = (List.assoc "class_data" index.other) in
+    get "class" c "primary" l
+                       |> String.split_on_char ' '
                        |> tup_from_list
-  let speed_of r = get "race" r "speed" "race_data" |> int_of_string
+
+  let speed_of r = let l = List.assoc "race_data" index.other in
+    get "race" r "speed" l
+                       |> int_of_string
 
   let get_item s = failwith "unimplemented"
   let get_npc s = failwith "unimplemented"
