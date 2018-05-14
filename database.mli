@@ -8,8 +8,8 @@ module type Database = sig
   (* [load_data f] is the data object retrieved from file [f] *)
   val load_data : string -> data
 
-  (** [save_data d f] writes a data object to a file [f]  *)
-  val save_data : data -> string
+  (** [save_data f d] writes a data object to a file [f]  *)
+  val save_data : string -> data -> unit
 
 (** [get_item id] is an item object corresponding to [id] in a
   * data object *)
