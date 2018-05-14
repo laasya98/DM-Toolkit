@@ -238,6 +238,6 @@ end
     end
   in alter_state st lst
 end
-| _ -> failwith "unimplemented"
+| _ -> alter_state st "Invalid move. Try again?"
 
 let output st = st.output
