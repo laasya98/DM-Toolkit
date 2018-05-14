@@ -58,8 +58,6 @@ module Database = struct
 
   let save_data f d = Csv.save f d
 
-
-
   let get_item s = failwith "unimplemented"
   let get_npc s = failwith "unimplemented"
   let get_class s = failwith "unimplemented"
