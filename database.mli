@@ -3,6 +3,9 @@ module type Database = sig
   (* [data] is the format of the data *)
   type data
 
+  (** [index] stores a mapping from keywords to filenames *)
+  type index
+
   (* [load_data f] is the data object retrieved from file [f] *)
   val load_data : string -> data
 
@@ -27,7 +30,7 @@ module type Database = sig
   (** [change_file field new_file] changes the default file
       for the type of query [field] to the filename [new_file]
   *)
-  val change_file : string -> string -> (string * string) list
+  val change_file : string -> string -> unit
 
   (** [get_item id] is an item object corresponding to [id] in a
     * data object *)

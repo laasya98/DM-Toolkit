@@ -1,8 +1,12 @@
 open Csv
+open Hashtbl
 module type Database = sig
 
   (* [data] is the format of the data *)
   type data
+
+  (** [index] stores a mapping from keywords to filenames *)
+  type index
 
   (* [load_data f] is the data object retrieved from file [f] *)
   val load_data : string -> data
@@ -28,7 +32,7 @@ module type Database = sig
   (** [change_file field new_file] changes the default file
       for the type of query [field] to the filename [new_file]
   *)
-  val change_file : string -> string -> (string * string) list
+  val change_file : string -> string -> unit
 
   (** [get_item id] is an item object corresponding to [id] in a
     * data object *)
@@ -55,17 +59,16 @@ module Database = struct
   (** [index] stores two association lists
 
   *)
-  type index = (string * string) list
+  type index = (string, string) Hashtbl.t
 
-  let files = [
-                ("init_state", "data/init_state.csv");
-                ("class_data", "data/classes.csv");
-                ("race_data", "data/races.csv")
-              ]
+  let files = create 3
 
+  let () = Hashtbl.add files "state" "data/init_state.csv";
+           Hashtbl.add files "class_data" "data/classes.csv";
+           Hashtbl.add files "race_data" "data/races.csv"
 
   let change_file field new_file =
-    (field, new_file)::(List.remove_assoc field files)
+    Hashtbl.add files field new_file
 
   let load_data s = let tab = Csv.load s in
     Csv.associate (List.hd tab) (List.tl tab)
@@ -79,19 +82,19 @@ module Database = struct
     List.find (fun l -> idk (List.assoc typ l)  = idk index) d
         |> List.assoc field
 
-  let hit_die c = let l = (List.assoc "class_data" files) in
+  let hit_die c = let l = (Hashtbl.find files "class_data") in
     get "class" c "hit_die" l
                   |> int_of_string
 
   let tup_from_list l =
     ((try List.nth l 0 with _ -> ""), (try List.nth l 1 with _ -> ""))
 
-  let primary_stat c = let l = (List.assoc "class_data" files) in
+  let primary_stat c = let l = (Hashtbl.find files "class_data") in
     get "class" c "primary" l
                        |> String.split_on_char ' '
                        |> tup_from_list
 
-  let speed_of r = let l = List.assoc "race_data" files in
+  let speed_of r = let l = Hashtbl.find files "race_data" in
     get "race" r "speed" l
                        |> int_of_string
 
