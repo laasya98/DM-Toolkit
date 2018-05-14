@@ -41,7 +41,8 @@ open Global
     or str if start is longer than str*)
   let remove_start start str  =
     if String.length start > String.length str then str else
-    String.trim (String.sub str (String.length start) (String.length str))
+      let len = String.length start in
+      String.trim (String.sub str len ((String.length str) - len))
 
   (*TODO what would you have to type to do item/state changes or character/entity
     creations??*)
@@ -123,8 +124,8 @@ let parse s =
         begin match lst with
         | c::s::t -> Cast (c,s,t)
         | _ -> Invalid end
-    |"quickbuild" -> let x = String.sub s 11 (String.length s)  in
+    |"quickbuild" | "build" |"quick" -> let x = String.sub s 11 (String.length s)  in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       if List.length lst = 3 || List.length lst = 4 then
-      QuickBuild lst else Invalid
+        QuickBuild lst else Invalid
     |_ -> Invalid

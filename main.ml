@@ -20,7 +20,7 @@ let rec repl state =
     let () = print_endline ("Invalid move. Try again.") in repl s' else
   let () = match cmd with
     |Quit -> exit 0
-    |Help -> ANSITerminal.(print_string [blue] "some rules and such");
+    |Help -> ANSITerminal.(print_string [blue] "some rules and such \n");
     |Event x ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
       print_endline s'.output;
       (*)|Inquiry -> *)

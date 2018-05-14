@@ -183,7 +183,6 @@ let char_by_name s st =
   | None -> None
   | Some (x,_) -> Some x
 
-
 let cast c s t evt st =
   let c' = char_by_name c st in
   let s' = failwith "match s with a spell in char spells" in
@@ -197,31 +196,24 @@ let cast c s t evt st =
       let chars = update_chars t' st in
       alter_state st ~evt:evt' ~chars:chars ((C.name c)^" cast "^(s)^"!")
   with _ -> alter_state st "One or more target names invalid."
-              (*
-let use_item i t evt st =
-  let t' = char_by_name t st in
-  try
-    let i' = List.find (fun (x,n) -> x.name=i) C.inv in
-    match c' with
-    | None -> alter_state st "The character name is invalid."
-    | Some c ->
-      let (evt', t') = E.cast c s' t' evt in
+
+let use_item i c evt st =
+  let c' = char_by_name c st in
+  match c' with
+  | None -> alter_state st "Character name invalid."
+  | Some c ->
+    try
+      let (i',_) = List.find (fun ((x:item ),n) -> x.name=i) (C.inv c) in
+      let (evt', t') = E.use_item i' c evt in
       let chars = update_chars t' st in
-      alter_state st ~evt:evt' ~chars:chars ((C.name c)^" cast "^(s)^"!")
-      with _ -> alter_state st "Item not found in character inventory."
-              *)
+      alter_state st ~evt:evt' ~chars:chars ((C.name c)^" used the "^(i)^"!")
+    with _ -> alter_state st "Item not found in character inventory."
 
 let action (c:command) (st:state) =
-match c with
-| Fight (a,b) -> begin
-  match E.get_form st.event with
-  | Battle -> attack a b st.event st
-  | _ -> alter_state st "No battle event occurring."
-end
-| Cast (c,s,t) -> cast c s t st.event st
-| UseItem (c,i) -> use_item i c st.event st
-| Buy (ch,i,q) -> begin
+  match c with
+  | Fight (a,b) -> begin
     match E.get_form st.event with
+<<<<<<< HEAD
     | Shop -> begin
       try buy_item ch i (int_of_string q) st.event st
       with _ -> alter_state st "Invalid item quantity."
@@ -244,5 +236,31 @@ end
   let newcharls = ((newchar,Party) :: st.characters) in
                      alter_state st ~chars:newcharls "New Character, " ^ n ^ ", added to party!"*)
 | _ -> alter_state st "Unimplemented"
+=======
+    | Battle -> attack a b st.event st
+    | _ -> alter_state st "No battle event occurring."
+  end
+  | Cast (c,s,t) -> cast c s t st.event st
+  | UseItem (c,i) -> use_item i c st.event st
+  | Buy (ch,i,q) -> begin
+      match E.get_form st.event with
+      | Shop -> begin
+        try buy_item ch i (int_of_string q) st.event st
+        with _ -> alter_state st "Invalid item quantity."
+      end
+      |_ -> alter_state st "Action Failed: There is no shop here."
+  end
+  | Turn -> let (evt', t') = E.turn st.event in
+    let chars = update_chars t' st in
+    alter_state st ~evt:evt' ~chars:chars "Turn incremented"
+  | GetCharacterList r -> begin
+      let lst = begin match r with
+      |All -> character_list_string  st
+      |role -> character_list_string ~role:role st
+      end
+    in alter_state st lst
+  end
+  | _ -> alter_state st "Invalid move. Try again?"
+>>>>>>> 69ce6709aad5d85e1339e63ac7b8b702b0f774fd
 
 let output st = st.output
