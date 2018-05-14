@@ -149,11 +149,9 @@ let sell c i q evt st =
   alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items sold."
 
 let use c i q evt st =
-  match i.uses with
-  | Int q when q<1 -> alter_state st "That item has no remaining uses."
-  | _ -> let (evt', t') = E.use_item i c evt in
-    let chars = update_chars t' st in
-    alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
+  let (evt', t') = E.use_item i c evt in
+  let chars = update_chars t' st in
+  alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
 
 let item_helper c i q inv f evt st =
   match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
