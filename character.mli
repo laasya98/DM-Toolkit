@@ -12,34 +12,6 @@ open Global
  (*type spell is a global*)
   type spell = Global.spell
 
-  (* not thinking abt subclasses right now
- type elf_sub =
-    | High
-    | Wood
-    | Dark
-
-  type half_sub =
-   | Lightfoot
-   | Stout
-
-  type dragon_descent =
-    | Black
-    | Blue
-    | Brass
-    | Bronze
-    | Copper
-    | Gold
-    | Green
-    | Red
-    | Silver
-    | White
-
-  type gnome_sub =
-   | Forest
-   | Rock*)
-
-
-
   (* type c_class is the types of classes of a character*)
   type c_class =
     | Barbarian
@@ -216,3 +188,6 @@ open Global
 
   (* [update_charisma character new_c] character with charisma = new_c.*)
   val update_charisma :  c -> int -> c
+
+(* [quickbuild n c r] creates a new character with from the name, class, and race (ncr)*)
+val quickbuild :  string -> string -> string -> c

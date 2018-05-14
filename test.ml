@@ -10,8 +10,7 @@ let item1 = {
   i_type=Other;
   description = "item1 desc";
   weight = 1;
-  effect = {stat=Str; die=[]; bonus=0};
-  uses = Int 0;
+  effect = {stat=Str; die="1d0"; bonus=0};
   value=5;
 }
 
@@ -20,8 +19,7 @@ let item2 = {
   i_type=Shield;
   description = "item2 desc";
   weight = 1;
-  effect = {stat=Str; die=[]; bonus=0};
-  uses = Int 0;
+  effect = {stat=Str; die="1d0"; bonus=0};
   value=0;
 }
 
@@ -43,7 +41,7 @@ let char1:Character.c = {
   char_mod = 0;
   cons_mod = 0;
   str_mod = 0;
-  dex_mod = 0;
+  dex_mod = 40;
   prof_bonus = 2;
   passive_wisdom = 0;
   dexterity=1;
@@ -93,6 +91,40 @@ let char2:Character.c = {
   inv=[item1, Int 2],3;
 }
 
+let char3:Character.c = {
+  name="char3";
+  race = Human;
+  c_class = Barbarian;
+  armor_class=0;
+  hd = 10;
+  hd_qty = 1;
+  wisdom=0;
+  charisma=0;
+  constitution = 0;
+  money = 10;
+  intel=0;
+  strength=2;
+  int_mod = 0;
+  wis_mod = 0;
+  char_mod = 0;
+  cons_mod = 0;
+  str_mod = 0;
+  dex_mod = 0;
+  prof_bonus = 2;
+  passive_wisdom = 0;
+  dexterity=1;
+
+  speed=1;
+  max_hp=10;
+  hp=10;
+  xp=0;
+  level=1;
+  skills=[];
+  spells=[];
+  equipped=[],3;
+  inv=[item1, Int 5; item2, Infinity],3;
+}
+
 let character_tests = [
   "name" >:: (fun _ -> assert_equal "char2" (Character.name char2));
   "wisdom" >:: (fun _ -> assert_equal 0 (Character.wisdom char1));
@@ -137,7 +169,7 @@ let character_tests = [
                       (Character.equipped (Character.equip char1 item1 1)));
 ]
 
-let evtC1 = Event.make_event "evtC1" Battle [] ["A";"B";"C"]
+let evtC1 = Event.make_event "evtC1" Battle [] [char1;char2]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
 let spell1 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=3;
@@ -146,7 +178,7 @@ let spell2 = {name="spell2"; stype=Conjuration; level=1; targets=1; to_cast=1;
               duration=0;}
 
 let magmissile =
-  let d = {saving_stat=""; damage_die=[4]; bonus_damage=1;
+  let d = {saving_stat=""; damage_die="1d4"; bonus_damage=1;
            range = 10; multiple=true} in
   {name="magic missile"; stype = Damage d; level = 1; targets=3; to_cast=1; duration=0}
 
@@ -161,8 +193,8 @@ let event_tests = [
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
   "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
   "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> fst |> Event.get_turn));
-  "get_tlst" >:: (fun _ -> assert_equal ["A";"B";"C"] (Event.get_turnlst evtC1));
-  "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
+  "get_tlst" >:: (fun _ -> assert_equal ["char1";"char2"] (Event.get_turnlst evtC1));
+  "update_tlst" >:: (fun _ -> assert_equal ["char2";"char1"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
 
   "cast" >:: (fun _ -> assert_equal [(spell2, 1)] (Event.cast char1 spell2 [] evtC1 |> fst|> Event.get_waiting_spells));
   "cast_d" >:: (fun _ -> assert_equal [] (Event.cast char1 spell2 [] evtC1 |> fst |> Event.turn |> fst|> Event.get_waiting_spells));
@@ -186,7 +218,7 @@ type state = State.state
 
 let loc:(State.location) = {name="loc1"; description=""; characters=[]; contents=[]; exits =[]}
 let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""}
-let st2:(state) = {locations=[]; characters=[(char1, Party)]; event=evtS;current_location=loc; output=""}
+let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""}
 
 let state_tests = [
   (*Combat*)
@@ -202,6 +234,10 @@ let state_tests = [
   "shop buy" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item1","2")) st2 |> State.output));
   "shop buy2" >:: (fun _ -> assert_equal "Character doesn't have enough money." (State.action (Buy("char1","item1","3")) st2 |> State.output));
   "shop buyI" >:: (fun _ -> assert_equal "Items bought." (State.action (Buy("char1","item2","200")) st2 |> State.output));
+
+  "shop sell" >:: (fun _ -> assert_equal "Items sold." (State.action (Sell("char3","item1","1")) st2 |> State.output));
+
+  "shop sellI" >:: (fun _ -> assert_equal "Items sold." (State.action (Sell("char3","item2","200")) st2 |> State.output));
 ]
 
 let command_tests = [
@@ -215,8 +251,6 @@ let command_tests = [
   "get characters hostile" >:: (fun _ -> assert_equal (GetCharacterList (Hostile)) (Command.parse "get characters hostile"));
   "get characters friendly" >:: (fun _ -> assert_equal (GetCharacterList (Friendly)) (Command.parse "get characters friendly"));
   "get characters neutral" >:: (fun _ -> assert_equal (GetCharacterList (Neutral)) (Command.parse "get characters neutral"));
-
-
 ]
 
 let suite =

@@ -13,8 +13,8 @@ open Global
 (* [form] is the variety of an event. *)
   type form = Battle | Shop | Interaction
 
-(* [init_event n] returns a basic empty event with initial fields and
-   form Interaction. *)
+(* [init_event n c] returns a basic empty event with initial fields and
+   form Interaction. Turn order is based on [c]. *)
 val init_event : string -> t
 
 (* [parse_event datalst] parses an event from associative list [datalst].
@@ -22,10 +22,11 @@ val init_event : string -> t
     information. *)
    val parse_event : (string*string) list -> t
 
-(* [make_event n f is ts] returns an event with name [n], form [f], items [is],
-   and turn order [ts]. Output is set to "Event created."
+(* [make_event n f is cs] returns an event with name [n], form [f], items [is],
+   and turn order of characters [cs]. Output is set to "Event created."
    All other fields are initialized to default values. *)
-  val make_event : string -> form -> (item * quantity) list -> string list-> t
+val make_event : string -> form -> (item * quantity) list ->
+  character list -> t
 
 val verbose : t -> string
 
