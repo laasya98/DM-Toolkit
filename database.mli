@@ -32,17 +32,10 @@ module type Database = sig
   *)
   val change_file : string -> string -> unit
 
-  (** [get_item id] is an item object corresponding to [id] in a
-    * data object *)
+  (** TODO specify*)
   val get_item : string -> (string * string) list
-
-  (** [get_char id] is an character object corresponding to [id] in a
-    * data object *)
-  val get_npc : string -> data
-
-  (** [get_class id] is a D&D class corresponding to [id] in a
-    * data object *)
-  val get_class : string -> string
+  val get_location : string -> (string * string) list
+  val get_event : string -> (string * string) list
 
 end
 
