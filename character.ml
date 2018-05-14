@@ -115,8 +115,13 @@ let update_wisdom  c w = {c with wisdom = w;
   let level_up  c l =
     {c with
       level = l
+(*TODO:
+  - add hd to hp
+  - new hd after every 5 levels
+  - prof bonus increase
+  - ability score increase
+  - reset skills *)
     }
-  (* TODO: whatever algorithm updates strength/skills/speed based off of level/chartype*)
   let skills c =  c.skills
   let spells c = c.spells
   let add_spell c s =
@@ -368,7 +373,7 @@ in skill2::(skill_set t c)
 
 
 let parse_char clist =
-  try
+  (*try*)
     let n = find_assoc "Name" clist in
     let cls = (find_assoc "Class" clist) |> class_of_string in
     let r = (find_assoc "Race" clist) |> race_of_string in
@@ -426,7 +431,7 @@ let parse_char clist =
       inv= [],0;
       money=cash;
     } (* )|> skill_set all_skills*)
-  with _ -> raise (Failure "Invalid Character Data")
+(*with _ -> raise (Failure "Invalid Character Data")*)
 
 let blank_char = {
   name = "Allan";

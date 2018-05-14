@@ -57,7 +57,7 @@ val empty_location : location
 
 (* [init_state s] is the initial state of the game loaded from a save file s
    from a database.*)
-val init_state : state
+val init_state : string -> state
 
 (*------------------GETTERS-------------------*)
 

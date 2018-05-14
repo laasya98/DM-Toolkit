@@ -106,19 +106,55 @@ let rec repl state =
       print_endline ((State.gen_printout s'));
     | _ -> print_endline ((State.gen_printout s'));
   in
-repl s'
+    repl s'
 
 (* [play_game f] plays the game in adventure file [f]. *)
-let start_game f =
-  Database.change_file "state" f;
-  print_endline "";
-  (repl init_state)
+let rec start_game f =
+  if (String.lowercase_ascii f = "quit") then
+    exit 0
+  else
+  try
+    Database.change_file "state" f;
+    let d = init_state "state" in
+    repl d
+  with _ -> begin
+        ANSITerminal.(print_string [red] "Not a valid file.\n");
+        print_endline "Please enter the name of the game file you want to load.\n";
+        print_string  "> ";
+        match read_line () with
+        | exception End_of_file -> start_game "QUIT"
+        | file_name -> start_game file_name
+      end
+
 
 (* [main ()] starts the REPL, which prompts for a game to play.
  * You are welcome to improve the user interface, but it must
  * still prompt for a game to play rather than hardcode a game file. *)
 let main () =
-  ANSITerminal.(print_string [red] "\n\nWelcome to the DM toolkit\n");
+  ANSITerminal.(print_string [red] "\n\nWelcome to the DM toolkit for Dungeons and Dragons!\n\n
+
+                                                 __----~~~~~~~~~~~------___
+                                     .  .   ~~//====......          __--~ ~~
+                   -.              \\_|//     |||\\\\  ~~~~~~::::... /~
+                ___-==_       _-~o~  \\/    |||  \\\\            _/~~-
+       __---~~~.==~||\\=_    -_--~/_-~|-   |\\\\   \\\\        _/~
+   _-~~     .=~    |  \\\\-_    '-~7  /-   /  ||    \\      /
+ .~       .~       |   \\\\ -_    /  /-   /   ||      \\   /
+/  ____  /         |    \\ \\ ~-_/  /|- _/   .||       \\ /
+|~~    ~~|--~~~~--_ \\     ~==-/   | \\~--===~~        .\\
+           '         ~-|      /|    |-~\\~~       __--~~
+                       |-~~-_/ |    |   ~\\_   _-~            /\\
+                            /  \\     \\__   \\/~                \\__
+                        _--~ _/ | .-~~____--~-/                  ~~==.
+                      ((->/~   '.|||' -_|    ~~-/ ,              . _||
+                                 -_     ~\\      ~~---l__i__i__i--~~_/
+    _|   _    _|             _-~-__   ~)  \\--______________--~~
+   |_|  | |  |_|          //.-~~~-~_--~- |-------~~~~~~~~
+                                      //.-~~~--\
+
+
+
+");
   print_endline "Please enter the name of the game file you want to load.\n";
   print_string  "> ";
   match read_line () with
