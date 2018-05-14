@@ -142,8 +142,9 @@ let buy c i q evt st =
     alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items bought."
 
 let sell c i q evt st =
-  let m = i.value * q /10 in
-  let c' = C.update_money (C.remove_item c i q) ((C.money c) +m) in
+  let m = i.value * q / 10 in
+  let cm = C.money c in
+  let c' = C.update_money (C.remove_item c i q) (cm+m) in
   let evt' = E.add_item i (Int q) evt in
   alter_state st ~evt:evt' ~chars:(update_char c c' st) "Items sold."
 
@@ -168,9 +169,18 @@ let item_helper c i q inv f evt st =
       else
         f c i q evt st
 
-let sell_item c i q evt st = item_helper c i q true sell evt st
-
-let buy_item c i q evt st= item_helper c i q false buy evt st
+let b_s_item c i q evt st buying =
+  match E.get_form st.event with
+  | Shop -> begin
+      try
+        let q' = int_of_string q in
+        if buying then
+          item_helper c i q' false buy evt st
+        else
+          item_helper c i q' true sell evt st
+    with _ -> alter_state st "Invalid item quantity."
+  end
+  |_ -> alter_state st "Action Failed: There is no shop here."
 
 let use_item i c evt st= item_helper c i 1 true use evt st
 
@@ -229,15 +239,9 @@ let action (c:command) (st:state) =
     | _ -> alter_state st "No battle event occurring."
   end
   | Cast (c,s,t) -> cast c s t st.event st
-  | UseItem (c,i) -> use_item i c st.event st
-  | Buy (ch,i,q) -> begin
-      match E.get_form st.event with
-      | Shop -> begin
-        try buy_item ch i (int_of_string q) st.event st
-        with _ -> alter_state st "Invalid item quantity."
-      end
-      |_ -> alter_state st "Action Failed: There is no shop here."
-  end
+  | UseItem (c,i) -> item_helper c i 1 true use st.event st
+  | Buy (ch,i,q) -> b_s_item ch i q st.event st true
+  | Sell (ch,i,q) -> b_s_item ch i q st.event st false
   | Turn -> let (evt', t') = E.turn st.event in
     let chars = update_chars t' st in
     alter_state st ~evt:evt' ~chars:chars "Turn incremented"

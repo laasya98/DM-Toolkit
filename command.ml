@@ -16,6 +16,7 @@ open Global
     |Drop of string
     |Shop of string
     |Buy of (string * string *string)
+    |Sell of (string * string *string)
     |Fight of (string * string)
     |Cast of (string * string * string list)
     |Turn
@@ -116,6 +117,11 @@ let parse s =
       begin match lst with
       | c::i::q::[] -> Buy (c,i,q)
       | _ -> Invalid end
+    |"sell" -> let x = (remove_start "sell" s) in
+      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+      begin match lst with
+        | c::i::q::[] -> Sell (c,i,q)
+        | _ -> Invalid end
     |"cast" -> let x = (remove_start "cast" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
         begin match lst with
