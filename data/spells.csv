@@ -1,3 +1,3 @@
 Name,Type,Level,Targets,Wait,WDie,Range,Multiple,Stat,EDice
-Magic Missile,Damage,1,3,1,1d4 1d1,120,true, ,
-Heal,Status,1,1,0, , , ,hp,2d8
+Magic Missile,Damage,1,3,1,1d4 1d1,120,true,None,None
+Heal,Status,1,1,0,None,None,None,hp,2d8

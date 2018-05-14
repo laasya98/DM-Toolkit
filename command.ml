@@ -10,6 +10,7 @@ open Global
     |LoadEvent of string
     |QuickEvent of (string*string)
     |Inquiry
+    |Look
     |Move of string
     |Use of (string * string)
     |Inv
@@ -65,6 +66,7 @@ let parse s =
     | "inv" -> Inv
     | "inventory" -> Inv
     | "inq" -> Inquiry
+    | "look" -> Look
     | "inquiry" -> Inquiry
     | "turn" -> Turn
     |"event" -> Event
