@@ -76,6 +76,7 @@ let parse s =
     |"take" -> Take rest
     |"drop" -> Drop rest
     |"shop" -> Shop rest
+    |"help" -> Help rest
     |"get" ->
       let indxget = if (String.contains rest ' ')
               then (String.index rest ' ') else String.length rest in
