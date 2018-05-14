@@ -2,6 +2,12 @@ open Character
 open Global
 open Database
 
+(*TODO list:
+  character death?
+  turn order calculation
+  selling items
+  casting summoning stuff? *)
+
   module C = Character
   type character = Character.c
 
@@ -16,7 +22,7 @@ open Database
     turn: int;
     turn_order: string list;
     spells: spellTimer list;
-    v_out: string;
+    mutable v_out: string;
     output: string;
   }
 
@@ -46,14 +52,14 @@ open Database
 
   let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(items = evt.items)
       ?(turn = evt.turn) ?(t_order = evt.turn_order)
-      ?(spells = evt.spells) ?(v=evt.v_out) output =
+      ?(spells = evt.spells) output =
     {
       name=name;
       form = form;
       items = items;
       turn = turn;
       turn_order = t_order;
-      v_out = v;
+      v_out = evt.v_out;
       output = output;
       spells = spells;
     }
@@ -105,14 +111,9 @@ let parse_event dlist =
     make_event n f' i' [] (*TODO: turn order*)
   with _ -> raise (Failure "Invalid Event Data")
 
-let clear_vout evt = alter_event evt ~v:"" "Verbose cleared."
+let clear_vout evt = evt.v_out <- ""
 
-let add_vout s evt = alter_event evt ~v:(evt.v_out^"\n"^s) "Verbose updated."
-
-let rec add_vout_lst s lst evt =
-  match lst with
-  | [] -> add_vout s evt
-  | h::t -> add_vout_lst (s^"\n"^h) t evt
+let add_vout s evt = evt.v_out <- evt.v_out^s
 
   let get_form evt = evt.form
 
@@ -207,17 +208,23 @@ let deal_damage a t = apply_effect HP (-1 *a) t
 (* returns the event and new state of the target after being hit*)
   let attack a t evt =
     let hit = attack_roll a t in
-    if hit = 0 then (add_vout "Attack missed." evt, t)
-    else if hit=2 then
+    if hit = 0 then begin
+      add_vout "Attack missed." evt;
+      (evt, t)
+    end
+    else if hit=2 then begin
       let d = damage_roll a true in
       let v = (C.name a)^" critically hit "^(C.name t)
               ^" for "^(string_of_int d)^" damage." in
-      (add_vout v evt, deal_damage d t)
+      add_vout v evt;
+      (evt, deal_damage d t)
+    end
     else
       let d = damage_roll a false in
       let v = (C.name a)^" hit "^(C.name t)
               ^" for "^(string_of_int d)^" damage." in
-      (add_vout v evt, deal_damage d t)
+      add_vout v evt;
+      (evt, deal_damage d t)
 (*TODO: add test for death, turn #, items becoming available, xp gain, etc
 *)
 
@@ -234,7 +241,8 @@ let deal_damage a t = apply_effect HP (-1 *a) t
     let spell = {turn=turn; castor=c; spell=s; targets=t} in
     let v = (C.name c)^" began casting "^s.name^"! It will cast in "^
             (string_of_int s.to_cast)^" turns." in
-    alter_event evt ~spells:(spell::evt.spells) ~v:v "Spell timer added."
+    add_vout v evt;
+    alter_event evt ~spells:(spell::evt.spells) "Spell timer added."
 
 (* [count_dups lst] is the list of tuples of each element of the list and
    how many times it appeared in the original list. It contains no duplicate
@@ -252,7 +260,7 @@ let count_dups lst =
   in
   count [] lst
 
-let spell_damage s (t,n) =
+let spell_damage s (t,n) evt =
   let rec dam s n acc =
     if n>0 then
       let d = roll_dice s.damage_die s.bonus_damage in
@@ -262,16 +270,20 @@ let spell_damage s (t,n) =
   in
   let d = dam s n 0 in
   let v = (C.name t)^" took "^(string_of_int d)^" damage!" in
-  (deal_damage d t, v)
+  add_vout v evt;
+  deal_damage d t
 
 let cast_damage c s t evt =
   if s.multiple then
     let t' = count_dups t in
-    List.map (fun n -> spell_damage s n) t'
+    List.map (fun n -> spell_damage s n evt) t'
   else
     let d = roll_dice s.damage_die s.bonus_damage in
-    List.map (fun n -> (deal_damage d n, (C.name n)^" took "^
-                                         (string_of_int d)^" damage!")) t
+    let f n =
+      add_vout ((C.name n)^" took "^(string_of_int d)^" damage!") evt;
+      deal_damage d n
+    in
+    List.map f t
 
 let string_of_stat s =
   match s with
@@ -285,41 +297,35 @@ let string_of_stat s =
 
 let cast_status c s t evt =
   let d = roll_dice s.die s.bonus in
-  List.map (fun n -> (apply_effect s.stat d n,
-                      (C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
-                      (string_of_int d)^"!")) t
+  let f n =
+    add_vout ((C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
+    (string_of_int d)^"!") evt;
+    apply_effect s.stat d n
+  in
+  List.map f t
 
     (*TODO: consolidate*)
 let use_item (i:item) c evt =
-  let v = (C.name c)^" used "^i.name^"!" in
-  (* TODO let i' = match i.uses with
+  add_vout ((C.name c)^" used "^i.name^"!") evt;
+  (*TODO let i' = match i.uses with
     | Infinity -> i
     | Int q -> {i with uses = Int (q-1)} in *)
-  let c' = cast_status c i.effect [c] (add_vout v evt) in
-  let t' = List.map (fun x -> fst x) c' in
-  let v' = List.map (fun x -> snd x) c' in
-  let evt' = add_vout_lst "" v' evt in
-  (evt', t')
+  let c' = cast_status c i.effect [c] evt in
+  (evt, c')
 
   let cast c s t evt =
     if s.to_cast = 0 || evt.form <> Battle then
+      let v = (C.name c)^" cast "^s.name^"!" in
+      add_vout v evt;
       match s.stype with (*TODO*)
       | Damage d -> begin
-          let v = (C.name c)^" cast "^s.name^"!" in
-          let c = cast_damage c d t (add_vout v evt) in
-          let t' = List.map (fun x -> fst x) c in
-          let v' = List.map (fun x -> snd x) c in
-          let evt' = add_vout_lst "" v' evt in
-          (evt', t')
+          let t' = cast_damage c d t evt in
+          (evt, t')
       end
       | Conjuration -> (evt, [])
       | Status d -> begin
-          let v = (C.name c)^" cast "^s.name^"!" in
-          let c = cast_status c d t (add_vout v evt) in
-          let t' = List.map (fun x -> fst x) c in
-          let v' = List.map (fun x -> snd x) c in
-          let evt' = add_vout_lst "" v' evt in
-          (evt', t')
+          let t' = cast_status c d t evt in
+          (evt, t')
       end
     else
       (add_spell c s t evt, [])
