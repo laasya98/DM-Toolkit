@@ -83,6 +83,7 @@ module Database = struct
 
 
   let save_data f d =
+    Unix.rmdir f;
     Unix.mkdir f 0o640;
     Csv.save ("./"^f^"/"^"newstate.csv") d
 
