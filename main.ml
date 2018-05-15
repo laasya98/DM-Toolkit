@@ -106,14 +106,26 @@ let rec repl state =
       print_endline ((State.gen_printout s'));
     | _ -> print_endline ((State.gen_printout s'));
   in
-repl s'
+    repl s'
 
 (* [play_game f] plays the game in adventure file [f]. *)
-let start_game f =
+let rec start_game f =
+  if (String.lowercase_ascii f = "quit") then
+    exit 0
+  else
   try
     Database.change_file "state" f;
-    (repl init_state)
-  with _ -> print_endline (" Invalid D&D File. Try again?")
+    let d = init_state "state" in
+    repl d
+  with _ -> begin
+        ANSITerminal.(print_string [red] "Not a valid file.\n");
+        print_endline "Please enter the name of the game file you want to load.\n";
+        print_string  "> ";
+        match read_line () with
+        | exception End_of_file -> start_game "QUIT"
+        | file_name -> start_game file_name
+      end
+
 
 (* [main ()] starts the REPL, which prompts for a game to play.
  * You are welcome to improve the user interface, but it must
