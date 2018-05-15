@@ -1,5 +1,3 @@
-open Global
-
 module type Database = sig
 
   (* [data] is the format of the data *)
@@ -36,7 +34,7 @@ module type Database = sig
 
   (** [get_item id] is an item object corresponding to [id] in a
     * data object *)
-  val get_item : string -> item
+  val get_item : string -> (string * string) list
 
   (** [get_char id] is an character object corresponding to [id] in a
     * data object *)

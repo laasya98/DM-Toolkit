@@ -2,11 +2,6 @@ open Character
 open Global
 open Database
 
-(*TODO list:
-  character death?
-  turn order calculation
-  casting summoning stuff? *)
-
   module C = Character
   type character = Character.c
 
@@ -20,6 +15,7 @@ open Database
     items: (item * quantity) list;
     turn: int;
     turn_order: string list;
+    first_turn: string;
     spells: spellTimer list;
     mutable v_out: string;
     output: string;
@@ -36,13 +32,19 @@ open Database
     |> List.rev
     |> List.map (fun (x,_) -> C.name x)
 
-  let make_event name form items c =
+let make_event name form items c =
+  let tord = calc_turn_order c in
+  let f = match tord with
+    |[] -> ""
+    |h::_ -> h
+  in
     {
       name=name;
       form = form;
       items = items;
       turn = 0;
-      turn_order = calc_turn_order c;
+      turn_order = tord;
+      first_turn = f;
       spells=[];
       v_out = "";
       output = "Event created.";
@@ -55,13 +57,14 @@ open Database
       items = [];
       turn = 0;
       turn_order = [];
+      first_turn = "";
       spells=[];
       v_out = "";
       output = "Event created.";
     }
 
   let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(items = evt.items)
-      ?(turn = evt.turn) ?(t_order = evt.turn_order)
+      ?(turn = evt.turn) ?(t_order = evt.turn_order) ?(f_turn = evt.first_turn)
       ?(spells = evt.spells) output =
     {
       name=name;
@@ -69,6 +72,7 @@ open Database
       items = items;
       turn = turn;
       turn_order = t_order;
+      first_turn = f_turn;
       v_out = evt.v_out;
       output = output;
       spells = spells;
@@ -104,7 +108,7 @@ let parse_itemlst ilst =
     match String.split_on_char '-' ilst with
     | i::q::t -> begin
         let q' = try Int (int_of_string q) with _ -> Infinity in
-        (Database.get_item i, q')
+        (Database.get_item i |> parse_item, q')
     end
     | _ -> failwith "Invalid?"
   in
@@ -179,7 +183,7 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
       with _ -> C.strength attacker
     in
     let prof = 0 in
-    let ac = try (get_armor target).ac with _ -> 0 in
+    let ac = try (get_armor target) with _ -> 0 in
     if d20 = 1 then 0
     else if d20 = 20 then 2
     else
@@ -268,7 +272,7 @@ let count_dups lst =
 let spell_damage s (t,n) evt =
   let rec dam s n acc =
     if n>0 then
-      let d = roll_dice_string s.damage_die + s.bonus_damage in
+      let d = roll_dice_string s.damage_die in
       dam s (n-1) (acc+d)
     else
       acc
@@ -283,7 +287,7 @@ let cast_damage c s t evt =
     let t' = count_dups t in
     List.map (fun n -> spell_damage s n evt) t'
   else
-    let d = roll_dice_string s.damage_die + s.bonus_damage in
+    let d = roll_dice_string s.damage_die in
     let f n =
       add_vout ((C.name n)^" took "^(string_of_int d)^" damage!") evt;
       deal_damage d n
@@ -301,7 +305,7 @@ let string_of_stat s =
   | HP -> "HP"
 
 let cast_status c s t evt =
-  let d = roll_dice_string s.die + s.bonus in
+  let d = roll_dice_string s.die in
   let f n =
     add_vout ((C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
     (string_of_int d)^"!") evt;
@@ -324,7 +328,6 @@ let use_item (i:item) c evt =
           let t' = cast_damage c d t evt in
           (evt, t')
       end
-      | Conjuration -> (evt, [])
       | Status d -> begin
           let t' = cast_status c d t evt in
           (evt, t')
@@ -353,16 +356,31 @@ let use_item (i:item) c evt =
     | h::t -> let (e', t') = update_and_cast h.castor h.spell h.targets e tar in
       castAll t (e', tar @ t')
 
-  let turn evt =
-    let t' = evt.turn + 1 in
-    let tlst = match evt.turn_order with
-      |[] -> []
-      |h::t -> t @ [h]
-    in
-    let spells = List.filter (fun (s:spellTimer) -> s.turn = t') evt.spells in
-    let rs = List.filter (fun (s:spellTimer) -> s.turn <> t') evt.spells in
-    let (evt', tar') = castAll spells (evt, []) in
-    let evt'' = alter_event evt' ~spells:rs
-        ~turn:t' ~t_order:tlst "Turn incremented."
-    in
-    (evt'', tar')
+let turn evt =
+  let tlst = match evt.turn_order with
+    |[] -> []
+    |h::t -> t @ [h]
+  in
+  let t' = match tlst with
+    |[] -> evt.turn + 1
+    |h::_ -> if h=evt.first_turn then evt.turn + 1 else evt.turn
+  in
+  let spells = List.filter (fun (s:spellTimer) -> s.turn = t') evt.spells in
+  let rs = List.filter (fun (s:spellTimer) -> s.turn <> t') evt.spells in
+  let (evt', tar') = castAll spells (evt, []) in
+  let evt'' = alter_event evt' ~spells:rs
+      ~turn:t' ~t_order:tlst "Turn incremented."
+  in
+  (evt'', tar')
+
+let remove_char c evt =
+  let rec ft ord =
+    match ord with
+    |[] -> evt.first_turn
+    |a::b::t ->
+      if a=c then b else ft (b::t)
+    |h::t -> if h=c then List.hd evt.turn_order else ft t
+  in
+  let f = if c=evt.first_turn then ft evt.turn_order else evt.first_turn in
+  let tord = List.filter (fun x -> x<>c) evt.turn_order in
+  alter_event evt ~t_order:tord ~f_turn:f "Character removed from turn order."

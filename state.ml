@@ -33,6 +33,7 @@ type state = {
   event : event;
   output :string;
   current_location : location;
+  files:(string*string) list;
 }
 
 let empty_location = {
@@ -45,10 +46,11 @@ let empty_location = {
 
 let empty_state = {
   locations = [];
-characters = [];
-event = init_event "";
-output = "";
-current_location = empty_location;
+  characters = [];
+  event = init_event "";
+  output = "";
+  current_location = empty_location;
+  files = [];
 }
 
 
@@ -62,6 +64,7 @@ let alter_state st ?(currLoc=st.current_location)
     event=evt;
     characters=chars;
     output=output;
+    files=st.files;
   }
 
 let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
@@ -230,18 +233,27 @@ let use_item i c evt st =
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
     with _ -> alter_state st "Item not found in character inventory."
 
-let destribute_xp n st = failwith "unimplemented"
+let distribute_xp c st =
+  match List.find_opt (fun (x,r) -> C.name x = c) st.characters with
+  |None -> st
+  |Some (_,Party) -> st
+  |Some (m,_) ->
+    let party = List.filter (fun (_,r) -> r=Party) st.characters in
+    let xp = C.xp m / (List.length party) in
+    let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp)) in
+    alter_state st ~chars:(update_chars p' st) "XP distributed."
 
 let remove_char c st =
-  let cs = List.filter (fun ((x:character),_) -> x.name <> c) st.characters in
-  alter_state st ~chars:cs "Character removed."
+  let cs = List.filter (fun (x,_) -> C.name x <> c) st.characters in
+  let evt' = remove_char c st.event in
+  alter_state st ~chars:cs ~evt:evt' "Character removed."
 
 let kill_char c st =
   let c' = char_by_name c st in
   match c' with
   | None -> alter_state st "Character name invalid."
   | Some c ->
-    let st' = remove_char c.name st in
+    let st' = remove_char c.name (distribute_xp c.name st) in
     alter_state st' "Character killed."
 
 let string_of_role r =
@@ -280,11 +292,11 @@ let action (c:command) (st:state) =
   | UseItem (c,i) -> item_helper c i 1 true use st.event st
   | Buy (ch,i,q) -> b_s_item ch i q st.event st true
   | Sell (ch,i,q) -> b_s_item ch i q st.event st false
-  | Turn -> let (evt', t') = E.turn st.event in
+  | Turn ->
+    let (evt', t') = E.turn st.event in
     let chars = update_chars t' st in
     alter_state st ~evt:evt' ~chars:chars ("Turn incremented.\n"^(E.verbose evt'))
   | Move r -> (try move_dir st r with _-> alter_state st "No such direction.")
-
   | GetCharacterList r -> begin
       let lst = begin match r with
       |All -> character_list_string  st

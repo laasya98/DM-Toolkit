@@ -13,7 +13,6 @@ type stat =
 type effect = {
   stat:stat;
   die:string;
-  bonus: int;
 }
 
 (* [quantity] is a type for that supports an infinite number of a thing.*)
@@ -30,18 +29,11 @@ type weapontype = {
   dice : string;
 }
 
-(* [armortype] contains the armor count for a piece of armor.*)
-type armortype = {
-  ac : int
-}
-
 (* [itemtype] is a type of item that can be found in the game, on a character,
    or in an inventory.*)
 type itemtype =
   | Weapon of weapontype
-  | Shield
-  | Armor of armortype
-  | Ring
+  | Armor of int
   | Other
 
 (* [item] has a name, an item type, a description, a weight, an effect, a
@@ -49,23 +41,19 @@ type itemtype =
 type item = {
   name:string;
   i_type:itemtype;
-  description:string;
   weight:int;
   effect:effect;
   value:int;
 }
 
 type damage_spell ={
-  saving_stat: string;
   damage_die: string;
-  bonus_damage: int;
   range: int;
-  multiple : bool;
+  multiple: bool;
 }
 
 type spelltype =
   | Damage of damage_spell
-  | Conjuration
   | Status of effect
 
 type spell =
@@ -75,7 +63,6 @@ type spell =
     level:int;
     targets: int;
     to_cast: int;
-    duration: int;
   }
 
 
@@ -98,3 +85,9 @@ val roll_dice_string : string -> int
 (* [roll_dice_int n d t] rolls n dice of type d and takes t of them, starting
    with the lowest roll dropped first. e.g. roll_dice 1 1 1 returns 1.  *)
 val roll_dice_int : int -> int -> int -> int
+
+val parse_item : (string*string) list -> item
+
+val parse_spell : (string * string) list -> spell
+
+val find_assoc : string -> (string*string)list -> string

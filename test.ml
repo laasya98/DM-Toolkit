@@ -8,18 +8,16 @@ open Command
 let item1 = {
   name="item1";
   i_type=Other;
-  description = "item1 desc";
   weight = 1;
-  effect = {stat=Str; die="1d0"; bonus=0};
+  effect = {stat=Str; die="1d0"};
   value=5;
 }
 
 let item2 = {
   name="item2";
-  i_type=Shield;
-  description = "item2 desc";
+  i_type=Other;
   weight = 1;
-  effect = {stat=Str; die="1d0"; bonus=0};
+  effect = {stat=Str; die="1d0"};
   value=0;
 }
 
@@ -172,32 +170,29 @@ let character_tests = [
 let evtC1 = Event.make_event "evtC1" Battle [] [char1;char2]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
-let spell1 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=3;
-              duration=0;}
-let spell2 = {name="spell2"; stype=Conjuration; level=1; targets=1; to_cast=1;
-              duration=0;}
+let dMM = {damage_die="1d4 1d1"; range=120;multiple=true}
+let spellMM = {name="MagicMissile"; stype=Damage dMM; level=1; targets=3;
+               to_cast=1}
+let heal = {stat=HP; die="1d20 1d1"}
+let spell1 = {name="spell2"; stype=Status heal; level=1; targets=1; to_cast=2}
 
-let magmissile =
-  let d = {saving_stat=""; damage_die="1d4"; bonus_damage=1;
-           range = 10; multiple=true} in
-  {name="magic missile"; stype = Damage d; level = 1; targets=3; to_cast=1; duration=0}
-
-    (* Casts two spells that should both take effect on turn 3 *)
+    (* Casts two spells that should both take effect on turn 2 *)
 let multicast = Event.cast char1 spell1 [] evtC1 |> fst |> Event.turn |> fst
-                |> Event.turn |> fst |> Event.cast char2 spell2 []|> fst
-                |> Event.turn |> fst |> Event.get_waiting_spells
+                |> Event.turn |> fst |> Event.cast char2 spellMM []|> fst
+                |> Event.turn |> fst |> Event.turn|> fst |> Event.get_waiting_spells
 
 let event_tests = [
   "form" >:: (fun _ -> assert_equal (Battle:Event.form) (Event.get_form evtC1));
   "name" >:: (fun _ -> assert_equal "evtC1" (Event.get_name evtC1));
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
   "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
-  "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> fst |> Event.get_turn));
+  "update_turn1" >:: (fun _ -> assert_equal 0 (Event.turn evtC1 |> fst |> Event.get_turn));
+  "update_turn2" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> fst |>Event.turn |>fst |> Event.get_turn));
   "get_tlst" >:: (fun _ -> assert_equal ["char1";"char2"] (Event.get_turnlst evtC1));
   "update_tlst" >:: (fun _ -> assert_equal ["char2";"char1"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
 
-  "cast" >:: (fun _ -> assert_equal [(spell2, 1)] (Event.cast char1 spell2 [] evtC1 |> fst|> Event.get_waiting_spells));
-  "cast_d" >:: (fun _ -> assert_equal [] (Event.cast char1 spell2 [] evtC1 |> fst |> Event.turn |> fst|> Event.get_waiting_spells));
+  "cast" >:: (fun _ -> assert_equal [(spellMM, 1)] (Event.cast char1 spellMM [] evtC1 |> fst|> Event.get_waiting_spells));
+  "cast_d" >:: (fun _ -> assert_equal [] (Event.cast char1 spellMM [] evtC1 |> fst |> Event.turn |> fst |> Event.turn |> fst|> Event.get_waiting_spells));
   "cast_m" >:: (fun _ -> assert_equal [] (multicast));
 
   "add_item1" >:: (fun _ -> assert_equal [(item1,Int 1)] (Event.add_item item1 (Int 1) evtC1 |> Event.get_items));
@@ -217,8 +212,8 @@ let event_tests = [
 type state = State.state
 
 let loc:(State.location) = {name="loc1"; description=""; characters=[]; contents=[]; exits =[]}
-let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""}
-let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""}
+let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""; files=[]}
+let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""; files=[]}
 
 let state_tests = [
   (*Combat*)
