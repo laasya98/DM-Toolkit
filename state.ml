@@ -379,7 +379,7 @@ let gen_printout st =
     (print_spells evt)^(print_chars_short st)
   |Shop ->
     (st.output)^
-    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_details evt))
+    "\n\nAt "^(E.get_name evt)^"\nItems available: \n"^(String.concat "\n" (E.get_item_details evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =
@@ -439,6 +439,7 @@ let action (c:command) (st:state) =
       in alter_state st s
     end
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
+  | Look -> alter_state st ""
   | Kill c -> kill_char c st
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
 
