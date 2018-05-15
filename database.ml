@@ -58,9 +58,9 @@ module Database = struct
 
   let files = create 3
 
-  let () = Hashtbl.add files "state" "./data/teststate.csv";
-           Hashtbl.add files "class_data" "./data/classes.csv";
-    Hashtbl.add files "race_data" "./data/races.csv"
+  let () = 
+    Hashtbl.add files "class_data" "./data/classes.csv";
+           Hashtbl.add files "race_data" "./data/races.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file

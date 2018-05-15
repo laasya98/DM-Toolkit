@@ -105,7 +105,7 @@ let add_item (i:item) q evt =
 let parse_itemlst ilst =
   let ilst' = String.split_on_char '+' ilst in
   let get_item str =
-    match String.split_on_char '-' ilst with
+    match String.split_on_char ':' ilst with
     | i::q::t -> begin
         let q' = try Int (int_of_string q) with _ -> Infinity in
         (Database.get_item i |> parse_item, q')
@@ -123,7 +123,7 @@ let parse_event dlist =
     let f = find_assoc "Form" dlist |> parse_form in
     let i = find_assoc "Items" dlist |> check_none parse_itemlst [] in
     make_event n f i [] (*TODO: turn order*)
-  with _ -> raise (Failure "Invalid Event Data")
+  with s -> raise s
 
 let clear_vout evt = evt.v_out <- ""
 
@@ -151,7 +151,10 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
         | Infinity -> alter_event evt
                         ~items:(change_item_q x (Int 0) evt.items) "Infinite removed."
 
-  let get_items evt = evt.items
+let get_items evt = evt.items
+
+let get_item_names evt =
+  List.map (fun ((i:item ),q) -> i.name) evt.items
 
   let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
@@ -311,10 +314,13 @@ let cast_status c s t evt =
   List.map f t
 
 let use_item (i:item) c evt =
-  add_vout ((C.name c)^" used "^i.name^"!") evt;
-  let c' = C.remove_item c i 1 in
-  let t' = cast_status c' i.effect [c'] evt in
-  (evt, t')
+  match i.effect with
+  | None -> add_vout ("Item has no effect.") evt; (evt,[c])
+  | Some e ->
+    add_vout ((C.name c)^" used "^i.name^"!") evt;
+    let c' = C.remove_item c i 1 in
+    let t' = cast_status c' e [c'] evt in
+    (evt, t')
 
   let cast c s t evt =
     if s.to_cast = 0 || evt.form <> Battle then

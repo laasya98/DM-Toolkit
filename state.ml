@@ -63,7 +63,7 @@ let parse_characters data =
   in
   let a = List.map (fun s -> split_char s) cs in
   let b =  List.map (fun (x,r) -> (D.get_char x,r)) a in
-  List.map (fun (c,r) -> (C.parse_char c,role r)) b 
+  List.map (fun (c,r) -> (C.parse_char c,role r)) b
 
   let parse_itemlst ilst =
     let ilst' = String.split_on_char '+' ilst in
@@ -127,7 +127,7 @@ let parse_state data =
     let e' = find_assoc "Event" data |> check_none parse_event (E.init_event "") in
     let curr_l' = find_assoc "Curr_Loc" data |> check_none (parse_curr_l l) empty_location  in
     {locations=l;characters=c; event=e';output="State Loaded.";current_location=curr_l'}
-  with d -> raise d (*)(Failure "Invalid Initial State File." *)
+  with d -> raise d
 
 (** [alter_state] st currLoc evt chars output is a function for conveniently
   changing the fields in state and providing an output for main to display.*)
@@ -141,7 +141,7 @@ let alter_state st ?(currLoc=st.current_location)
     output=output;
   }
 
-let init_state = D.load_data "state" |> D.flatten |> parse_state
+let init_state n = D.load_data n |> D.flatten |> parse_state
 
 let current_location st = alter_state st st.current_location.name
 let current_room_characters st = failwith "unimplemented"
@@ -348,9 +348,12 @@ let gen_printout st =
   let evt = st.event in
   match E.get_form evt with
   |Battle ->
-  (st.output)^
-  "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
-  ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+    (st.output)^
+    "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
+    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+  |Shop ->
+    (st.output)^
+    "\n\nItems available: "^(String.concat ", " (E.get_item_names evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =

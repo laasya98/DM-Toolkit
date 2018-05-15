@@ -32,7 +32,7 @@ type item = {
   name:string;
   i_type:itemtype;
   weight:int;
-  effect:effect;
+  effect:effect option;
   value:int;
 }
 
@@ -57,7 +57,7 @@ let parse_effect dlist =
     in
     let d = find_assoc "EDice" dlist in
     {stat=s; die=d}
-  with _ -> raise (Failure "Invalid Effect Data")
+  with s -> raise s
 
 let parse_weapon dlist =
   try
@@ -80,10 +80,10 @@ let parse_item dlist =
       |_ -> Other
     in
     let w = int_of_string (find_assoc "Weight" dlist) in
-    let e = parse_effect dlist in
+    let e = try Some (parse_effect dlist) with _ -> None in
     let v = int_of_string (find_assoc "Value" dlist) in
     {name=n; i_type=t'; weight=w;effect=e;value=v}
-  with _ -> raise (Failure "Invalid Item Data")
+  with s -> raise s
 
 type damage_spell ={
   damage_die: string;
