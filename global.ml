@@ -11,7 +11,6 @@ type stat =
 type effect = {
   stat:stat;
   die:string;
-  bonus: int;
 }
 
 type quantity = Int of int | Infinity
@@ -24,29 +23,68 @@ type weapontype = {
   dice : string;
 }
 
-type armortype = {
-  ac : int
-}
-
 type itemtype =
   | Weapon of weapontype
-  | Shield
-  | Armor of armortype
-  | Ring
+  | Armor of int
   | Other
 
 type item = {
   name:string;
   i_type:itemtype;
-  description:string;
   weight:int;
   effect:effect;
   value:int;
 }
 
+let find_assoc n lst =
+  List.find (fun (x,_) -> x="Name") lst
+  |> snd
+
+
+let parse_effect dlist =
+  try
+    let s = match find_assoc "Stat" dlist with
+      |"constitution" -> Constitution
+      |"charisma" -> Charisma
+      |"wisdom" -> Wisdom
+      |"intelligence" -> Intel
+      |"strength" -> Str
+      |"dexterity" -> Dex
+      |"hp" -> HP
+      |_ -> raise (Failure "Invalid Stat")
+    in
+    let d = find_assoc "Die" dlist in
+    {stat=s; die=d}
+  with _ -> raise (Failure "Invalid Effect Data")
+
+let parse_weapon dlist =
+  try
+    let t = match find_assoc "Wtype" dlist with
+      |"Ranged" -> Ranged
+      |_->Melee
+    in
+    let dam = int_of_string (find_assoc "Damage" dlist) in
+    let dice = find_assoc "Dice" dlist in
+    {t=t; damage=dam; dice=dice}
+  with _ -> raise (Failure "Invalid Weapon Data")
+
+let parse_item dlist =
+  try
+    let n = find_assoc "Name" dlist in
+    let t = find_assoc "Type" dlist in
+    let t' = match t with
+      |"Weapon" -> Weapon (parse_weapon dlist)
+      |"Armor" -> Armor (int_of_string (find_assoc "AC" dlist))
+      |_ -> Other
+    in
+    let w = int_of_string (find_assoc "Weight" dlist) in
+    let e = parse_effect dlist in
+    let v = int_of_string (find_assoc "Value" dlist) in
+    {name=n; i_type=t'; weight=w;effect=e;value=v}
+  with _ -> raise (Failure "Invalid Item Data")
+
 type damage_spell ={
   damage_die: string;
-  bonus_damage: int;
   range: int;
   multiple: bool;
 }
@@ -62,8 +100,34 @@ type spell =
     level:int;
     targets: int;
     to_cast: int;
-    duration: int;
   }
+
+let parse_damage dlist =
+  try
+    let d = find_assoc "Die" dlist in
+    let r = int_of_string (find_assoc "Range" dlist) in
+    let m =
+      match find_assoc "Multiple" dlist with
+      |"True" -> true
+      |_ -> false
+    in
+    {damage_die = d; range = r; multiple=m}
+  with _ -> raise (Failure "Invalid Damage Spell Data")
+
+let parse_spell dlist =
+  try
+    let n = find_assoc "Name" dlist in
+    let t = find_assoc "Type" dlist in
+    let t' = match t with
+      |"Damage" -> Damage (parse_damage dlist)
+      |"Status" -> Status (parse_effect dlist)
+      |_ -> raise (Failure "Invalid Spell Data")
+    in
+    let l = int_of_string (find_assoc "Level" dlist) in
+    let tar = int_of_string (find_assoc "Targets" dlist) in
+    let wait = int_of_string (find_assoc "Wait" dlist) in
+    {name=n; stype=t'; level=l; targets=tar; to_cast=wait}
+  with _ -> raise (Failure "Invalid Spell Data")
 
 type role = All | Party | Hostile | Friendly | Neutral
 

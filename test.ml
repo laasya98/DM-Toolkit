@@ -8,18 +8,16 @@ open Command
 let item1 = {
   name="item1";
   i_type=Other;
-  description = "item1 desc";
   weight = 1;
-  effect = {stat=Str; die="1d0"; bonus=0};
+  effect = {stat=Str; die="1d0"};
   value=5;
 }
 
 let item2 = {
   name="item2";
-  i_type=Shield;
-  description = "item2 desc";
+  i_type=Other;
   weight = 1;
-  effect = {stat=Str; die="1d0"; bonus=0};
+  effect = {stat=Str; die="1d0"};
   value=0;
 }
 
@@ -172,12 +170,11 @@ let character_tests = [
 let evtC1 = Event.make_event "evtC1" Battle [] [char1;char2]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
-let dMM = {damage_die="1d4"; bonus_damage=1; range=120;multiple=true}
+let dMM = {damage_die="1d4 1d1"; range=120;multiple=true}
 let spellMM = {name="MagicMissile"; stype=Damage dMM; level=1; targets=3;
-               to_cast=1; duration=0;}
-let heal = {stat=HP; die="1d20"; bonus=1}
-let spell1 = {name="spell2"; stype=Status heal; level=1; targets=1; to_cast=2;
-              duration=0;}
+               to_cast=1}
+let heal = {stat=HP; die="1d20 1d1"}
+let spell1 = {name="spell2"; stype=Status heal; level=1; targets=1; to_cast=2}
 
     (* Casts two spells that should both take effect on turn 2 *)
 let multicast = Event.cast char1 spell1 [] evtC1 |> fst |> Event.turn |> fst

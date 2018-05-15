@@ -108,7 +108,7 @@ let parse_itemlst ilst =
     match String.split_on_char '-' ilst with
     | i::q::t -> begin
         let q' = try Int (int_of_string q) with _ -> Infinity in
-        (Database.get_item i, q')
+        (Database.get_item i |> parse_item, q')
     end
     | _ -> failwith "Invalid?"
   in
@@ -183,7 +183,7 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
       with _ -> C.strength attacker
     in
     let prof = 0 in
-    let ac = try (get_armor target).ac with _ -> 0 in
+    let ac = try (get_armor target) with _ -> 0 in
     if d20 = 1 then 0
     else if d20 = 20 then 2
     else
@@ -272,7 +272,7 @@ let count_dups lst =
 let spell_damage s (t,n) evt =
   let rec dam s n acc =
     if n>0 then
-      let d = roll_dice_string s.damage_die + s.bonus_damage in
+      let d = roll_dice_string s.damage_die in
       dam s (n-1) (acc+d)
     else
       acc
@@ -287,7 +287,7 @@ let cast_damage c s t evt =
     let t' = count_dups t in
     List.map (fun n -> spell_damage s n evt) t'
   else
-    let d = roll_dice_string s.damage_die + s.bonus_damage in
+    let d = roll_dice_string s.damage_die in
     let f n =
       add_vout ((C.name n)^" took "^(string_of_int d)^" damage!") evt;
       deal_damage d n
@@ -305,7 +305,7 @@ let string_of_stat s =
   | HP -> "HP"
 
 let cast_status c s t evt =
-  let d = roll_dice_string s.die + s.bonus in
+  let d = roll_dice_string s.die in
   let f n =
     add_vout ((C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
     (string_of_int d)^"!") evt;
