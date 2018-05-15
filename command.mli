@@ -18,7 +18,6 @@ open Global
        |Inquiry
        |Look
        |Move of string
-       |Use of (string * string)
        |Inv of string
        |Give of string
        |Take of string

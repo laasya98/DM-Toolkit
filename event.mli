@@ -14,7 +14,7 @@ open Global
   type form = Battle | Shop | Interaction
 
 (* [init_event n c] returns a basic empty event with initial fields and
-   form Interaction. Turn order is based on [c]. *)
+   form Interaction. *)
 val init_event : string -> t
 
 (* [parse_event datalst] parses an event from associative list [datalst].
@@ -57,10 +57,6 @@ val clear_vout : t -> unit
 (* [get_items evt] is the list of items in the event - probably only relevant
    in shops. *)
   val get_items : t -> (item * quantity) list
-
-(* [change_form form t] changes the form of event [t] to that specified by
-   [form]. This may affect fields of [t] other than just [form]. *)
-  val change_form : form -> t -> t
 
 (* [attack a t evt] calculates the result of character [a] attacking
    character [t], and returns the new states of [evt] and [t]. *)

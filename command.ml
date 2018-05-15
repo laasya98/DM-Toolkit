@@ -12,7 +12,6 @@ open Global
     |Inquiry
     |Look
     |Move of string
-    |Use of (string * string)
     |Inv of string
     |Give of string
     |Take of string
@@ -106,7 +105,7 @@ let parse s =
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       if List.length lst = 2 then
         match lst with
-        | a::b::[] -> Use (a,b)
+        | a::b::[] -> UseItem (a,b)
         | _ -> Invalid
       else Invalid
     |"roll" -> let x = (remove_start "roll" s) in Roll x
