@@ -1,0 +1,21 @@
+Level,Proficiency,Features,Cantrips,Spells
+1,2,Otherworldly_Patron Pact_Magic,2,2
+2,2,Eldritch_Invocations,2,3
+3,2,Pact_Boon,2,4
+4,2,Ability_Score_Improvement,3,5
+5,3,_,3,6
+6,3,Patron_Feature,3,7
+7,3,_,3,8
+8,3,Ability_Score_Improvement,3,9
+9,4,_,3,10
+10,4,Patron_Feature,4,10
+11,4,Mystic_Arcanum,4,11
+12,4,Ability_Score_Improvement,4,11
+13,5,Mystic_Arcanum,4,12
+14,5,Patron_Feature,4,12
+15,5,Mystic_Arcanum,4,13
+16,5,Ability_Score_Improvement,4,13
+17,6,Mystic_Arcanum,4,14
+18,6,_,4,14
+19,6,Ability_Score_Improvement,4,15
+20,6,Eldritch_Master,4,15
