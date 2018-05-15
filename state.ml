@@ -375,7 +375,9 @@ let distribute_xp c st =
   |Some (m,_) ->
     let party = List.filter (fun (_,r) -> r=Party) st.characters in
     let xp = C.xp m / (List.length party) in
-    let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp)) in
+    let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp))
+             |>  List.map (fun x -> if ((x.xp) >= (D.xp_from_level (level x)))
+                            then level_up x ((level x) + 1) else x )  in
     alter_state st ~chars:(update_chars p' st) "XP distributed."
 
 let remove_char c st =
