@@ -68,7 +68,8 @@ let parse s =
     | "look" -> Look
     | "inquiry" -> Inquiry
     | "turn" -> Turn
-    |"event" -> Event
+    | "event" -> Event
+    | "exits" -> GetExits
     | "characters" -> GetCharacterList (All)
     | _ -> Invalid end
   else let indx = (String.index str ' ') in
