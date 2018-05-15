@@ -1,2 +1,2 @@
 Locations,Characters,Event,Curr_Loc,class_data,race_data,item_data,loc_data,spell_data,char_data,event_data
-None,Laasya:Party,Shop1,None,data/classes.csv,data/races.csv,data/items.csv,data/locations.csv,spells.csv,./data/char_data.csv,data/events.csv
+Loc1 Loc2,Laasya:Party,Shop1,Loc1,data/classes.csv,data/races.csv,data/items.csv,data/locations.csv,data/spells.csv,./data/char_data.csv,data/events.csv
