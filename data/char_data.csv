@@ -1,2 +1,2 @@
-Name,Race,Class,Armor,Class,Prof,Bonus,Passive,Wisdom,Constitution,Cons,Mod,Wisdom,Wis,Mod,Charisma,Char,Mod,Intelligence,Int,Mod,Strength,Str,Mod,Dexterity,Dex,Mod,Speed,Max,HP,HP,HD,HD,qty,XP,Level,Skills,Spells,Inv,Equipment,Money
+Name,Race,Class,ArmorClass,ProfBonus,PassiveWisdom,Constitution,ConsMod,Wisdom,WisMod,Charisma,CharMod,Intelligence,IntMod,Strength,StrMod,Dexterity,DexMod,Speed,MaxHP,HP,HD,Hdqty,XP,Level,Skills,Spells,Inv,Equipment,Money
 Laasya,Human,Wizard,10,10,10,10,0,10,0,10,0,10,0,10,0,10,0,20,10,10,10,1,0,1,None,None,None,None,0

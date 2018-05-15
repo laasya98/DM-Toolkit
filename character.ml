@@ -373,30 +373,30 @@ in skill2::(skill_set t c)
 
 
 let parse_char clist =
-  try
+  (*try*)
     let n = find_assoc "Name" clist in
     let cls = (find_assoc "Class" clist) |> class_of_string in
     let r = (find_assoc "Race" clist) |> race_of_string in
-    let ac = (find_assoc "Armor Class" clist) |> int_of_string in
-    let pw = (find_assoc "Passive Wisdom" clist) |> int_of_string  in
-    let pb = (find_assoc "Prof Bonus" clist) |> int_of_string  in
+    let ac = (find_assoc "ArmorClass" clist) |> int_of_string in
+    let pw = (find_assoc "PassiveWisdom" clist) |> int_of_string  in
+    let pb = (find_assoc "ProfBonus" clist) |> int_of_string  in
     let co = (find_assoc "Constitution" clist) |> int_of_string  in
-    let com = (find_assoc "Cons Mod" clist) |> int_of_string  in
+    let com = (find_assoc "ConsMod" clist) |> int_of_string  in
     let ch = (find_assoc "Charisma" clist) |> int_of_string  in
-    let chm = (find_assoc "Char Mod" clist) |> int_of_string  in
+    let chm = (find_assoc "CharMod" clist) |> int_of_string  in
     let dex = (find_assoc "Dexterity" clist) |> int_of_string  in
-    let dm = (find_assoc "Dex Mod" clist) |> int_of_string  in
+    let dm = (find_assoc "DexMod" clist) |> int_of_string  in
     let wis = (find_assoc "Wisdom" clist) |> int_of_string  in
-    let wm = (find_assoc "Wis Mod" clist) |> int_of_string  in
+    let wm = (find_assoc "WisMod" clist) |> int_of_string  in
     let intl = (find_assoc "Intelligence" clist) |> int_of_string  in
-    let im = (find_assoc "Int Mod" clist) |> int_of_string  in
+    let im = (find_assoc "IntMod" clist) |> int_of_string  in
     let st = (find_assoc "Strength" clist) |> int_of_string  in
-    let sm = (find_assoc "Str Mod" clist) |> int_of_string  in
+    let sm = (find_assoc "StrMod" clist) |> int_of_string  in
     let sp = (find_assoc "Speed" clist) |> int_of_string  in
-    let mhp = (find_assoc "Max HP" clist) |> int_of_string  in
+    let mhp = (find_assoc "MaxHP" clist) |> int_of_string  in
     let hp = (find_assoc "HP" clist) |> int_of_string  in
     let hd = (find_assoc "HD" clist) |> int_of_string  in
-    let hdq = (find_assoc "HD qty" clist) |> int_of_string  in
+    let hdq = (find_assoc "HDqty" clist) |> int_of_string  in
     let xp = (find_assoc "XP" clist) |> int_of_string  in
     let lvl = (find_assoc "Level" clist) |> int_of_string  in
     let cash = (find_assoc "Money" clist) |> int_of_string  in
@@ -431,7 +431,7 @@ let parse_char clist =
       inv= [],0;
       money=cash;
     } (* )|> skill_set all_skills*)
-  with _ -> raise (Failure "Invalid Character Data")
+(*with _ -> raise (Failure "Invalid Character Data")*)
 
 let blank_char = {
   name = "Allan";
