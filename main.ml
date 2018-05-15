@@ -17,7 +17,7 @@ open Database
 let helps = [
   ("commands",
 "-Commands-
-help - quit - roll - characters");
+help - quit - roll - get - characters - exits -");
 
   ("help",
 "-Help-
@@ -36,11 +36,18 @@ Usage: \"quit\" ");
 Roll n1dn2tn3 rolls n1 dice of size n2 and takes n3 of them.
 Usage: \"roll 3d6t2\" rolls three d6 dice and drops the lowest (taking the top two)."
   );
+  ("get",
+"-Get-
+Get [argument] gives you information about the argument.
+
+  Accepted arguments:
+  characters [role] gives a list of characters by role (Party, Neutral, Hostile, or Friendly).
+  exits gives a list of directions one can move to in the current location.
+    ");
+  
   ("characters",
    "-Characters-
-Characters ___ gives you the list of characters in the current room. The
-optional argument allows you to filter it by role.
-Roles: Party, Neutral, Hostile, or Friendly.
+Characters gives you the list of characters in the current room.
 Usage: \"characters ?role\"" );
   ("quickbuild",
    "-QuickBuild-
