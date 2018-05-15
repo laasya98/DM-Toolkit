@@ -86,3 +86,5 @@ val roll_dice_string : string -> int
 val roll_dice_int : int -> int -> int -> int
 
 val parse_item : (string*string) list -> item
+
+val parse_spell : (string * string) list -> spell

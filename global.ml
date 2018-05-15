@@ -40,7 +40,6 @@ let find_assoc n lst =
   List.find (fun (x,_) -> x="Name") lst
   |> snd
 
-
 let parse_effect dlist =
   try
     let s = match find_assoc "Stat" dlist with
@@ -53,7 +52,7 @@ let parse_effect dlist =
       |"hp" -> HP
       |_ -> raise (Failure "Invalid Stat")
     in
-    let d = find_assoc "Die" dlist in
+    let d = find_assoc "EDice" dlist in
     {stat=s; die=d}
   with _ -> raise (Failure "Invalid Effect Data")
 
@@ -64,7 +63,7 @@ let parse_weapon dlist =
       |_->Melee
     in
     let dam = int_of_string (find_assoc "Damage" dlist) in
-    let dice = find_assoc "Dice" dlist in
+    let dice = find_assoc "WDice" dlist in
     {t=t; damage=dam; dice=dice}
   with _ -> raise (Failure "Invalid Weapon Data")
 
@@ -104,11 +103,11 @@ type spell =
 
 let parse_damage dlist =
   try
-    let d = find_assoc "Die" dlist in
+    let d = find_assoc "WDie" dlist in
     let r = int_of_string (find_assoc "Range" dlist) in
     let m =
       match find_assoc "Multiple" dlist with
-      |"True" -> true
+      |"true" -> true
       |_ -> false
     in
     {damage_die = d; range = r; multiple=m}
