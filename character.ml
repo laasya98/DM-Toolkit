@@ -142,22 +142,22 @@ let ability_mod a =
       List.map(fun (a,b) -> if i = a then (i,b-n) else (a,b)) l else
       l *)
 
-  let equip c e n =
-    let equipment =  fst (c.equipped) in
-    let cap = snd c.equipped in
-    if List.length equipment <= cap && List.mem_assoc e (fst (c.inv)) then
-      {c with equipped = (insert_qty e n equipment),cap} else c
-  let add_item c i n =
+    let equip c e n =
+      let equipment =  fst (c.equipped) in
+      let cap = snd c.equipped in
+      if List.length equipment <= cap && List.mem_assoc e (fst (c.inv)) then
+        {c with equipped = (insert_qty e n equipment),cap} else c
+    let add_item c i n =
     let items = fst (c.inv) in
-    let cap = snd c.inv in
-    if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
-    else c
-let remove_item c i n = c (*TODO: THIS. BC ITS UNIMPLEMENTED*)
-  let money c = c.money
-  let update_money c m = {c with money = m}
-  let charisma c = c.char_mod
-let update_charisma c a = {c with charisma = a;
-                          char_mod = ability_mod a}
+      let cap = snd c.inv in
+        if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
+        else c
+    let remove_item c i n = c (*TODO: THIS. BC ITS UNIMPLEMENTED*)
+    let money c = c.money
+    let update_money c m = {c with money = m}
+    let charisma c = c.char_mod
+    let update_charisma c a = {c with charisma = a;
+                            char_mod = ability_mod a}
 
 
   let class_of_string s =
