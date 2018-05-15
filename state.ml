@@ -228,18 +228,27 @@ let use_item i c evt st =
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
     with _ -> alter_state st "Item not found in character inventory."
 
-let destribute_xp n st = failwith "unimplemented"
+let distribute_xp c st =
+  match List.find_opt (fun (x,r) -> C.name x = c) st.characters with
+  |None -> st
+  |Some (_,Party) -> st
+  |Some (m,_) ->
+    let party = List.filter (fun (_,r) -> r=Party) st.characters in
+    let xp = C.xp m / (List.length party) in
+    let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp)) in
+    alter_state st ~chars:(update_chars p' st) "XP distributed."
 
 let remove_char c st =
-  let cs = List.filter (fun ((x:character),_) -> x.name <> c) st.characters in
-  alter_state st ~chars:cs "Character removed."
+  let cs = List.filter (fun (x,_) -> C.name x <> c) st.characters in
+  let evt' = remove_char c st.event in
+  alter_state st ~chars:cs ~evt:evt' "Character removed."
 
 let kill_char c st =
   let c' = char_by_name c st in
   match c' with
   | None -> alter_state st "Character name invalid."
   | Some c ->
-    let st' = remove_char c.name st in
+    let st' = remove_char c.name (distribute_xp c.name st) in
     alter_state st' "Character killed."
 
 let string_of_role r =
@@ -290,7 +299,7 @@ let action (c:command) (st:state) =
   end
   |GetExits -> alter_state st (String.concat ", " (get_exits st))
   |Roll d -> alter_state st (string_of_int (Global.roll_dice_string d))
-  |QuickBuild lst -> (*alter_state st "Unimplemented"*)
+  |QuickBuild lst ->
     let n = List.hd lst in
     let c = List.hd (List.tl lst) in
     let r = List.nth lst 2 in

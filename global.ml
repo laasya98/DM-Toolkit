@@ -45,16 +45,14 @@ type item = {
 }
 
 type damage_spell ={
-  saving_stat: string;
   damage_die: string;
   bonus_damage: int;
   range: int;
-  multiple : bool;
+  multiple: bool;
 }
 
 type spelltype =
   | Damage of damage_spell
-  | Conjuration
   | Status of effect
 
 type spell =
