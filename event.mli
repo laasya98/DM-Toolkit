@@ -90,3 +90,5 @@ val get_waiting_spells : t -> (spell*int) list
 val use_item: item -> character -> t -> (t * character list)
 
 val remove_char : string -> t -> t
+
+val get_item_names : t -> string list

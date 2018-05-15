@@ -9,7 +9,7 @@ let item1 = {
   name="item1";
   i_type=Other;
   weight = 1;
-  effect = {stat=Str; die="1d0"};
+  effect = Some {stat=Str; die="1d0"};
   value=5;
 }
 
@@ -17,7 +17,7 @@ let item2 = {
   name="item2";
   i_type=Other;
   weight = 1;
-  effect = {stat=Str; die="1d0"};
+  effect = Some {stat=Str; die="1d0"};
   value=0;
 }
 

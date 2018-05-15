@@ -127,7 +127,7 @@ let parse_state data =
     let e' = find_assoc "Event" data |> check_none parse_event (E.init_event "") in
     let curr_l' = find_assoc "Curr_Loc" data |> check_none (parse_curr_l l) empty_location  in
     {locations=l;characters=c; event=e';output="State Loaded.";current_location=curr_l'}
-  with d -> raise (Failure "Invalid Initial State File.")
+  with d -> raise d
 
 (** [alter_state] st currLoc evt chars output is a function for conveniently
   changing the fields in state and providing an output for main to display.*)
@@ -351,6 +351,9 @@ let gen_printout st =
     (st.output)^
     "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
     ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+  |Shop ->
+    (st.output)^
+    "\n\nItems available: "^(String.concat ", " (E.get_item_names evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =

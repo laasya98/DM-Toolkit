@@ -42,7 +42,7 @@ type item = {
   name:string;
   i_type:itemtype;
   weight:int;
-  effect:effect;
+  effect:effect option;
   value:int;
 }
 

@@ -1,4 +1,4 @@
 Name,Type,Weight,Value,AC,Wtype,Damage,WDice,Stat,EDice
-Sword,Weapon,2,30, ,Melee,2,2d4, ,
-Plated Armor,Armor,4,50,4, , , , ,
-Potion,Other,1,10, , , , ,hp,1d20 5d1
+Sword,Weapon,2,30,None,Melee,2,2d4,None,
+Plated Armor,Armor,4,50,4,None,None,None,None,
+Potion,Other,1,10,None,None,None,None,hp,1d20 5d1
