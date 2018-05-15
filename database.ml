@@ -56,11 +56,14 @@ module Database = struct
   (** [index] is a hash table of association  *)
   type index = (string, string) Hashtbl.t
 
-  let files = create 3
+  let files = create 5
 
-  let () = 
+  let () =
     Hashtbl.add files "class_data" "./data/classes.csv";
-           Hashtbl.add files "race_data" "./data/races.csv"
+    Hashtbl.add files "race_data" "./data/races.csv";
+    Hashtbl.add files "item_data" "./data/items.csv";
+    Hashtbl.add files "loc_data" "./data/loc_data.csv";
+    Hashtbl.add files "event_data" "./data/events.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file
@@ -99,11 +102,11 @@ module Database = struct
                        |> tup_from_list
 
   let speed_of r =
-    get "race" r "speed" "race_data"
+    get "Race" r "Speed" "race_data"
                        |> int_of_string
 
   let get_item s = get_lst "Name" s "item_data"
-  let get_location s = get_lst "name" s "loc_data"
+  let get_location s = get_lst "Name" s "loc_data"
   let get_event s = get_lst "Name" s "event_data"
   let get_char s = get_lst "Name" s "char_data"
 
