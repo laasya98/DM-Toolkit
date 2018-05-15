@@ -10,7 +10,7 @@ type stat =
 
 type effect = {
   stat:stat;
-  die:int list;
+  die:string;
   bonus: int;
 }
 
@@ -21,7 +21,7 @@ type wtype = Ranged | Melee
 type weapontype = {
   t : wtype;
   damage : int;
-  dice : int list;
+  dice : string;
 }
 
 type armortype = {
@@ -46,7 +46,7 @@ type item = {
 
 type damage_spell ={
   saving_stat: string;
-  damage_die: int list;
+  damage_die: string;
   bonus_damage: int;
   range: int;
   multiple : bool;
@@ -100,8 +100,10 @@ try
 with _ ->  raise (Bad_dice "cannot read dice input")
 
 let roll_dice_string str =
-  let str' = str|>String.trim|>String.lowercase_ascii in
-  dice_helper str' 0
+  try
+    let str' = str|>String.trim|>String.lowercase_ascii in
+    dice_helper str' 0
+  with _-> -1
 
 let roll_dice_int n d t =
   (dice_roller n d []) |> List.sort compare |> List.rev |> sum_to_n t 0

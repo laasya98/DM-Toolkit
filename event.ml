@@ -5,7 +5,6 @@ open Database
 (*TODO list:
   character death?
   turn order calculation
-  selling items
   casting summoning stuff? *)
 
   module C = Character
@@ -26,13 +25,23 @@ open Database
     output: string;
   }
 
-  let make_event name form items turn_order =
+  let initiative c =
+    let r = roll_dice_int 1 20 1 in
+    let dex = C.dex c in
+    (c, dex + r)
+
+  let calc_turn_order c =
+    List.map initiative c
+    |> List.sort (fun (_,a) (_,b) -> compare a b)
+    |> List.map (fun (x,_) -> C.name x)
+
+  let make_event name form items c =
     {
       name=name;
       form = form;
       items = items;
       turn = 0;
-      turn_order = turn_order;
+      turn_order = calc_turn_order c;
       spells=[];
       v_out = "";
       output = "Event created.";
@@ -74,6 +83,7 @@ let change_item_q i q lst =
   List.map (fun (a,b) -> if a=i then (a,q) else (a,b)) lst
   |> List.filter (fun (_,n) -> gz n)
 
+
 let add_item (i:item) q evt =
   match List.find_opt (fun ((x:item),q) -> x.name=i.name) evt.items with
   | None -> alter_event evt ~items:((i,q)::evt.items) "Item added."
@@ -98,8 +108,6 @@ let parse_itemlst ilst =
     | _ -> failwith "Invalid?"
   in
   List.map get_item ilst'
-
-let calc_turn_order c evt = failwith "unimplemented"
 
 let parse_event dlist =
   try
@@ -162,7 +170,7 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
     | _ -> failwith "No armor"
 
   let attack_roll attacker target =
-    let d20 = 1+ Random.int 19 in
+    let d20 = roll_dice_int 1 20 1 in
     let ability =
       try
         if (get_weapon attacker).t = Ranged then C.dex attacker
@@ -177,24 +185,18 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
       let roll = d20 + ability + prof in
       if roll > ac then 1 else 0
 
-  let rec roll_dice dice acc =
-    match dice with
-    | [] -> acc
-    | h::t -> roll_dice t (acc + 1 + Random.int h)
-
   let damage_roll attacker crit =
     let dice = try
         let weapon = get_weapon attacker in
-        if crit then weapon.dice @ weapon.dice
+        if crit then weapon.dice ^" "^ weapon.dice
         else weapon.dice
-      with _ -> [] in
+      with _ -> "1d0" in
     let ability = try
       if (get_weapon attacker).t = Ranged then C.dex attacker
       else C.strength attacker
     with _ -> C.strength attacker in
-    ability + roll_dice dice 0
+    ability + roll_dice_string dice
 
-(*TODO: don't change bases? *)
 let apply_effect s a t =
   match s with
   | Constitution -> C.update_const t (C.const t + a)
@@ -265,7 +267,7 @@ let count_dups lst =
 let spell_damage s (t,n) evt =
   let rec dam s n acc =
     if n>0 then
-      let d = roll_dice s.damage_die s.bonus_damage in
+      let d = roll_dice_string s.damage_die + s.bonus_damage in
       dam s (n-1) (acc+d)
     else
       acc
@@ -280,7 +282,7 @@ let cast_damage c s t evt =
     let t' = count_dups t in
     List.map (fun n -> spell_damage s n evt) t'
   else
-    let d = roll_dice s.damage_die s.bonus_damage in
+    let d = roll_dice_string s.damage_die + s.bonus_damage in
     let f n =
       add_vout ((C.name n)^" took "^(string_of_int d)^" damage!") evt;
       deal_damage d n
@@ -298,7 +300,7 @@ let string_of_stat s =
   | HP -> "HP"
 
 let cast_status c s t evt =
-  let d = roll_dice s.die s.bonus in
+  let d = roll_dice_string s.die + s.bonus in
   let f n =
     add_vout ((C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
     (string_of_int d)^"!") evt;

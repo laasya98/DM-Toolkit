@@ -75,21 +75,30 @@ type c = {
   money: int;
 }
 
+let ability_mod a =
+  let b = a - 10 in
+  if (b/2)*2 = b
+  then b/2 else (b-1)/2
+
   let name  c = c.name
   let race  c = c.race
   let class_of  c = c.c_class
-  let wisdom  c = c.wisdom
+  let wisdom  c = c.wis_mod
   let update_wisdom  c w = {c with wisdom = w}
-  let const  c = c.constitution
-  let update_const  c o = {c with constitution = o}
+  let const  c = c.cons_mod
+  let update_const  c o = {c with constitution = o;
+                        cons_mod = ability_mod o}
   let armor_class  c = c.armor_class
   let update_ac c a = {c with armor_class = a;}
-  let dex  c = c.dexterity
-  let update_dex c d = {c with dexterity = d;}
-  let intel c = c.intel
-  let update_intel c i = {c with intel = i;}
-  let strength c = c.strength
-  let update_strength c s = {c with strength = s}
+  let dex  c = c.dex_mod
+  let update_dex c d = {c with dexterity = d;
+                     dex_mod = ability_mod d}
+  let intel c = c.int_mod
+  let update_intel c i = {c with intel = i;
+                       int_mod = ability_mod i}
+  let strength c = c.str_mod
+  let update_strength c s = {c with strength = s;
+                          str_mod = ability_mod s}
   let speed c = c.speed
   let update_speed c s = {c with speed = s}
   let curr_hp c = c.hp
@@ -143,11 +152,12 @@ type c = {
     let cap = snd c.inv in
     if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
     else c
-  let remove_item c i n = failwith "Unimplemented"
+let remove_item c i n = c (*TODO: THIS. BC ITS UNIMPLEMENTED*)
   let money c = c.money
   let update_money c m = {c with money = m}
-  let charisma c = c.charisma
-  let update_charisma c a = {c with charisma = a}
+  let charisma c = c.char_mod
+let update_charisma c a = {c with charisma = a;
+                          char_mod = ability_mod a}
 
 
   let class_of_string s =
@@ -179,33 +189,14 @@ type c = {
       | "tiefling" -> Tiefling
       | _ -> failwith "not a race, spell better pls"
 
-  let rec roll_dice (dice:int list) (acc : int list)  =
-    match dice with
-    | [] -> acc
-    | h::t -> roll_dice t ((1 + (Random.int h))::acc)
-
-  let sum lst =
-    List.fold_left (fun a x -> x + a) 0 lst
-
-  let minof lst : int=
-    List.fold_left (fun a b -> if a <= b then a else b) (List.hd lst) lst
-
-  let remove_min (lst : int list) : int list=
-    let minval = minof lst in
-      List.filter (fun x -> (x != minval)) lst
 
   let rec stat_lister acc : int list=
     if List.length acc = 6
       then
         acc |> List.sort compare |> List.rev
       else
-        let stat =  roll_dice [6;6;6;6] []  |> remove_min |> sum in
+        let stat =  Global.roll_dice_int 4 6 3 in
         stat_lister (stat::acc)
-
-let ability_mod a =
-  let b = a - 10 in
-  if (b/2)*2 = b
-  then b/2 else (b-1)/2
 
 let all_skills = (*Database.allskills*)
   {
@@ -343,7 +334,7 @@ let rec skill_set c (s:skill list) =
                 let new_mod = h.modifier+c.wis_mod in
                 {h with modifier = new_mod } else h in
     let skill2 = if skill1.prof then let newer_mod = skill1.modifier+c.prof_bonus in
-        {skill1 with modifier = newer_mod} else h
+        {skill1 with modifier = newer_mod} else skill1
 in skill2::(skill_set c t)
 
 let blank_char = {
@@ -477,6 +468,7 @@ let quickbuild n c r =
                 {step1 with
                  name = n;
                  race = race;
+                 c_class = cls;
                  cons_mod = ability_mod step1.constitution;
                  char_mod = ability_mod step1.charisma ;
                  wis_mod = ability_mod step1.wisdom;

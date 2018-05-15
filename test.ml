@@ -10,7 +10,7 @@ let item1 = {
   i_type=Other;
   description = "item1 desc";
   weight = 1;
-  effect = {stat=Str; die=[]; bonus=0};
+  effect = {stat=Str; die="1d0"; bonus=0};
   value=5;
 }
 
@@ -19,7 +19,7 @@ let item2 = {
   i_type=Shield;
   description = "item2 desc";
   weight = 1;
-  effect = {stat=Str; die=[]; bonus=0};
+  effect = {stat=Str; die="1d0"; bonus=0};
   value=0;
 }
 
@@ -41,7 +41,7 @@ let char1:Character.c = {
   char_mod = 0;
   cons_mod = 0;
   str_mod = 0;
-  dex_mod = 0;
+  dex_mod = 40;
   prof_bonus = 2;
   passive_wisdom = 0;
   dexterity=1;
@@ -169,7 +169,7 @@ let character_tests = [
                       (Character.equipped (Character.equip char1 item1 1)));
 ]
 
-let evtC1 = Event.make_event "evtC1" Battle [] ["A";"B";"C"]
+let evtC1 = Event.make_event "evtC1" Battle [] [char1;char2]
 let evtC2 = Event.make_event "evtC1" Battle [(item1,Int 1)] []
 let evtS = Event.make_event "evtS" Shop [(item1,Int 3); (item2, Infinity)] []
 let spell1 = {name="spell1"; stype=Conjuration; level=1; targets=1; to_cast=3;
@@ -178,7 +178,7 @@ let spell2 = {name="spell2"; stype=Conjuration; level=1; targets=1; to_cast=1;
               duration=0;}
 
 let magmissile =
-  let d = {saving_stat=""; damage_die=[4]; bonus_damage=1;
+  let d = {saving_stat=""; damage_die="1d4"; bonus_damage=1;
            range = 10; multiple=true} in
   {name="magic missile"; stype = Damage d; level = 1; targets=3; to_cast=1; duration=0}
 
@@ -193,8 +193,8 @@ let event_tests = [
   "get_items" >:: (fun _ -> assert_equal [] (Event.get_items evtC1));
   "get_turn" >:: (fun _ -> assert_equal 0 (Event.get_turn evtC1));
   "update_turn" >:: (fun _ -> assert_equal 1 (Event.turn evtC1 |> fst |> Event.get_turn));
-  "get_tlst" >:: (fun _ -> assert_equal ["A";"B";"C"] (Event.get_turnlst evtC1));
-  "update_tlst" >:: (fun _ -> assert_equal ["B";"C";"A"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
+  "get_tlst" >:: (fun _ -> assert_equal ["char1";"char2"] (Event.get_turnlst evtC1));
+  "update_tlst" >:: (fun _ -> assert_equal ["char2";"char1"] (Event.turn evtC1 |>fst |> Event.get_turnlst));
 
   "cast" >:: (fun _ -> assert_equal [(spell2, 1)] (Event.cast char1 spell2 [] evtC1 |> fst|> Event.get_waiting_spells));
   "cast_d" >:: (fun _ -> assert_equal [] (Event.cast char1 spell2 [] evtC1 |> fst |> Event.turn |> fst|> Event.get_waiting_spells));

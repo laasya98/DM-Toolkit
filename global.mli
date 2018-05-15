@@ -12,7 +12,7 @@ type stat =
 (* For now, just change a stat by set amount. *)
 type effect = {
   stat:stat;
-  die:int list;
+  die:string;
   bonus: int;
 }
 
@@ -27,7 +27,7 @@ type wtype = Ranged | Melee
 type weapontype = {
   t : wtype;
   damage : int;
-  dice : int list;
+  dice : string;
 }
 
 (* [armortype] contains the armor count for a piece of armor.*)
@@ -57,7 +57,7 @@ type item = {
 
 type damage_spell ={
   saving_stat: string;
-  damage_die: int list;
+  damage_die: string;
   bonus_damage: int;
   range: int;
   multiple : bool;

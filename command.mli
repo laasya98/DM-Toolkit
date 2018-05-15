@@ -11,8 +11,10 @@ open Global
        |Load of string
        |Save
        |Quit
-       |Help
-       |Event of string
+       |Help of string
+       |Event
+       |LoadEvent of string
+       |QuickEvent of (string*string)
        |Inquiry
        |Move of (string *string)
        |Use of (string * string)
