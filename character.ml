@@ -148,10 +148,25 @@ let level_up  c l =
       List.map f l else
       (i, Int n)::l
 
-  (*let remove_qty i n l =
+
+  let remove_qty i n l =
     if List.mem_assoc i l then
-      List.map(fun (a,b) -> if i = a then (i,b-n) else (a,b)) l else
-      l *)
+      let f (a,b) =
+        if i=a then
+          match b with
+          |Infinity -> (a,b)
+          |Int b' -> (a, Int (b'-n))
+        else
+          (a,b)
+      in
+      let g (a,b) =
+        match b with
+        |Infinity -> true
+        |Int b' -> b' > 0
+      in
+      List.map f l |> List.filter g
+    else l
+
 
     let equip c e n =
       let equipment =  fst (c.equipped) in
@@ -163,7 +178,10 @@ let level_up  c l =
       let cap = snd c.inv in
         if List.length items <= cap then {c with inv = (insert_qty i n items), cap}
         else c
-    let remove_item c i n = c (*TODO: THIS. BC ITS UNIMPLEMENTED*)
+    let remove_item c i n =
+      let items = fst (c.inv) in
+      let cap = snd c.inv in
+      {c with inv = (remove_qty i n items), cap}
     let money c = c.money
     let update_money c m = {c with money = m}
     let charisma c = c.char_mod
@@ -557,6 +575,9 @@ let quickbuild n c r =
                    skills = skill_set all_skills step2;
                    passive_wisdom = 10 + step2.wis_mod + step2.prof_bonus;
                    armor_class = 10+step2.dex_mod;
+                   money = 50; (*to start*)
+                   equipped = [],5;
+                   inv = [],5;
                   }
       in
       step3
