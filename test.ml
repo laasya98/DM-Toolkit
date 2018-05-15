@@ -39,7 +39,7 @@ let char1:Character.c = {
   char_mod = 0;
   cons_mod = 0;
   str_mod = 0;
-  dex_mod = 0;
+  dex_mod = 30;
   prof_bonus = 2;
   passive_wisdom = 0;
   dexterity=1;
@@ -140,7 +140,7 @@ let character_tests = [
   "intel" >:: (fun _ -> assert_equal 0 (Character.intel char1));
   "update intel" >:: (fun _ -> assert_equal 0
                          (Character.intel (Character.update_intel char2 10)));
-  "dex" >:: (fun _ -> assert_equal 0 (Character.dex char1));
+  "dex" >:: (fun _ -> assert_equal 30 (Character.dex char1));
   "update dex" >:: (fun _ -> assert_equal 0
                        (Character.dex (Character.update_dex char1 10)));
   "hp" >:: (fun _ -> assert_equal 10 (Character.curr_hp char1));

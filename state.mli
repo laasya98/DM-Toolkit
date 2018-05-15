@@ -36,7 +36,7 @@ type location = {
   characters : (character * role) list;
   items : item list;
   event : event;
-  exits : ( string * location ) list (*(direction, location)*)
+  exits : ( string * string ) list (*(direction, location)*)
 }
 
 (* [state] is the game's current state. It contains a list of locations to
