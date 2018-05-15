@@ -58,9 +58,10 @@ module Database = struct
 
   let files = create 3
 
-  let () = Hashtbl.add files "state" "./data/init_state.csv";
+  let () = Hashtbl.add files "state" "./data/teststate.csv";
            Hashtbl.add files "class_data" "./data/classes.csv";
-           Hashtbl.add files "race_data" "./data/races.csv"
+    Hashtbl.add files "race_data" "./data/races.csv";
+    Hashtbl.add files "event_data" "./data/events.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file
@@ -68,16 +69,18 @@ module Database = struct
   let flatten data = List.flatten data
 
   let load_data s =
-    let d = Hashtbl.find files s in
+    let d =
+        Hashtbl.find files s in
     let tab = Csv.load d in
     Csv.associate (List.hd tab) (List.tl tab)
+
 
   let save_data f d =
     Unix.mkdir "save" 0o640
 
   (** []  *)
   let get_lst typ ind file =
-    let d = load_data (Hashtbl.find files file) in
+    let d = load_data file in
     let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
     List.find (fun l -> idk (List.assoc typ l)  = idk ind) d
 
@@ -100,8 +103,8 @@ module Database = struct
     get "race" r "speed" "race_data"
                        |> int_of_string
 
-  let get_item s = get_lst "name" s "item_data"
+  let get_item s = get_lst "Name" s "item_data"
   let get_location s = get_lst "name" s "loc_data"
-  let get_event s = get_lst "name" s "event_data"
+  let get_event s = get_lst "Name" s "event_data"
   let get_char s = get_lst "name" s "char_data"
 end

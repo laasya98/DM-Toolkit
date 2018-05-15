@@ -114,16 +114,15 @@ let parse_itemlst ilst =
   in
   List.map get_item ilst'
 
+let parse_form f =
+  if f="Battle" then Battle else if f="Shop" then Shop else Interaction
+
 let parse_event dlist =
   try
-    let (_,n) = List.find (fun (x,y) -> x="Name") dlist in
-    let (_,f) = List.find (fun (x,y) -> x="Form") dlist in
-    let f' =
-      if f="Battle" then Battle else if f="Shop" then Shop else Interaction
-    in
-    let (_,i) = List.find (fun (x,y) -> x="Items") dlist in
-    let i' = parse_itemlst i in
-    make_event n f' i' [] (*TODO: turn order*)
+    let n = find_assoc "Name" dlist in
+    let f = find_assoc "Form" dlist |> parse_form in
+    let i = find_assoc "Items" dlist |> check_none parse_itemlst [] in
+    make_event n f i [] (*TODO: turn order*)
   with _ -> raise (Failure "Invalid Event Data")
 
 let clear_vout evt = evt.v_out <- ""

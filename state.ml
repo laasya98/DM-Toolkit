@@ -71,9 +71,6 @@ let parse_characters data =
     in
     List.map get_item ilst'
 
-  let check_none f d str =
-    if str="None" then d else f str
-
   let parse_loc dlist =
     try
       let n = find_assoc "Name" dlist in
@@ -83,7 +80,7 @@ let parse_characters data =
       let e = find_assoc "Event" dlist |> D.get_event |> E.parse_event in
       let exits = list_of_string (find_assoc "Exits" dlist) |> exits_of_string in
       {name=n; description=d; characters=cs; items=is; event=e; exits=exits}
-    with _ -> raise (Failure "Invalid Initial Save File.")
+    with x -> raise (Failure "Invalid Location File")
 
   let parse_locations data =
     let cs = String.split_on_char ' ' data in
@@ -117,7 +114,7 @@ let empty_state = {
 }
 
 let parse_event s =
-  E.parse_event (D.get_event s)
+    E.parse_event (D.get_event s)
 
 let parse_curr_l l s =
   List.find (fun l -> l.name=s) l
@@ -130,7 +127,7 @@ let parse_state data =
     let e' = find_assoc "Event" data |> check_none parse_event (E.init_event "") in
     let curr_l' = find_assoc "Curr_Loc" data |> check_none (parse_curr_l l) empty_location  in
     {locations=l;characters=c; event=e';output="State Loaded.";current_location=curr_l'}
-  with _ -> raise (Failure "Invalid Save File.")
+  with d -> raise d (*)(Failure "Invalid Initial State File." *)
 
 (** [alter_state] st currLoc evt chars output is a function for conveniently
   changing the fields in state and providing an output for main to display.*)
@@ -407,6 +404,7 @@ let action (c:command) (st:state) =
         | None -> "Invalid move. That's not a character"
       in alter_state st s
     end
+  | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
 
 let output st = st.output

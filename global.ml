@@ -40,6 +40,9 @@ let find_assoc n lst =
   List.find (fun (x,_) -> x=n) lst
   |> snd
 
+let check_none f d str =
+  if str="None" then d else f str
+
 let parse_effect dlist =
   try
     let s = match find_assoc "Stat" dlist with

@@ -73,6 +73,7 @@ let parse s =
     let rest = (String.sub str (indx) ((String.length str)-indx))|>String.trim in
     (* Multiple Word Commands. "rest" is the remainder of the string.*)
     match first with
+    |"event" -> Event
     |"load" -> Load rest
     |"loadevent" -> LoadEvent rest
     |"give" -> Give rest
