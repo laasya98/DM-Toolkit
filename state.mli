@@ -93,4 +93,6 @@ val init_state : string -> state
    the REPL. *)
 val output : state -> string
 
+(* [gen_printout st] is a string containing a more informative and verbose
+   version of the output of [st]. Used in the REPL. *)
 val gen_printout : state -> string

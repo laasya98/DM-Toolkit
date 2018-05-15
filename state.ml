@@ -357,16 +357,29 @@ let print_chars_short st =
   List.map print_char_short st.characters
   |> List.fold_left (fun x a-> x^"\n"^a) ""
 
+let print_spells evt =
+  let lst = get_waiting_spells evt in
+  match lst with
+  |[] -> ""
+  |_ ->
+    let lst' =
+      List.map
+      (fun ((s:spell ),t) -> s.name^" will cast on turn "^(string_of_int t)^".")
+      lst
+    in
+    "Waiting Spells:\n"^List.fold_left (^) "\n" lst'
+
 let gen_printout st =
   let evt = st.event in
   match E.get_form evt with
   |Battle ->
     (st.output)^
     "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
-    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^
+    (print_spells evt)^(print_chars_short st)
   |Shop ->
     (st.output)^
-    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_names evt))
+    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_details evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =
@@ -408,7 +421,7 @@ let action (c:command) (st:state) =
     alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
       with _-> alter_state st "Failed. Your arguments might be off." end
   |QuickEvent (n,f) -> begin
-      let f' = match f with
+      let f' = match String.lowercase_ascii f with
       |"battle" -> Battle
       |"shop" -> Shop
       | _ -> Interaction
