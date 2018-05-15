@@ -61,9 +61,9 @@ let parse_characters data =
             |>String.trim in
     (c,r)
   in
-  List.map (fun s -> split_char s) cs
-  |>List.map (fun (x,r) -> (D.get_char x,r))
-  |> List.map (fun (c,r) -> (C.parse_char c,role r))
+  let a = List.map (fun s -> split_char s) cs in
+  let b =  List.map (fun (x,r) -> (D.get_char x,r)) a in
+  List.map (fun (c,r) -> (C.parse_char c,role r)) b 
 
   let parse_itemlst ilst =
     let ilst' = String.split_on_char '+' ilst in
