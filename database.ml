@@ -58,9 +58,9 @@ module Database = struct
 
   let files = create 3
 
-  let () = 
+  let () =
     Hashtbl.add files "class_data" "./data/classes.csv";
-           Hashtbl.add files "race_data" "./data/races.csv"
+    Hashtbl.add files "race_data" "./data/races.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file
@@ -79,7 +79,9 @@ module Database = struct
 
   (** []  *)
   let get_lst typ ind file =
-    let d = load_data file in
+
+      let d = load_data file in
+
     let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
       List.find (fun l -> idk (List.assoc typ l) = idk ind) d
 
@@ -103,7 +105,7 @@ module Database = struct
                        |> int_of_string
 
   let get_item s = get_lst "Name" s "item_data"
-  let get_location s = get_lst "name" s "loc_data"
+  let get_location s = get_lst "Name" s "loc_data"
   let get_event s = get_lst "Name" s "event_data"
   let get_char s = get_lst "Name" s "char_data"
 

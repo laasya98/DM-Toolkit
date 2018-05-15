@@ -28,6 +28,7 @@ open Global
     |ItemChange of (string * string)
     |Roll of (string)
     |UseItem of (string*string)
+    |Kill of string
     (* GETTERS  *)
     |GetCharacterList of role
     |GetExits
@@ -66,6 +67,7 @@ let parse s =
     | "inq" -> Inquiry
     | "inquiry" -> Inquiry
     | "turn" -> Turn
+    |"event" -> Event
     | "characters" -> GetCharacterList (All)
     | _ -> Invalid end
   else let indx = (String.index str ' ') in
@@ -73,7 +75,6 @@ let parse s =
     let rest = (String.sub str (indx) ((String.length str)-indx))|>String.trim in
     (* Multiple Word Commands. "rest" is the remainder of the string.*)
     match first with
-    |"event" -> Event
     |"load" -> Load rest
     |"loadevent" -> LoadEvent rest
     |"give" -> Give rest
@@ -136,4 +137,5 @@ let parse s =
       QuickBuild lst
     | "who" -> let x = (remove_start "who is" s) in Whois x
     | "whomst" -> let x = (remove_start "whomst" s) in Whois x
+    |"kill" -> let x = (remove_start "kill" s) in Kill x
     |_ -> Invalid

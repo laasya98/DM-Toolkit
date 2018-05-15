@@ -34,6 +34,7 @@ open Global
        |ItemChange of (string * string)
        |Roll of (string)
        |UseItem of (string*string)
+       |Kill of string
        |GetCharacterList of role
        |GetExits
        |Whois of string
