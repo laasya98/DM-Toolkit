@@ -16,14 +16,14 @@ type data = D.data
 
 type entity =
   |Item of item
-  |Effect of (entity * int)
   |Event of event
 
 type location = {
   name : string;
   description : string;
   characters : (character * role) list;
-  contents : entity list;
+  items : item list;
+  event : event;
   exits : ( string * location ) list (*(direction, location)*)
 }
 
@@ -33,14 +33,77 @@ type state = {
   event : event;
   output :string;
   current_location : location;
-  files:(string*string) list;
 }
+
+let add_filename n data :unit =
+  try
+    let f = find_assoc n data in
+    D.change_file n f
+  with _ -> ()
+
+(* TODO let parse_loc dlist =
+  try
+    let n = find_assoc "Name" dlist in
+    let d = find_assoc "Description" dlist in
+    let cs = find_assoc "Characters" dlist in
+    let is = find_assoc "Items" dlist in
+    let e = find_assoc "Event" dlist in
+    let exits = find_assoc "Exits" dlist in
+  with _ -> raise (Failure "Invalid Save File.") *)
+
+let parse_locations data =
+  let cs = String.split_on_char ' ' data in
+  let csd = List.map (fun x -> D.get_location x) cs in
+  List.map (fun c -> parse_loc c) csd
+
+let parse_characters data =
+  let role r = match r with
+    |"Party" -> Party
+    |"Friendly" -> Friendly
+    |"Hostile" -> Hostile
+    |_ -> Neutral
+  in
+  let cs = String.split_on_char ' ' data in
+  let split_char s =
+    let indxget = String.index s '+' in
+    let c = String.sub s 0 indxget in
+    let r = (String.sub s (indxget) ((String.length rest) - indxget))
+            |>String.trim in
+    (c,r)
+  in
+  List.map (fun s -> split_char s) cs
+  |>List.map (fun (x,r) -> (D.get_char x,r))
+  |> List.map (fun (c,r) -> (C.parse_char c,role r))
+
+let add_data data =
+  add_filename "class_data" data;
+  add_filename "race_data" data;
+  add_filename "item_data" data;
+  add_filename "location_data" data;
+  add_filename "spell_data" data;
+  add_filename "char_data" data;
+  add_filename "event_data" data
+
+let parse_state data =
+  add_data data;
+  try
+    let l = find_assoc "Locations" data in
+    let c = find_assoc "Characters" data in
+    let e = find_assoc "Event" data in
+    let curr_l = find_assoc "Curr_Loc" data in
+    let l' = parse_locations l in
+    let c' = parse_characters c in
+    let e' = E.parse_event (D.get_event e) in
+    let curr_l' = List.find (fun l -> l.name=curr_l) l' in
+    {locations=l';characters=c'; event=e';output="State Loaded.";current_location=curr_l'}
+  with _ -> raise (Failure "Invalid Save File.")
 
 let empty_location = {
   name = "empty";
   description = "no description";
   characters = [];
-  contents = [];
+  items = [];
+  event = E.init_event "event";
   exits = [];
 }
 
@@ -50,9 +113,7 @@ let empty_state = {
   event = init_event "";
   output = "";
   current_location = empty_location;
-  files = [];
 }
-
 
 (** [alter_state] st currLoc evt chars output is a function for conveniently
   changing the fields in state and providing an output for main to display.*)
@@ -64,7 +125,6 @@ let alter_state st ?(currLoc=st.current_location)
     event=evt;
     characters=chars;
     output=output;
-    files=st.files;
   }
 
 let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
@@ -72,7 +132,6 @@ let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)
 let current_location st = alter_state st st.current_location.name
 let current_room_characters st = failwith "unimplemented"
 let rooms st = failwith "unimplemented"
-let effects st = failwith "unimplemented"
 let event st = st.event
 
 (** [get_exits st] returns a list of strings that represents the exits for the

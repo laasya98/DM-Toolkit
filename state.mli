@@ -31,13 +31,14 @@ open Global
 (* a [location] is a named structure containing a description, a character,
    a list of characters, contents, and a list of exits which link to other
    locations.*)
-  type location = {
-    name : string;
-    description : string;
-    characters : (character * role) list;
-    contents : entity list;
-    exits : ( string * location ) list (*(direction, location)*)
-  }
+type location = {
+  name : string;
+  description : string;
+  characters : (character * role) list;
+  items : item list;
+  event : event;
+  exits : ( string * location ) list (*(direction, location)*)
+}
 
 (* [state] is the game's current state. It contains a list of locations to
    travel between, a list of currently-present characters, an active event status,
@@ -48,7 +49,6 @@ open Global
     event : event;
     output :string;
     current_location : location;
-    files: (string*string) list;
   }
 (* [empty_location] is an location with default record values.  *)
 val empty_location : location

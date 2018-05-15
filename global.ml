@@ -1,3 +1,4 @@
+
 type stat =
   | Constitution
   | Charisma
@@ -6,7 +7,6 @@ type stat =
   | Str
   | Dex
   | HP
-
 
 type effect = {
   stat:stat;

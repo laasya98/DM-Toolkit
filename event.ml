@@ -195,11 +195,11 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
         let weapon = get_weapon attacker in
         if crit then weapon.dice ^" "^ weapon.dice
         else weapon.dice
-      with _ -> "1d0" in
+      with _ -> "1d1" in
     let ability = try
       if (get_weapon attacker).t = Ranged then C.dex attacker
       else C.strength attacker
-    with _ -> C.strength attacker in
+      with _ -> C.strength attacker in
     ability + roll_dice_string dice
 
 let apply_effect s a t =
