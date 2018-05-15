@@ -91,3 +91,5 @@ val parse_item : (string*string) list -> item
 val parse_spell : (string * string) list -> spell
 
 val find_assoc : string -> (string*string)list -> string
+
+val check_none : (string -> 'a) -> 'a -> string -> 'a
