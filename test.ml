@@ -251,8 +251,6 @@ let command_tests = [
   "get characters hostile" >:: (fun _ -> assert_equal (GetCharacterList (Hostile)) (Command.parse "get characters hostile"));
   "get characters friendly" >:: (fun _ -> assert_equal (GetCharacterList (Friendly)) (Command.parse "get characters friendly"));
   "get characters neutral" >:: (fun _ -> assert_equal (GetCharacterList (Neutral)) (Command.parse "get characters neutral"));
-
-
 ]
 
 let suite =

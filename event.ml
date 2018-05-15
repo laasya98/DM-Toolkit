@@ -33,6 +33,7 @@ open Database
   let calc_turn_order c =
     List.map initiative c
     |> List.sort (fun (_,a) (_,b) -> compare a b)
+    |> List.rev
     |> List.map (fun (x,_) -> C.name x)
 
   let make_event name form items c =
@@ -350,7 +351,7 @@ let use_item (i:item) c evt =
     match s with
     | [] -> (e,tar)
     | h::t -> let (e', t') = update_and_cast h.castor h.spell h.targets e tar in
-    castAll t (e', tar @ t')
+      castAll t (e', tar @ t')
 
   let turn evt =
     let t' = evt.turn + 1 in
