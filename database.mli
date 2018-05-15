@@ -6,6 +6,8 @@ module type Database = sig
   (** [index] stores a mapping from keywords to filenames *)
   type index
 
+  val flatten : data -> (string * string) list
+
   (* [load_data f] is the data object retrieved from file [f] *)
   val load_data : string -> data
 

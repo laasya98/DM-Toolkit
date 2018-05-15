@@ -1,5 +1,6 @@
 open Csv
 open Hashtbl
+
 module type Database = sig
 
   (* [data] is the format of the data *)
@@ -7,6 +8,8 @@ module type Database = sig
 
   (** [index] stores a mapping from keywords to filenames *)
   type index
+
+  val flatten : data -> (string * string) list
 
   (* [load_data f] is the data object retrieved from file [f] *)
   val load_data : string -> data
@@ -55,43 +58,50 @@ module Database = struct
 
   let files = create 3
 
-  let () = Hashtbl.add files "state" "data/init_state.csv";
-           Hashtbl.add files "class_data" "data/classes.csv";
-           Hashtbl.add files "race_data" "data/races.csv"
+  let () = Hashtbl.add files "state" "./data/init_state.csv";
+           Hashtbl.add files "class_data" "./data/classes.csv";
+           Hashtbl.add files "race_data" "./data/races.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file
 
-  let load_data s = let tab = Csv.load s in
+  let flatten data = List.flatten data
+
+  let load_data s =
+    let d = Hashtbl.find files s in
+    let tab = Csv.load d in
     Csv.associate (List.hd tab) (List.tl tab)
 
-  let save_data f d = failwith "UNIMPLEMENTED"
+  let save_data f d =
+    Unix.mkdir "save" 0o640
 
   (** []  *)
-  let get typ ind field file =
-    let d = load_data file in
+  let get_lst typ ind file =
+    let d = load_data (Hashtbl.find files file) in
     let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
     List.find (fun l -> idk (List.assoc typ l)  = idk ind) d
-        |> List.assoc field
 
-  let hit_die c = let l = (Hashtbl.find files "class_data") in
-    get "class" c "hit_die" l
+  let get typ ind field file =
+    get_lst typ ind file |> List.assoc field
+
+  let hit_die c =
+    get "class" c "hit_die" "class_data"
                   |> int_of_string
 
   let tup_from_list l =
     ((try List.nth l 0 with _ -> ""), (try List.nth l 1 with _ -> ""))
 
-  let primary_stat c = let l = (Hashtbl.find files "class_data") in
-    get "class" c "primary" l
+  let primary_stat c =
+    get "class" c "primary" "class_data"
                        |> String.split_on_char ' '
                        |> tup_from_list
 
-  let speed_of r = let l = Hashtbl.find files "race_data" in
-    get "race" r "speed" l
+  let speed_of r =
+    get "race" r "speed" "race_data"
                        |> int_of_string
 
-  let get_item s = failwith "unimplemented"
-  let get_location s = failwith "unimplemented"
-  let get_event s = failwith "unimplemented"
-  let get_char s = failwith "unimplemented"
+  let get_item s = get_lst "name" s "item_data"
+  let get_location s = get_lst "name" s "loc_data"
+  let get_event s = get_lst "name" s "event_data"
+  let get_char s = get_lst "name" s "char_data"
 end

@@ -1,0 +1,21 @@
+Level,Proficiency,Martial_Arts,Ki,Speed,Features
+1,2,4,_,_,Unarmored_Defense Martial_Arts
+2,2,4,2,10,_
+3,2,4,3,10,Monastic_Tradition Deflect_Missiles
+4,2,4,4,10,Ability_Score_Improvement Slow_Fall
+5,3,6,5,10,Extra_Attack Stunning_Strike
+6,3,6,6,15,Ki-Empowered_Strikes Tradition_Feature
+7,3,6,7,15,Evasion Stillness_of_Mind
+8,3,6,8,15,Ability_Score_Improvement
+9,4,6,9,15,_
+10,4,6,10,20,Purity_of_Body
+11,4,8,11,20,Tradition_Feature
+12,4,8,12,20,Ability_Score_Improvement
+13,5,8,13,20,Tongue_of_the_Sun_and_Moon
+14,5,8,14,25,Diamond_Soul
+15,5,8,15,25,Timeless_Body
+16,5,8,16,25,Ability_Score_Improvement
+17,6,10,17,25,Tradition_Feature
+18,6,10,18,30,Empty_Body
+19,6,10,19,30,Ability_Score_Improvement
+20,6,10,20,30,Perfect_Self

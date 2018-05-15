@@ -193,4 +193,6 @@ open Global
   val quickbuild :  string -> string -> string -> c
 
   (*[details c] gives a string with important info about a character  c*)
-  val details : c -> string
+val details : c -> string
+
+val parse_char : (string*string) list -> c

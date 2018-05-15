@@ -1,0 +1,21 @@
+Level,Proficiency,Features
+1,2,Fighting_Style Second_Wind
+2,2,Action_Surge
+3,2,Martial_Archetype
+4,2,Ability_Score_Improvement
+5,3,Extra_Attack
+6,3,Ability_Score_Improvement
+7,3,Archetype_Feature
+8,3,Ability_Score_Improvement
+9,4,Indomitable
+10,4,Archetype_Feature
+11,4,Extra_Attack
+12,4,Ability_Score_Improvement
+13,5,Indomitable
+14,5,Ability_Score_Improvement
+15,5,Archetype_Feature
+16,5,Ability_Score_Improvement
+17,6,Action_Surge Indomitable
+18,6,Archetype_Feature
+19,6,Ability_Score_Improvement
+20,6,Extra_Attack

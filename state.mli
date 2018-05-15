@@ -24,7 +24,6 @@ open Global
    is able to interact in the gamespace.*)
   type entity =
     |Item of item
-    |Effect of (entity * int)
     |Event of event
 
 (* TODO write a spec or something*)
@@ -58,7 +57,7 @@ val empty_location : location
 
 (* [init_state s] is the initial state of the game loaded from a save file s
    from a database.*)
-val init_state : data -> state
+val init_state : state
 
 (*------------------GETTERS-------------------*)
 
@@ -70,9 +69,6 @@ val init_state : data -> state
 
 (* [rooms s] is a list of rooms in the current gamestate. *)
   val rooms : state -> string list
-
-(* [effects s] is a list of effects in the current room for current entities.*)
-  val effects : state -> string list
 
 (* [event s] is a list of current events for the current gamespace. *)
   val event : state -> event
