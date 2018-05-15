@@ -16,7 +16,7 @@ open Global
        |LoadEvent of string
        |QuickEvent of (string*string)
        |Inquiry
-       |Move of (string *string)
+       |Move of string
        |Use of (string * string)
        |Inv
        |Give of string

@@ -10,7 +10,7 @@ open Global
     |LoadEvent of string
     |QuickEvent of (string*string)
     |Inquiry
-    |Move of (string *string)
+    |Move of string
     |Use of (string * string)
     |Inv
     |Give of string
@@ -79,6 +79,7 @@ let parse s =
     |"drop" -> Drop rest
     |"shop" -> Shop rest
     |"help" -> Help rest
+    |"move" -> Move rest
     |"get" ->
       let indxget = if (String.contains rest ' ')
               then (String.index rest ' ') else String.length rest in
@@ -95,13 +96,6 @@ let parse s =
         |_ -> GetCharacterList (All) end
       |"exits" -> GetExits
       |_ -> Invalid end
-    |"move" -> let x = (remove_start "move" s) in
-      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
-      if List.length lst = 2 then
-        match lst with
-        | a::b::[] -> Move (a,b)
-        | _ -> Invalid
-      else Invalid
     |"use" -> let x = (remove_start "use" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       if List.length lst = 2 then

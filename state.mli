@@ -90,7 +90,7 @@ val init_state : data -> state
 
 (** [move st dir] moves the focus of the toolkit to the direction dir of the
         current room.*)
-  val move : state -> string -> state
+  val move_dir : state -> string -> state
 
 (* [output st] is the string output of state [st], for use in testing and
    the REPL. *)
