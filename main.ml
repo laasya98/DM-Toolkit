@@ -9,6 +9,7 @@
  *)
 open State
 open Command
+open Database
 (* when you add an entry into the help file, add it as a (string *string) with
    the first string the command name to be matched against, and the second is
    the description. Make sure to add each command to the "Commands" entry which
@@ -110,7 +111,7 @@ repl s'
 (* [play_game f] plays the game in adventure file [f]. *)
 let start_game f =
   try
-    D.change_file "state" f;
+    Database.change_file "state" f;
     (repl init_state)
   with _ -> print_endline (" Invalid D&D File. Try again?")
 

@@ -1,2 +1,2 @@
-locations,characters,event,output,current_location
-[],[],"init_event """"","""""",empty_location
+Locations,Characters,Event,Curr_Loc,class_data,race_data,item_data,location_data,spell_data,char_data,event_data
+None,None,None,None,

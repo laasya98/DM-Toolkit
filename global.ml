@@ -37,7 +37,7 @@ type item = {
 }
 
 let find_assoc n lst =
-  List.find (fun (x,_) -> x="Name") lst
+  List.find (fun (x,_) -> x=n) lst
   |> snd
 
 let parse_effect dlist =

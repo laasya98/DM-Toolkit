@@ -121,7 +121,7 @@ let parse_event dlist =
     let f' =
       if f="Battle" then Battle else if f="Shop" then Shop else Interaction
     in
-    let (_,i) = List.find (fun (x,y) -> x="Name") dlist in
+    let (_,i) = List.find (fun (x,y) -> x="Items") dlist in
     let i' = parse_itemlst i in
     make_event n f' i' [] (*TODO: turn order*)
   with _ -> raise (Failure "Invalid Event Data")

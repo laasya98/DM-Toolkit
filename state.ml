@@ -44,26 +44,7 @@ let add_filename n data :unit =
 let list_of_string s =
   String.sub s 1 (String.length s - 2) |> String.split_on_char ';'
 
-let parse_char s = failwith ""
-let item_of_string s = failwith ""
-let event_of_string s = failwith ""
 let exits_of_string s = failwith ""
-
-let parse_loc dlist =
-  try
-    let n = find_assoc "Name" dlist in
-    let d = find_assoc "Description" dlist in
-    let cs = list_of_string (find_assoc "Characters" dlist) |> parse_char in
-    let is = list_of_string (find_assoc "Items" dlist) |> item_of_string in
-    let e = list_of_string (find_assoc "Event" dlist) |> event_of_string in
-    let exits = list_of_string (find_assoc "Exits" dlist) |> exits_of_string in
-    {name=n; description=d; characters=cs; items=is; event=e; exits=exits}
-  with _ -> raise (Failure "Invalid Save File.")
-
-let parse_locations data =
-  let cs = String.split_on_char ' ' data in
-  let csd = List.map (fun x -> D.get_location x) cs in
-  List.map (fun c -> parse_loc c) csd
 
 let parse_characters data =
   let role r = match r with
@@ -84,6 +65,31 @@ let parse_characters data =
   |>List.map (fun (x,r) -> (D.get_char x,r))
   |> List.map (fun (c,r) -> (C.parse_char c,role r))
 
+  let parse_itemlst ilst =
+    let ilst' = String.split_on_char '+' ilst in
+    let get_item str = Database.get_item str |> parse_item
+    in
+    List.map get_item ilst'
+
+  let check_none f d str =
+    if str="None" then d else f str
+
+  let parse_loc dlist =
+    try
+      let n = find_assoc "Name" dlist in
+      let d = find_assoc "Description" dlist in
+      let cs = (find_assoc "Characters" dlist) |> check_none parse_characters [] in
+      let is = find_assoc "Items" dlist |> check_none parse_itemlst [] in
+      let e = find_assoc "Event" dlist |> D.get_event |> E.parse_event in
+      let exits = list_of_string (find_assoc "Exits" dlist) |> exits_of_string in
+      {name=n; description=d; characters=cs; items=is; event=e; exits=exits}
+    with _ -> raise (Failure "Invalid Initial Save File.")
+
+  let parse_locations data =
+    let cs = String.split_on_char ' ' data in
+    let csd = List.map (fun x -> D.get_location x) cs in
+    List.map (fun c -> parse_loc c) csd
+
 let add_data data =
   add_filename "class_data" data;
   add_filename "race_data" data;
@@ -92,20 +98,6 @@ let add_data data =
   add_filename "spell_data" data;
   add_filename "char_data" data;
   add_filename "event_data" data
-
-let parse_state data =
-  add_data data;
-  try
-    let l = find_assoc "Locations" data in
-    let c = find_assoc "Characters" data in
-    let e = find_assoc "Event" data in
-    let curr_l = find_assoc "Curr_Loc" data in
-    let l' = parse_locations l in
-    let c' = parse_characters c in
-    let e' = E.parse_event (D.get_event e) in
-    let curr_l' = List.find (fun l -> l.name=curr_l) l' in
-    {locations=l';characters=c'; event=e';output="State Loaded.";current_location=curr_l'}
-  with _ -> raise (Failure "Invalid Save File.")
 
 let empty_location = {
   name = "empty";
@@ -117,12 +109,28 @@ let empty_location = {
 }
 
 let empty_state = {
-  locations = [];
+  locations = [empty_location];
   characters = [];
   event = init_event "";
-  output = "";
+  output = "Empty State Loaded.";
   current_location = empty_location;
 }
+
+let parse_event s =
+  E.parse_event (D.get_event s)
+
+let parse_curr_l l s =
+  List.find (fun l -> l.name=s) l
+
+let parse_state data =
+  add_data data;
+  try
+    let l = find_assoc "Locations" data |> check_none parse_locations [empty_location] in
+    let c = find_assoc "Characters" data |> check_none parse_characters [] in
+    let e' = find_assoc "Event" data |> check_none parse_event (E.init_event "") in
+    let curr_l' = find_assoc "Curr_Loc" data |> check_none (parse_curr_l l) empty_location  in
+    {locations=l;characters=c; event=e';output="State Loaded.";current_location=curr_l'}
+  with _ -> raise (Failure "Invalid Save File.")
 
 (** [alter_state] st currLoc evt chars output is a function for conveniently
   changing the fields in state and providing an output for main to display.*)
