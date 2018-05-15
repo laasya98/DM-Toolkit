@@ -44,7 +44,7 @@ let empty_location = {
 }
 
 let empty_state = {
-locations = [];
+  locations = [];
 characters = [];
 event = init_event "";
 output = "";
@@ -78,8 +78,10 @@ let get_exits st =
   List.map (fun x -> fst x) (st.current_location.exits)
 
 
-(*TODO: update list of locations to reflect   *)
-let move st dir =
+(* [move st dir] is the state with current_room now the room reflected by dir
+   from the original current_room. It leaves all non-party characters in the
+   previous room. It's output is "Party moves *dir*" with a description*)
+let move_dir st dir =
   if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
   then alter_state st "Not a direction"
   else let newlocation =
@@ -88,7 +90,7 @@ let move st dir =
       (List.filter (fun x -> snd x = Party) st.characters)
       @ newlocation.characters in
     alter_state st ~currLoc:newlocation ~chars:newcharacters
-      ("Party moves" ^dir)
+      ("Party moves" ^dir ^"\n\n\n" ^ newlocation.description)
 
 (** [character_list_filter ls role] returns a string delimited by commas
   representing the characters in a list that match the given role *)
@@ -281,6 +283,8 @@ let action (c:command) (st:state) =
   | Turn -> let (evt', t') = E.turn st.event in
     let chars = update_chars t' st in
     alter_state st ~evt:evt' ~chars:chars ("Turn incremented.\n"^(E.verbose evt'))
+  | Move r -> (try move_dir st r with _-> alter_state st "No such direction.")
+
   | GetCharacterList r -> begin
       let lst = begin match r with
       |All -> character_list_string  st
@@ -290,13 +294,14 @@ let action (c:command) (st:state) =
   end
   |GetExits -> alter_state st (String.concat ", " (get_exits st))
   |Roll d -> alter_state st (string_of_int (Global.roll_dice_string d))
-  |QuickBuild lst -> (*alter_state st "Unimplemented"*)
+  |QuickBuild lst -> begin try
     let n = List.hd lst in
     let c = List.hd (List.tl lst) in
     let r = List.nth lst 2 in
     let newchar = C.quickbuild n c r in
     let newcharls = ((newchar,Party) :: st.characters) in
     alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
+      with _-> alter_state st "Failed. Your arguments might be off." end
   |QuickEvent (n,f) -> begin
       let f' = match f with
       |"battle" -> Battle
@@ -307,6 +312,6 @@ let action (c:command) (st:state) =
       let evt = E.make_event n f' [] c in
       alter_state st ~evt:evt "Event started."
   end
-  | _ -> alter_state st "Invalid move. Try again?"
+  | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
 
 let output st = st.output
