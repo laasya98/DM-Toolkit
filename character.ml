@@ -369,101 +369,59 @@ let blank_char = {
   inv = [],0;
   money = 0;
 }
-
-
+let remove s lst = (List.filter (fun x -> x<>s) lst)
+let stat_list = ["strength";"charisma";"dexterity";"intelligence";"constitution";"wisdom"]
+let rec assign_stats s l c =
+  match s with
+  | [] -> c
+  | h::t -> begin
+      match String.lowercase_ascii h with
+      | "strength" -> assign_stats (t) (List.tl l) {c with strength = List.hd l}
+      | "dexterity" -> assign_stats (t) (List.tl l) {c with dexterity = List.hd l}
+      | "charisma" -> assign_stats (t) (List.tl l) {c with charisma = List.hd l}
+      | "constitution" -> assign_stats (t) (List.tl l) {c with constitution = List.hd l}
+      | "intelligence" -> assign_stats (t) (List.tl l) {c with intel = List.hd l}
+      | "wisdom" -> assign_stats (t) (List.tl l) {c with wisdom = List.hd l}
+      | _ -> c
+    end
 
 let quickbuild n c r =
-  let cls = class_of_string c in
-  let race = race_of_string r in
+    let cls = class_of_string c in
+    let race = race_of_string r in
     let stats = stat_lister [] in
-    let step1 = (*core stats*)
-      match cls with
-        | Barbarian -> {blank_char with
-                        constitution = List.hd stats;
-                        charisma = List.nth stats 1;
-                        wisdom = List.nth stats 2;
-                        intel = List.nth stats 3;
-                        strength = List.nth stats 4;
-                        dexterity = List.nth stats 5; }
-        | Bard -> {blank_char with
-                   constitution = List.hd stats;
-                   charisma = List.nth stats 1;
-                   wisdom = List.nth stats 2;
-                   intel = List.nth stats 3;
-                   strength = List.nth stats 4;
-                   dexterity = List.nth stats 5; }
-        | Cleric -> {blank_char with
-                     constitution = List.hd stats;
-                     charisma = List.nth stats 1;
-                     wisdom = List.nth stats 2;
-                     intel = List.nth stats 3;
-                     strength = List.nth stats 4;
-                     dexterity = List.nth stats 5; }
-        | Druid -> {blank_char with
-                    constitution = List.hd stats;
-                    charisma = List.nth stats 1;
-                    wisdom = List.nth stats 2;
-                    intel = List.nth stats 3;
-                    strength = List.nth stats 4;
-                    dexterity = List.nth stats 5; }
-        | Fighter -> {blank_char with
-                      constitution = List.hd stats;
-                      charisma = List.nth stats 1;
-                      wisdom = List.nth stats 2;
-                      intel = List.nth stats 3;
-                      strength = List.nth stats 4;
-                      dexterity = List.nth stats 5; }
-        | Monk -> {blank_char with
-                   constitution = List.hd stats;
-                   charisma = List.nth stats 1;
-                   wisdom = List.nth stats 2;
-                   intel = List.nth stats 3;
-                   strength = List.nth stats 4;
-                   dexterity = List.nth stats 5; }
-        | Paladin -> {blank_char with
-                      constitution = List.hd stats;
-                      charisma = List.nth stats 1;
-                      wisdom = List.nth stats 2;
-                      intel = List.nth stats 3;
-                      strength = List.nth stats 4;
-                      dexterity = List.nth stats 5; }
-        | Ranger -> {blank_char with
-                     constitution = List.hd stats;
-                     charisma = List.nth stats 1;
-                     wisdom = List.nth stats 2;
-                     intel = List.nth stats 3;
-                     strength = List.nth stats 4;
-                     dexterity = List.nth stats 5; }
-        | Rogue -> {blank_char with
-                    constitution = List.hd stats;
-                    charisma = List.nth stats 1;
-                    wisdom = List.nth stats 2;
-                    intel = List.nth stats 3;
-                    strength = List.nth stats 4;
-                    dexterity = List.nth stats 5; }
-        | Sorcerer -> {blank_char with
-                       constitution = List.hd stats;
-                       charisma = List.nth stats 1;
-                       wisdom = List.nth stats 2;
-                       intel = List.nth stats 3;
-                       strength = List.nth stats 4;
-                       dexterity = List.nth stats 5; }
-        | Warlock -> {blank_char with
-                      constitution = List.hd stats;
-                      charisma = List.nth stats 1;
-                      wisdom = List.nth stats 2;
-                      intel = List.nth stats 3;
-                      strength = List.nth stats 4;
-                      dexterity = List.nth stats 5; }
-        | Wizard -> {blank_char with
-                     constitution = List.hd stats;
-                     charisma = List.nth stats 1;
-                     wisdom = List.nth stats 2;
-                     intel = List.nth stats 3;
-                     strength = List.nth stats 4;
-                     dexterity = List.nth stats 5; }
+    let prim_stats = Database.primary_stat c in
+    let all_stats = stat_list in
+
+    let step1a = (*core stats*)
+      let first = (fst prim_stats) |> String.lowercase_ascii in
+      match first with
+      | "strength" -> {blank_char with strength = List.hd stats}, (remove "strength" all_stats)
+      | "dexterity" -> {blank_char with dexterity = List.hd stats}, (remove "dexterity" all_stats)
+      | "charisma" -> {blank_char with charisma = List.hd stats}, (remove "charisma" all_stats)
+      | "constitution" -> {blank_char with constitution = List.hd stats}, (remove "constitution" all_stats)
+      | "intelligence" -> {blank_char with intel = List.hd stats}, (remove "intelligence" all_stats)
+      | "wisdom" -> {blank_char with wisdom = List.hd stats}, (remove "wisdom" all_stats)
+      | _ -> {blank_char with strength = List.hd stats}, (remove "strength" all_stats)
     in
-    let hit = (*Database.get_hd c*) 10 in
+    let step1b =
+      let second = (snd prim_stats) |> String.lowercase_ascii in
+      let temp = fst step1a in
+      let al_stats = snd step1a in
+      match second with
+      | "strength" -> {temp with strength = List.nth stats 2}, (remove "strength" al_stats)
+      | "dexterity" -> {temp with dexterity = List.nth stats 2}, (remove "dexterity" al_stats)
+      | "charisma" -> {temp with charisma = List.nth stats 2}, (remove "charisma" al_stats)
+      | "constitution" -> {temp with constitution = List.nth stats 2}, (remove "constitution" al_stats)
+      | "intelligence" -> {temp with intel = List.nth stats 2}, (remove "intelligence" al_stats)
+      | "wisdom" -> {temp with wisdom = List.nth stats 2}, (remove "wisdom" al_stats)
+      | _ -> if temp.strength <> 0
+        then {temp with charisma = List.nth stats 2}, (remove "charisma" al_stats)
+        else {temp with strength = List.nth stats 2}, (remove "strength" al_stats)
+    in
+    let new_stats = stats |> List.tl |> List.tl in
+    let step1 = assign_stats (snd step1b) new_stats (fst step1b) in
+
+    let hit = Database.hit_die c in
     let step2 = (* non core stats, speed, ability modifiers*)
                 {step1 with
                  name = n;
@@ -480,14 +438,16 @@ let quickbuild n c r =
                  hd_qty = 1;
                  max_hp = hit;
                  hp = hit;
-                 speed = (*Database.get_speed r*) 40;
+                 speed = (*Database.speed_of r*) 40;
                 }
 
       in
-      let step3 = {step2 with
+      let step3 =  (*initializing skills and items*)
+              {step2 with
                    spells = []; (*Database.get_spells c*)
                    skills = skill_set step2 all_skills;
+                   passive_wisdom = 10 + step2.wis_mod + step2.prof_bonus;
                    armor_class = 10+step2.dex_mod;
-
-                  }in (*initializing skills and items*)
+                  }
+      in
     step3
