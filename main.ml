@@ -52,7 +52,8 @@ let rec repl state =
   let s' = action cmd state  in
   if cmd = Invalid
   then
-    let () = print_endline ("Invalid move. Try again.") in repl s' else
+    let () = print_endline ("Invalid move. Try again. Type \"help commands\" for a list of commands.")
+    in repl s' else
   let () = match cmd with
     |Quit -> exit 0
     |Help s -> begin try
