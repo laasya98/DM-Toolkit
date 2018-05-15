@@ -1,0 +1,3 @@
+Name,Description,Characters,Items,Event,Exits
+Loc1,location 1 description,None,None,None,south:Loc2
+Loc2,location 2 description,None,potion,None,north:Loc1
