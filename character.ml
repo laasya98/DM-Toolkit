@@ -226,6 +226,9 @@ let string_of_race r =
   | Half_Orc -> "Half-Orc"
   | Tiefling -> "Tiefling"
 
+let init_spells =
+  [(Database.get_spell_data "MagicMissile") |> Global.parse_spell ;
+   (Database.get_spell_data "Heal") |> Global.parse_spell ]
 
 let all_skills = (*Database.allskills*)
   {
@@ -431,7 +434,7 @@ let parse_char clist =
       xp=xp;
       level=lvl;
       skills= all_skills;
-      spells= [];
+      spells= init_spells;
       equipped= [],0;
       inv= [],0;
       money=cash;
@@ -465,7 +468,7 @@ let blank_char = {
   xp = 0;
   level = 1;
   skills = all_skills;
-  spells = [];
+  spells = init_spells;
   equipped = [],0;
   inv = [],0;
   money = 0;

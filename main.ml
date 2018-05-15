@@ -17,7 +17,7 @@ open Database
 let helps = [
   ("commands",
 "-Commands-
-help - quit - roll - characters - quickevent");
+help - quit - roll - characters - quickevent - battle");
 
   ("help",
 "-Help-
@@ -95,14 +95,25 @@ Usage: \"quickbuild name form\"");
 
   ("battle",
    "-Battle-
-Within a Battle event, many special actions can be taken.
+Within a Battle event, some special actions can be taken.
   Fight: \"fight [attacker] [defender]\"
       Use this command to have the [attacker] character attempt to hit the
       [defender] character with their equipped weapon. If no weapon is equipped,
       an unarmed strike is made instead.
   Turn: \"turn\" moves the turn to the next player. Once all players have
       taken a turn, the turn number increases. This is used for spellcasting,
-      to deal with wait times.")
+      to deal with wait times.");
+
+  ("shop",
+   "-Shop-
+Within a Shop event, some special actions can be taken.
+    Buy: \"buy [character] [item] [quantity]\"
+        Use this command to have the [character] buy [quantity] of [item]
+        from the shop. This will fail if the item is not available or the
+        character doesn't have enough money.
+    Sell: \"sell [character] [item] [quantity]\"
+        Use this command to have the [character] sell [quantity] of [item]
+        to the shop. This will fail if the item is not owned by the character.")
 ]
 
 let help_file = String.concat "\n \n" (List.map (fun x-> snd x) helps)
