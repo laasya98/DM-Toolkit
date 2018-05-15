@@ -519,7 +519,7 @@ let action (c:command) (st:state) =
           List.map idetail (C.inv c) |> List.fold_left (fun x a -> x^"\n"^a) ""
       in alter_state st s
     end
-  | Save -> (*save_game st;*) alter_state st "Game saved!"
+  | Save -> save_game st; alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
   with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
 
