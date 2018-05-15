@@ -12,34 +12,6 @@ open Global
  (*type spell is a global*)
   type spell = Global.spell
 
-  (* not thinking abt subclasses right now
- type elf_sub =
-    | High
-    | Wood
-    | Dark
-
-  type half_sub =
-   | Lightfoot
-   | Stout
-
-  type dragon_descent =
-    | Black
-    | Blue
-    | Brass
-    | Bronze
-    | Copper
-    | Gold
-    | Green
-    | Red
-    | Silver
-    | White
-
-  type gnome_sub =
-   | Forest
-   | Rock*)
-
-
-
   (* type c_class is the types of classes of a character*)
   type c_class =
     | Barbarian

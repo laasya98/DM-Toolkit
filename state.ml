@@ -123,14 +123,14 @@ match r' with
   List.map (fun (x,r) -> if x=c then (c',r') else (x,r)) st.characters
 
 let update_chars cs st =
-let rec r cs lst =
-match cs with
-| [] -> lst
-| c::t -> r t (List.map
-   (fun (x,r) -> if C.name x = C.name c then (c,r)
-    else (x,r)) lst)
-in
-r cs st.characters
+  let rec r cs lst =
+  match cs with
+  | [] -> lst
+  | c::t -> r t (List.map
+     (fun (x,r) -> if C.name x = C.name c then (c,r)
+      else (x,r)) lst)
+  in
+  r cs st.characters
 
 (** SHOP **)
 
@@ -230,6 +230,44 @@ let use_item i c evt st =
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
     with _ -> alter_state st "Item not found in character inventory."
 
+let destribute_xp n st = failwith "unimplemented"
+
+let remove_char c st =
+  let cs = List.filter (fun ((x:character),_) -> x.name <> c) st.characters in
+  alter_state st ~chars:cs "Character removed."
+
+let kill_char c st =
+  let c' = char_by_name c st in
+  match c' with
+  | None -> alter_state st "Character name invalid."
+  | Some c ->
+    let st' = remove_char c.name st in
+    alter_state st' "Character killed."
+
+let string_of_role r =
+  match r with
+  | All -> "All"
+  | Party -> "Party"
+  | Hostile -> "Hostile"
+  | Friendly -> "Friendly"
+  | Neutral -> "Neutral"
+
+let print_char_short (c,r) =
+  (C.name c)^"\t"^(string_of_role r)^"\tHP: "^(string_of_int (C.curr_hp c))
+
+let print_chars_short st =
+  List.map print_char_short st.characters
+  |> List.fold_left (fun x a-> x^"\n"^a) ""
+
+let gen_printout st =
+  let evt = st.event in
+  match E.get_form evt with
+  |Battle ->
+  (st.output)^
+  "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
+  ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+  |_ -> st.output
+
 let action (c:command) (st:state) =
   E.clear_vout st.event;
   match c with
@@ -244,8 +282,9 @@ let action (c:command) (st:state) =
   | Sell (ch,i,q) -> b_s_item ch i q st.event st false
   | Turn -> let (evt', t') = E.turn st.event in
     let chars = update_chars t' st in
-    alter_state st ~evt:evt' ~chars:chars "Turn incremented"
+    alter_state st ~evt:evt' ~chars:chars ("Turn incremented.\n"^(E.verbose evt'))
   | Move r -> (try move_dir st r with _-> alter_state st "No such direction.")
+
   | GetCharacterList r -> begin
       let lst = begin match r with
       |All -> character_list_string  st

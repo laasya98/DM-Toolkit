@@ -5,11 +5,29 @@ module type Database = sig
   (* [data] is the format of the data *)
   type data
 
+  (** [newdata] is the format of data with headers *)
+  type newdata
+
   (* [load_data f] is the data object retrieved from file [f] *)
-  val load_data : string -> data
+  val load_data : string -> newdata
 
   (** [save_data d f] writes a data object to a file [f]  *)
   val save_data : string -> data -> unit
+
+  (** [hit_die class] is the hit die belonging to a given class
+      represented by the string [class]
+  *)
+  val hit_die : string -> int
+
+  (** [primary_stat class] is a tuple of the two most prominent
+      (highest number) ability score of a given class
+  *)
+  val primary_stat : string -> (string * string)
+
+  (** [speed_of race] is the speed stat of each race where [race]
+      is a string
+  *)
+  val speed_of : string -> int
 
   (** [change_file field new_file] changes the default file
       for the type of query [field] to the filename [new_file]
@@ -38,6 +56,7 @@ module Database = struct
   *)
   type data = string list list
 
+  type newdata = (string * string) list list
   (** [index] stores two association lists
 
   *)
@@ -48,15 +67,40 @@ module Database = struct
 
   let index = {
                 files = [("init_state", "data/init_state.csv")];
-                other = [];
+                other = [("class_data", "data/classes.csv");
+                         ("race_data", "data/races.csv")];
               }
 
   let change_file field new_file =
     (field, new_file)::(List.remove_assoc field index.files)
 
-  let load_data s = Csv.load s
+  let load_data s = let tab = Csv.load s in
+    Csv. associate (List.hd tab) (List.tl tab)
 
   let save_data f d = Csv.save f d
+
+  (** []  *)
+  let get typ index field file =
+    let d = load_data file in
+    let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
+    List.find (fun l -> idk (List.assoc typ l)  = idk index) d
+        |> List.assoc field
+
+  let hit_die c = let l = (List.assoc "class_data" index.other) in
+    get "class" c "hit_die" l
+                  |> int_of_string
+
+  let tup_from_list l =
+    ((try List.nth l 0 with _ -> ""), (try List.nth l 1 with _ -> ""))
+
+  let primary_stat c = let l = (List.assoc "class_data" index.other) in
+    get "class" c "primary" l
+                       |> String.split_on_char ' '
+                       |> tup_from_list
+
+  let speed_of r = let l = List.assoc "race_data" index.other in
+    get "race" r "speed" l
+                       |> int_of_string
 
   let get_item s = failwith "unimplemented"
   let get_npc s = failwith "unimplemented"

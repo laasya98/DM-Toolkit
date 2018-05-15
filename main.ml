@@ -60,11 +60,11 @@ let rec repl state =
       ANSITerminal.(print_string [blue] print);
         with _->  print_endline ("No help file for " ^ s) end
     |Event ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
-      print_endline s'.output;
+      print_endline (State.gen_printout s');
       (*)|Inquiry -> *)
     |Move x-> (*ANSITerminal.(print_string [green] "You're now in "^ s'.current_location)*)
-      print_endline (s'.output);
-    | _ -> print_endline (s'.output);
+      print_endline (State.gen_printout s');
+    | _ -> print_endline (State.gen_printout s');
   in
 repl s'
 
