@@ -112,16 +112,20 @@ let update_wisdom  c w = {c with wisdom = w;
   let xp c = c.xp
   let update_xp c x = {c with xp = x}
   let level  c = c.level
-  let level_up  c l =
+let level_up  c l =
+  let prf = Database.prof_of_level l in
+  let addhp = Global.roll_dice_int 1 (c.hd) 1 in
+  let newhp = addhp + c.cons_mod in
+  let oldhp = c.hp in
+  let old_max = c.max_hp in
+  let old = c.prof_bonus in
     {c with
-      level = l
-(*TODO:
-  - add hd to hp
-  - new hd after every 5 levels
-  - prof bonus increase
-  - ability score increase
-  - reset skills *)
-    }
+      hd_qty = l;
+      prof_bonus = prf + old;
+      max_hp = old_max + newhp;
+      hp = oldhp + newhp;
+      level = l }
+
   let skills c =  c.skills
   let spells c = c.spells
   let add_spell c s =
@@ -534,7 +538,7 @@ let quickbuild n c r =
                  hd_qty = 1;
                  max_hp = hit;
                  hp = hit;
-                 speed = (*Database.speed_of r*) 40;
+                 speed = Database.speed_of r;
                 }
 
       in
