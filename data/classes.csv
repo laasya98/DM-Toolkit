@@ -1,4 +1,4 @@
-Class,Hit Die,Primary Ability,STP
+class,hit_die,primary,STP
 Barbarian,12,Strength,Strength Constitution
 Bard,8,Charisma,Dexterity Charisma
 Cleric,8,Wisdom,Wisdom Charisma
