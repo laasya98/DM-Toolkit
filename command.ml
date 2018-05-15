@@ -22,6 +22,7 @@ open Global
     |Sell of (string * string *string)
     |Fight of (string * string)
     |Cast of (string * string * string list)
+    |Spell of string
     |Turn
     |QuickBuild of string list (* command entered: [name, class, race]*)
     |CharacterAction
@@ -140,4 +141,5 @@ let parse s =
     | "who" -> let x = (remove_start "who is" s) in Whois x
     | "whomst" -> let x = (remove_start "whomst" s) in Whois x
     |"kill" -> let x = (remove_start "kill" s) in Kill x
+    | "spell" -> let x = (remove_start "spell" s) in Spell x
     |_ -> Invalid

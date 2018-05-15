@@ -28,6 +28,7 @@ open Global
        |Sell of (string * string *string)
        |Fight of (string * string)
        |Cast of (string * string * string list)
+       |Spell of string
        |Turn
        |QuickBuild of string list
        |CharacterAction

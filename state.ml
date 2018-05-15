@@ -303,7 +303,7 @@ let cast c s t evt st =
     | Some c ->
       match List.find_opt (fun (x:spell) -> x.name=s) (C.spells c) with
       | None -> alter_state st "That castor doesn't know that spell."
-      | Some s' -> 
+      | Some s' ->
       let (evt', t') = E.cast c s' t' evt in
       let chars = update_chars t' st in
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
@@ -370,6 +370,19 @@ let print_spells evt =
       lst
     in
     "Waiting Spells:\n"^List.fold_left (^) "\n" lst'
+
+let spell_info n =
+  try
+    let s = Database.get_spell_data n |> Global.parse_spell in
+    let d = match s.stype with
+      |Damage a -> "\nType: Damage\nDie: "^(a.damage_die)^"\nRange: "^
+                   (string_of_int a.range)^"\nSeperate target rolls: "^
+                   (if a.multiple then "True" else "False")
+      |Status a -> "\nType: Status\nDie: "^(a.die)^"\nStat: "^(string_of_stat a.stat)
+    in
+    "Spell: "^(s.name)^"\nLevel: "^(string_of_int s.level)^"\nTargets: "^
+    (string_of_int s.targets)^"\nTurns to cast: "^(string_of_int s.to_cast)^(d)
+with _ -> "Spell not found."
 
 let gen_printout st =
   let evt = st.event in
@@ -444,7 +457,8 @@ let action (c:command) (st:state) =
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
   | Look -> alter_state st ""
   | Kill c -> kill_char c st
-  | Save -> save_game st; alter_state st "Game saved!"
+  | Spell s -> alter_state st (spell_info s)
+  | Save -> (*save_game st;*) alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
   with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
 
