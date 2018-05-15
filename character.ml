@@ -400,13 +400,6 @@ let parse_char clist =
     let xp = (find_assoc "XP" clist) |> int_of_string  in
     let lvl = (find_assoc "Level" clist) |> int_of_string  in
     let cash = (find_assoc "Money" clist) |> int_of_string  in
-
-    (*let t' = match t with
-      |"Weapon" -> Weapon (parse_weapon dlist)
-      |"Armor" -> Armor (int_of_string (find_assoc "AC" dlist))
-      |_ -> Other
-      in*)
-
     { name=n;
       race=r;
       c_class=cls;
