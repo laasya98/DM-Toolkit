@@ -294,6 +294,17 @@ let item_helper c i q inv f evt st =
       else
         f c i q evt st
 
+let equip c i st =
+match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
+| None -> alter_state st "Action Failed: Invalid character name."
+| Some (c,_) ->
+  match List.find_opt (fun ((x:item),_) -> x.name =i) (C.inv c) with
+  | None ->  alter_state st "Action Failed: That item is not available."
+  | Some (i,_) ->
+    let c' = C.equip c i 1 in
+    alter_state st ~chars:(update_char c c' st) "Item equipped."
+
+
 let b_s_item c i q evt st buying =
   match E.get_form st.event with
   | Shop -> begin
@@ -494,6 +505,18 @@ let action (c:command) (st:state) =
   | Look -> alter_state st ""
   | Kill c -> kill_char c st
   | Spell s -> alter_state st (spell_info s)
+  | Equip (c,i) -> equip c i st
+  | Inv x -> begin
+      let s =
+        match char_by_name x st with
+        | None -> "Invalid move. That's not a character"
+        | Some c ->
+          let idetail ((i:item),q) =
+            i.name^"\tValue: "^(string_of_int i.value)^"\tQuantity: "^
+            (match q with |Infinity -> "inf" | Int q -> string_of_int q) in
+          List.map idetail (C.inv c) |> List.fold_left (fun x a -> x^"\n"^a) ""
+      in alter_state st s
+    end
   | Save -> (*save_game st;*) alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
   with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
