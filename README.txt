@@ -11,13 +11,22 @@ File Loading:
 
 Things to Try:
 
+  To start, I recommend adding a character, buying and selling, making a
+  Battle event, and trying to both use the fight command and
+  cast MagicMissile and Heal.
+
   "help" : displays a help menu. While incomplete, this can give some info
   on which commands are valid and how to invoke them.
 
   "roll [X]d[Y]t[Z]": rolls [X] die with [Y] sides each and takes [Z] of them.
 
-  "move [dir]": Moves the party to a new location. In the default file, the only
-  options are "south" from location1 and "north" from location2.
+  "move [exit]": Moves the party to a new location, by exit name.
+  "get exits": Gives current room exits.
+
+  "who is [name]": Gives details about a character.
+  "characters": Lists characters present.
+
+  "inv [name]": Lists a character's inventory.
 
   "quickbuild [name] [class] [race]": creates a new character based off the
   three arguments, and adds that character to the current party.
@@ -33,6 +42,9 @@ Things to Try:
     Interaction:  The default event. Neither a battle nor a shop.
             Use this to remove one of the other types.
 
+  "use [character] [item]": has [character] use [item], if possible.
+  "equip [character] [item]": has [character] equip [item], if possible.
+
   Within a Battle event, some special actions can be taken.
     Fight: "fight [attacker] [defender]"
         Use this command to have the [attacker] character attempt to hit the
@@ -44,3 +56,18 @@ Things to Try:
     Cast: "cast [castor] [spell] [target list]" casts the spell on the targets.
         Use "spell [name]" to get information on a specific spell and how
         many targets it has. Casting may take multiple turns.
+
+  Within a Shop event, some special actions can be taken.
+      Buy: \"buy [character] [item] [quantity]\"
+          Use this command to have the [character] buy [quantity] of [item]
+          from the shop. This will fail if the item is not available or the
+          character doesn't have enough money.
+      Sell: \"sell [character] [item] [quantity]\"
+          Use this command to have the [character] sell [quantity] of [item]
+          to the shop. This will fail if the item is not owned by the character.
+
+
+Note:
+
+We added the line "rm -rf save" to the makefile to clean out save data when
+cleaning the code.
