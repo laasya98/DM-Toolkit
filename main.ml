@@ -17,7 +17,7 @@ open Database
 let helps = [
   ("commands",
 "-Commands-
-help - quit - roll - characters");
+help - quit - roll - characters - quickevent");
 
   ("help",
 "-Help-
@@ -79,7 +79,30 @@ Usage: \"quickbuild name class race\"" );
    "-Who Is?-
 Who is [name] prints out the important stats about a player with name [name],
 including the race, class, HP, and core stat values.
-Usage: \"who is name \" or \"whomst name \"" )
+Usage: \"who is name \" or \"whomst name \"" );
+
+  ("quickevent",
+  "-QuickEvent-
+Quickbuild [name] [form] creates a new event with those values, and starts it.
+The list of acceptable event forms are:
+  Battle: A combat event that tracks turn order and character attacks.
+          Type \"help battle\" for more information about battles and combat.
+  Shop:   A shop event wherein the player can buy and sell items.
+          Type \"help battle\" for more information about shops.
+  Interaction:  The default event. Neither a battle nor a shop.
+          Use this to remove one of the other types.
+Usage: \"quickbuild name form\"");
+
+  ("battle",
+   "-Battle-
+Within a Battle event, many special actions can be taken.
+  Fight: \"fight [attacker] [defender]\"
+      Use this command to have the [attacker] character attempt to hit the
+      [defender] character with their equipped weapon. If no weapon is equipped,
+      an unarmed strike is made instead.
+  Turn: \"turn\" moves the turn to the next player. Once all players have
+      taken a turn, the turn number increases. This is used for spellcasting,
+      to deal with wait times.")
 ]
 
 let help_file = String.concat "\n \n" (List.map (fun x-> snd x) helps)

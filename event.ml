@@ -155,9 +155,10 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
 let get_items evt = evt.items
 
 let get_item_details evt =
-  List.map (fun ((i:item ),q) ->
-      i.name^": "^(match q with |Infinity -> "inf" | Int q -> string_of_int q))
-    evt.items
+  let idetail ((i:item),q) =
+    i.name^"\tCost: "^(string_of_int i.value)^"\tQuantity: "^
+    (match q with |Infinity -> "inf" | Int q -> string_of_int q) in
+  List.map idetail evt.items
 
   let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
