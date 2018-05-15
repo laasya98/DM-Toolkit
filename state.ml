@@ -221,6 +221,42 @@ let update_chars cs st =
   in
   r cs st.characters
 
+(** SAVE **)
+
+let rec string_of_locs lst =
+  match lst with
+  |[] -> ""
+  |l::locs -> l.name ^ " " ^ (string_of_locs locs)
+
+let string_of_role r =
+  match r with
+  |Party -> "Party"
+  |Friendly -> "Friendly"
+  |Hostile -> "Hostile"
+  |Neutral -> "Neutral"
+  |All -> "All"
+
+let rec string_of_chars (lst : (character * Global.role) list) =
+  match lst with
+  |[] -> ""
+  |(c, r)::chars -> c.name^":"^(string_of_role r)^" "^(string_of_chars chars)
+
+let save_game st =
+  let ls = st.locations |> string_of_locs |> String.trim in
+  let cs = st.characters |> string_of_chars |> String.trim in
+  let e = st.event |> E.get_name in
+  let cl = st.current_location.name in
+  let f = "save" in
+  let p = "./"^f^"/" in
+  let d = [["Locations";"Characters";"Event";"Curr_Loc";
+            "class_data";"race_data";"item_data";"loc_data";
+            "spell_data";"char_data"; "event_data"];
+           [ls;cs;e;cl;
+            p^"class.csv";p^"race.csv";p^"item.csv";"loc.csv";
+            p^"spell.csv";p^"char.csv";"event.csv"]] in
+  D.save_data f d
+
+
 (** SHOP **)
 
 let buy c i q evt st =

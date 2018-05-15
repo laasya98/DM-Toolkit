@@ -15,7 +15,7 @@ module type Database = sig
   val load_data : string -> data
 
   (** [save_data d f] writes a data object to a file [f]  *)
-  val save_data : string -> data -> unit
+  val save_data : string -> string list list -> unit
 
   (** [hit_die class] is the hit die belonging to a given class
       represented by the string [class]
@@ -83,7 +83,10 @@ module Database = struct
 
 
   let save_data f d =
-    Unix.mkdir "save" 0o640
+    Unix.rmdir f;
+    Unix.mkdir f 0o640;
+    Csv.save ("./"^f^"/"^"newstate.csv") d
+
 
   (** []  *)
   let get_lst typ ind file =
