@@ -444,6 +444,7 @@ let action (c:command) (st:state) =
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
   | Look -> alter_state st ""
   | Kill c -> kill_char c st
+  | Save -> save_game st; alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
   with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
 
