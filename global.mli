@@ -78,6 +78,7 @@ type spell =
     duration: int;
   }
 
+
 (* [role] is the role of a character.
    Party signals a player character.
    A Friendly npc will aid the characters in the event

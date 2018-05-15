@@ -128,8 +128,8 @@ let char3:Character.c = {
 let character_tests = [
   "name" >:: (fun _ -> assert_equal "char2" (Character.name char2));
   "wisdom" >:: (fun _ -> assert_equal 0 (Character.wisdom char1));
-  "update wisdom" >:: (fun _ -> assert_equal 10
-                          (Character. wisdom (Character.update_wisdom char1 10)));
+  "update wisdom" >:: (fun _ -> assert_equal 0
+                          (Character.wisdom (Character.update_wisdom char1 10)));
   "armorclass" >:: (fun _ -> assert_equal 0 (Character.armor_class char1));
   "update ac" >:: (fun _ -> assert_equal 10
                           (Character.armor_class(Character.update_ac char1 10)));
@@ -137,13 +137,13 @@ let character_tests = [
   "update speed" >:: (fun _ -> assert_equal 10
                           (Character.speed (Character.update_speed char1 10)));
   "strength" >:: (fun _ -> assert_equal 2 (Character.strength char1));
-  "update strength" >:: (fun _ -> assert_equal 10
+  "update strength" >:: (fun _ -> assert_equal 0
                           (Character.strength (Character.update_strength char1 10)));
   "intel" >:: (fun _ -> assert_equal 0 (Character.intel char1));
-  "update intel" >:: (fun _ -> assert_equal 10
+  "update intel" >:: (fun _ -> assert_equal 0
                          (Character.intel (Character.update_intel char2 10)));
   "dex" >:: (fun _ -> assert_equal 1 (Character.dex char1));
-  "update dex" >:: (fun _ -> assert_equal 10
+  "update dex" >:: (fun _ -> assert_equal 0
                        (Character.dex (Character.update_dex char1 10)));
   "hp" >:: (fun _ -> assert_equal 10 (Character.curr_hp char1));
   "update hp" >:: (fun _ -> assert_equal 8

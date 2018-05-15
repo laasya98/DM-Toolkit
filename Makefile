@@ -5,7 +5,7 @@ compile-i:
 	ocamlc -c global.mli command.mli character.mli event.mli database.mli state.mli
 
 compile:
-	ocamlbuild -use-ocamlfind event.cmo state.cmo character.cmo
+	ocamlbuild -use-ocamlfind event.cmo state.cmo character.cmo global.cmo
 
 play:
 	ocamlbuild -use-ocamlfind main.byte && ./main.byte

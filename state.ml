@@ -311,7 +311,14 @@ let action (c:command) (st:state) =
       let c = List.map fst st.characters in
       let evt = E.make_event n f' [] c in
       alter_state st ~evt:evt "Event started."
-  end
+    end
+  | Whois x -> begin
+      let s =
+      match char_by_name x st with
+        | Some c -> C.details c
+        | None -> "Invalid move. That's not a character"
+      in alter_state st s
+    end
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
 
 let output st = st.output

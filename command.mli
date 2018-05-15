@@ -36,6 +36,7 @@ open Global
        |UseItem of (string*string)
        |GetCharacterList of role
        |GetExits
+       |Whois of string
        |Invalid
 
 

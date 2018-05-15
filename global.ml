@@ -67,6 +67,7 @@ type spell =
     duration: int;
   }
 
+
 type role = All | Party | Hostile | Friendly | Neutral
 
 
