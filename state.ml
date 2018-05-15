@@ -24,7 +24,7 @@ type location = {
   characters : (character * role) list;
   items : item list;
   event : event;
-  exits : ( string * location ) list (*(direction, location)*)
+  exits : ( string * string ) list (*(direction, location)*)
 }
 
 type state = {
@@ -47,7 +47,7 @@ let list_of_string s =
 let exits_of_string s = failwith ""
 
 let parse_characters data =
-  let role r = match r with
+    let role r = match r with
     |"Party" -> Party
     |"Friendly" -> Friendly
     |"Hostile" -> Hostile
@@ -55,15 +55,15 @@ let parse_characters data =
   in
   let cs = String.split_on_char ' ' data in
   let split_char s =
-    let indxget = String.index s '+' in
+    let indxget = String.index s ':' in
     let c = String.sub s 0 indxget in
     let r = (String.sub s (indxget) ((String.length s) - indxget))
             |>String.trim in
     (c,r)
   in
   let a = List.map (fun s -> split_char s) cs in
-  let b =  List.map (fun (x,r) -> (D.get_char x,r)) a in
-  List.map (fun (c,r) -> (C.parse_char c,role r)) b
+    let b =  List.map (fun (x,r) -> (D.get_char x,r)) a in
+    List.map (fun (c,r) -> (C.parse_char c,role r)) b
 
   let parse_itemlst ilst =
     let ilst' = String.split_on_char '+' ilst in
@@ -160,13 +160,18 @@ let get_exits st =
 let move_dir st dir =
   if not (List.mem dir (List.map (fun x -> fst x) st.current_location.exits))
   then alter_state st "Not a direction"
-  else let newlocation =
-         snd (List.find (fun x -> fst x = dir) st.current_location.exits) in
+  else
+    let newlocation =
+      snd (List.find (fun x -> fst x = dir) st.current_location.exits) in
+    let nl = List.find_opt (fun l -> l.name = newlocation) st.locations in
+    match nl with
+    | None -> alter_state st "Not a valid direction."
+    |Some loc ->
     let newcharacters =
       (List.filter (fun x -> snd x = Party) st.characters)
-      @ newlocation.characters in
-    alter_state st ~currLoc:newlocation ~chars:newcharacters
-      ("Party moves" ^dir ^"\n\n\n" ^ newlocation.description)
+      @ loc.characters in
+    alter_state st ~currLoc:loc ~chars:newcharacters
+      ("Party moves" ^dir ^"\n\n\n" ^ loc.description)
 
 (** [character_list_filter ls role] returns a string delimited by commas
   representing the characters in a list that match the given role *)
@@ -353,7 +358,7 @@ let gen_printout st =
     ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
   |Shop ->
     (st.output)^
-    "\n\nItems available: "^(String.concat ", " (E.get_item_names evt))
+    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_names evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =
@@ -368,10 +373,14 @@ let action (c:command) (st:state) =
   | UseItem (c,i) -> item_helper c i 1 true use st.event st
   | Buy (ch,i,q) -> b_s_item ch i q st.event st true
   | Sell (ch,i,q) -> b_s_item ch i q st.event st false
-  | Turn ->
-    let (evt', t') = E.turn st.event in
-    let chars = update_chars t' st in
-    alter_state st ~evt:evt' ~chars:chars ("Turn incremented.\n"^(E.verbose evt'))
+  | Turn ->begin
+      match E.get_form st.event with
+      |Battle ->
+        let (evt', t') = E.turn st.event in
+        let chars = update_chars t' st in
+        alter_state st ~evt:evt' ~chars:chars ("Turn incremented.\n"^(E.verbose evt'))
+      |_ -> alter_state st "No battle occuring."
+  end
   | Move r -> (try move_dir st r with _-> alter_state st "No such direction.")
   | GetCharacterList r -> begin
       let lst = begin match r with
