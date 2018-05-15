@@ -118,14 +118,14 @@ let rec start_game f =
     let d = init_state "state" in
     repl d
   with x ->
-      begin
+      raise x (*)begin
         ANSITerminal.(print_string [red] "Not a valid file.\n");
         print_endline "Please enter the name of the game file you want to load.\n";
         print_string  "> ";
         match read_line () with
         | exception End_of_file -> start_game "QUIT"
         | file_name -> start_game file_name
-                end 
+                end *)
 
 
 (* [main ()] starts the REPL, which prompts for a game to play.
