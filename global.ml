@@ -8,6 +8,16 @@ type stat =
   | Dex
   | HP
 
+  let string_of_stat s =
+    match s with
+    | Constitution -> "Constitution"
+    | Charisma -> "Charisma"
+    | Wisdom -> "Wisdom"
+    | Intel -> "Intelligence"
+    | Str -> "Strength"
+    | Dex -> "Dexterity"
+    | HP -> "HP"
+
 type effect = {
   stat:stat;
   die:string;

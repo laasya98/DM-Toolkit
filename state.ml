@@ -365,7 +365,7 @@ let distribute_xp c st =
     let party = List.filter (fun (_,r) -> r=Party) st.characters in
     let xp = C.xp m / (List.length party) in
     let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp))
-             |>  List.map (fun x -> if (xp x >= (D.xp_from_level (level x)))
+             |>  List.map (fun x -> if ((x.xp) >= (D.xp_from_level (level x)))
                             then level_up x ((level x) + 1) else x )  in
     alter_state st ~chars:(update_chars p' st) "XP distributed."
 
@@ -408,6 +408,19 @@ let print_spells evt =
       lst
     in
     "Waiting Spells:\n"^List.fold_left (^) "\n" lst'
+
+let spell_info n =
+  try
+    let s = Database.get_spell_data n |> Global.parse_spell in
+    let d = match s.stype with
+      |Damage a -> "\nType: Damage\nDie: "^(a.damage_die)^"\nRange: "^
+                   (string_of_int a.range)^"\nSeperate target rolls: "^
+                   (if a.multiple then "True" else "False")
+      |Status a -> "\nType: Status\nDie: "^(a.die)^"\nStat: "^(string_of_stat a.stat)
+    in
+    "Spell: "^(s.name)^"\nLevel: "^(string_of_int s.level)^"\nTargets: "^
+    (string_of_int s.targets)^"\nTurns to cast: "^(string_of_int s.to_cast)^(d)
+with _ -> "Spell not found."
 
 let gen_printout st =
   let evt = st.event in
@@ -482,7 +495,8 @@ let action (c:command) (st:state) =
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
   | Look -> alter_state st ""
   | Kill c -> kill_char c st
-  | Save -> save_game st; alter_state st "Game saved!"
+  | Spell s -> alter_state st (spell_info s)
+  | Save -> (*save_game st;*) alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
   with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
 

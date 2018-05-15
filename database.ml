@@ -44,6 +44,7 @@ module type Database = sig
   val get_char : string -> (string * string) list
   val prof_of_level : int -> int
   val get_spell_data : string -> (string * string) list
+  val xp_from_level : int -> int
 end
 
 module Database = struct
@@ -83,6 +84,7 @@ module Database = struct
 
 
   let save_data f d =
+    Unix.rmdir f;
     Unix.mkdir f 0o640;
     Csv.save ("./"^f^"/"^"newstate.csv") d
 
@@ -122,5 +124,8 @@ module Database = struct
     get "level" (string_of_int i) "prof" "level_data"
                          |> int_of_string
   let get_spell_data s = get_lst "Name" s "spell_data"
+
+  let xp_from_level i = get "level" (string_of_int i) "exp" "level_data"
+                      |> int_of_string
 
 end

@@ -41,6 +41,7 @@ module type Database = sig
   val get_char : string -> (string * string) list
   val prof_of_level : int -> int
   val get_spell_data : string -> (string * string) list
+  val xp_from_level : int -> int
 end
 
 module Database:Database
