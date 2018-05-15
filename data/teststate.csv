@@ -1,0 +1,2 @@
+Locations,Characters,Event,Curr_Loc,class_data,race_data,item_data,location_data,spell_data,char_data,event_data
+ , ,default,empty,classes.csv,races.csv,items.csv,locations.csv,spells.csv,chars.csv,events.csv
