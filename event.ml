@@ -188,16 +188,15 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
   let damage_roll attacker crit =
     let dice = try
         let weapon = get_weapon attacker in
-        if crit then weapon.dice ^ weapon.dice
+        if crit then weapon.dice ^" "^ weapon.dice
         else weapon.dice
-      with _ -> "" in
+      with _ -> "1d0" in
     let ability = try
       if (get_weapon attacker).t = Ranged then C.dex attacker
       else C.strength attacker
     with _ -> C.strength attacker in
     ability + roll_dice_string dice
 
-(*TODO: don't change bases? *)
 let apply_effect s a t =
   match s with
   | Constitution -> C.update_const t (C.const t + a)

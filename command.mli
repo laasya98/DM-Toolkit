@@ -12,7 +12,9 @@ open Global
        |Save
        |Quit
        |Help of string
-       |Event of string
+       |Event
+       |LoadEvent of string
+       |QuickEvent of (string*string)
        |Inquiry
        |Move of (string *string)
        |Use of (string * string)
