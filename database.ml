@@ -34,17 +34,10 @@ module type Database = sig
   *)
   val change_file : string -> string -> unit
 
-  (** [get_item id] is an item object corresponding to [id] in a
-    * data object *)
-  val get_item : string -> (string*string) list
-
-  (** [get_char id] is an character object corresponding to [id] in a
-    * data object *)
-  val get_npc : string -> data
-
-  (** [get_class id] is a D&D class corresponding to [id] in a
-    * data object *)
-  val get_class : string -> string
+  (** TODO specify*)
+  val get_item : string -> (string * string) list
+  val get_location : string -> (string * string) list
+  val get_event : string -> (string * string) list
 end
 
 module Database = struct
@@ -76,10 +69,10 @@ module Database = struct
   let save_data f d = failwith "UNIMPLEMENTED"
 
   (** []  *)
-  let get typ index field file =
+  let get typ ind field file =
     let d = load_data file in
     let idk = fun s -> s |> String.trim |> String.lowercase_ascii in
-    List.find (fun l -> idk (List.assoc typ l)  = idk index) d
+    List.find (fun l -> idk (List.assoc typ l)  = idk ind) d
         |> List.assoc field
 
   let hit_die c = let l = (Hashtbl.find files "class_data") in
@@ -99,6 +92,6 @@ module Database = struct
                        |> int_of_string
 
   let get_item s = failwith "unimplemented"
-  let get_npc s = failwith "unimplemented"
-  let get_class s = failwith "unimplemented"
+  let get_location s = failwith "unimplemented"
+  let get_event s = failwith "unimplemented"
 end
