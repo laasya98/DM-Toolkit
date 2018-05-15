@@ -206,8 +206,7 @@ let event_tests = [
   "remove_item5" >:: (fun _ -> assert_equal [(item1,Int 3)] (Event.remove_item "item2" (Infinity) evtS |> Event.get_items));
   "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 3); (item2, Infinity)] (Event.remove_item "item2" (Int 4) evtS |> Event.get_items));
   "remove_item6" >:: (fun _ -> assert_equal [(item1,Int 1); (item2, Infinity)] (Event.remove_item "item1" (Int 2) evtS |> Event.get_items));
-  "changeF" >:: (fun _ -> assert_equal (Interaction:Event.form) (Event.change_form Interaction evtC1 |> Event.get_form));
-]
+  ]
 
 type state = State.state
 
