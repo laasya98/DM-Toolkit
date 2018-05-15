@@ -2,10 +2,13 @@ open Character
 open Global
 open Database
 
-  module C = Character
-  type character = Character.c
+module C = Character
+type character = Character.c
 
-  type form = Battle | Shop | Interaction
+type form = Battle | Shop | Interaction
+
+(* [spellTimer] stores the information needed to cast a spell, and what turn
+   number the spell will cast on. *)
   type spellTimer = {turn:int; castor: character; spell: spell;
                      targets: character list}
 
@@ -21,11 +24,16 @@ open Database
     output: string;
   }
 
+(*[initiative c] calculates the initiative roll of a character [c].
+  returns: [(c,roll)] where [c] is the character and [roll] is the initiative. *)
   let initiative c =
     let r = roll_dice_int 1 20 1 in
     let dex = C.dex c in
     (c, dex + r)
 
+(*[calc_turn_order c] calculates the turn order for a battle event from the
+  list of characters [c].
+  returns: [string list] of the character names in order of initiative. *)
   let calc_turn_order c =
     List.map initiative c
     |> List.sort (fun (_,a) (_,b) -> compare a b)
@@ -63,6 +71,9 @@ let make_event name form items c =
       output = "Event created.";
     }
 
+(* [alter_event evt ... output] returns a new event with any optional arguemts
+   that were supplied changed to the given values.
+   Output must always be changed. *)
   let alter_event evt ?(name=evt.name) ?(form=evt.form) ?(items = evt.items)
       ?(turn = evt.turn) ?(t_order = evt.turn_order) ?(f_turn = evt.first_turn)
       ?(spells = evt.spells) output =
@@ -80,6 +91,11 @@ let make_event name form items c =
 
 let verbose evt = evt.v_out
 
+(* [change_item_q i q lst] changes the quantity of item [i] in list [lst]
+   to [q].
+   returns: a copy of [lst] where [i] has quantity [q], and any items with
+            quantity of less than 1 are removed.
+            if [i] is not in [lst], returns [lst]*)
 let change_item_q i q lst =
   let gz n = match n with
     |Infinity -> true
@@ -87,7 +103,6 @@ let change_item_q i q lst =
   in
   List.map (fun (a,b) -> if a=i then (a,q) else (a,b)) lst
   |> List.filter (fun (_,n) -> gz n)
-
 
 let add_item (i:item) q evt =
   match List.find_opt (fun ((x:item),q) -> x.name=i.name) evt.items with
@@ -100,10 +115,13 @@ let add_item (i:item) q evt =
       | Int q -> alter_event evt
                 ~items:(change_item_q i (Int (n+q)) evt.items) "Item added."
       | Infinity -> alter_event evt
-                      ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
+              ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
 
+(* [parse_itemlst ilst] parses the item names and quantities in [ilst] into
+   an (item*quantity) list.
+   raises: [Invalid Item List] if the items are formatted wrong or nonexistant. *)
 let parse_itemlst ilst =
-
+  try
   let ilst' = String.split_on_char '+' ilst in
   let get_item str =
     match String.split_on_char ':' str with
@@ -114,17 +132,21 @@ let parse_itemlst ilst =
     | _ -> failwith "Invalid?"
   in
   List.map get_item ilst'
+with _ -> failwith "Invalid Item List."
 
+(* [parse_form f] parses string [f] into a [form]. *)
 let parse_form f =
   if f="Battle" then Battle else if f="Shop" then Shop else Interaction
 
+(*[parse_event dlist] parses an event object from the data [dlist].
+  raises: [Invalid Event Data] if parsing fails.*)
 let parse_event dlist =
   try
     let n = find_assoc "Name" dlist in
     let f = find_assoc "Form" dlist |> parse_form in
     let i = find_assoc "Items" dlist |> check_none parse_itemlst [] in
     make_event n f i [] (*TODO: turn order*)
-  with s -> raise s
+  with s -> failwith "Invalid Event Data"
 
 let clear_vout evt = evt.v_out <- ""
 
@@ -159,8 +181,6 @@ let get_item_details evt =
     i.name^"\tCost: "^(string_of_int i.value)^"\tQuantity: "^
     (match q with |Infinity -> "inf" | Int q -> string_of_int q) in
   List.map idetail evt.items
-
-  let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
   let get_weapon c =
     let equipment = List.fold_left (fun n (a,b) -> a::n) [] (C.equipped c) in

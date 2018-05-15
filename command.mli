@@ -18,12 +18,12 @@ open Global
        |Inquiry
        |Look
        |Move of string
-       |Use of (string * string)
        |Inv of string
        |Give of string
        |Take of string
        |Drop of string
        |Shop of string
+       |Equip of (string * string)
        |Buy of (string * string *string)
        |Sell of (string * string *string)
        |Fight of (string * string)
@@ -40,7 +40,6 @@ open Global
        |GetCharacterList of role
        |GetExits
        |Whois of string
-       |Equip of string*string
        |Invalid
 
 
