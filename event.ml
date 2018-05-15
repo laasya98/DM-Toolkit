@@ -306,6 +306,8 @@ let spell_damage s (t,n) evt =
   add_vout v evt;
   deal_damage d t
 
+(*[cast_status c s t evt] casts a damage spell [s] on targets [t], cast by
+  character [c]. It returns the new list of target statuses. *)
 let cast_damage c s t evt =
   if s.multiple then
     let t' = count_dups t in
@@ -318,6 +320,8 @@ let cast_damage c s t evt =
     in
     List.map f t
 
+(*[cast_status c s t evt] casts a status spell [s] on targets [t], cast by
+  character [c]. It returns the new list of target statuses. *)
 let cast_status c s t evt =
   let d = roll_dice_string s.die in
   let f n =
@@ -352,6 +356,8 @@ let use_item (i:item) c evt =
     else
       (add_spell c s t evt, [])
 
+(*[update_and_cast c s t evt upc] casts each spell [s] and updates the
+  characters each time through [upc]. *)
   let rec update_and_cast c s t evt (upc:character list) =
     match upc with
     | [] -> cast c s t evt

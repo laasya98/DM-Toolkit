@@ -109,7 +109,10 @@ Within a Battle event, some special actions can be taken.
       an unarmed strike is made instead.
   Turn: \"turn\" moves the turn to the next player. Once all players have
       taken a turn, the turn number increases. This is used for spellcasting,
-      to deal with wait times.");
+      to deal with wait times.
+  Cast: \"cast [castor] [spell] [target list]\" casts the spell on the targets.
+      Use \"spell [name]\" to get information on a specific spell and how
+      many targets it has. Casting may take multiple turns.");
 
   ("shop",
    "-Shop-
