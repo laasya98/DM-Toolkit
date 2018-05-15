@@ -109,8 +109,10 @@ repl s'
 
 (* [play_game f] plays the game in adventure file [f]. *)
 let start_game f =
-  (repl empty_state)
-(*with _ -> print_endline (" Invalid D&D File. Try again?")*)
+  try
+    D.change_file "state" f;
+    (repl init_state)
+  with _ -> print_endline (" Invalid D&D File. Try again?")
 
 (* [main ()] starts the REPL, which prompts for a game to play.
  * You are welcome to improve the user interface, but it must
