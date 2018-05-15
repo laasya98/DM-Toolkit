@@ -10,19 +10,22 @@ open Global
     |LoadEvent of string
     |QuickEvent of (string*string)
     |Inquiry
+    |Look
     |Move of string
     |Use of (string * string)
-    |Inv
+    |Inv of string
     |Give of string
     |Take of string
     |Drop of string
     |Shop of string
+    |Equip of (string * string)
     |Buy of (string * string *string)
     |Sell of (string * string *string)
     |Fight of (string * string)
     |Cast of (string * string * string list)
+    |Spell of string
     |Turn
-    |QuickBuild of string list (* command entered: [name, class, race, (sub_race)]*)
+    |QuickBuild of string list (* command entered: [name, class, race]*)
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
@@ -62,9 +65,8 @@ let parse s =
     | "save" -> Save
     | "quit" -> Quit
     | "help" -> Help ("")
-    | "inv" -> Inv
-    | "inventory" -> Inv
     | "inq" -> Inquiry
+    | "look" -> Look
     | "inquiry" -> Inquiry
     | "turn" -> Turn
     | "event" -> Event
@@ -118,6 +120,11 @@ let parse s =
       begin match lst with
         | a::b::_ -> QuickEvent (a,b)
         | _ -> Invalid end
+    |"equip" -> let x = (remove_start "equip" s) in
+      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+      begin match lst with
+        | c::i::[] -> Equip (c,i)
+        | _ -> Invalid end
     |"buy" -> let x = (remove_start "buy" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       begin match lst with
@@ -139,4 +146,7 @@ let parse s =
     | "who" -> let x = (remove_start "who is" s) in Whois x
     | "whomst" -> let x = (remove_start "whomst" s) in Whois x
     |"kill" -> let x = (remove_start "kill" s) in Kill x
+    | "spell" -> let x = (remove_start "spell" s) in Spell x
+    | "inv" -> let x = (remove_start "inv" s) in Inv x
+    | "inventory" ->  let x = (remove_start "inventory" s) in Inv x
     |_ -> Invalid

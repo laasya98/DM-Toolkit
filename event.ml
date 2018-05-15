@@ -154,10 +154,11 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
 
 let get_items evt = evt.items
 
-let get_item_names evt =
-  List.map (fun ((i:item ),q) ->
-      i.name^": "^(match q with |Infinity -> "inf" | Int q -> string_of_int q))
-    evt.items
+let get_item_details evt =
+  let idetail ((i:item),q) =
+    i.name^"\tCost: "^(string_of_int i.value)^"\tQuantity: "^
+    (match q with |Infinity -> "inf" | Int q -> string_of_int q) in
+  List.map idetail evt.items
 
   let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
@@ -281,7 +282,7 @@ let spell_damage s (t,n) evt =
       acc
   in
   let d = dam s n 0 in
-  let v = (C.name t)^" took "^(string_of_int d)^" damage!" in
+  let v = (C.name t)^" took "^(string_of_int d)^" damage!\n" in
   add_vout v evt;
   deal_damage d t
 
@@ -292,26 +293,16 @@ let cast_damage c s t evt =
   else
     let d = roll_dice_string s.damage_die in
     let f n =
-      add_vout ((C.name n)^" took "^(string_of_int d)^" damage!") evt;
+      add_vout ((C.name n)^" took "^(string_of_int d)^" damage!\n") evt;
       deal_damage d n
     in
     List.map f t
-
-let string_of_stat s =
-  match s with
-  | Constitution -> "Constitution"
-  | Charisma -> "Charisma"
-  | Wisdom -> "Wisdom"
-  | Intel -> "Intelligence"
-  | Str -> "Strength"
-  | Dex -> "Dexterity"
-  | HP -> "HP"
 
 let cast_status c s t evt =
   let d = roll_dice_string s.die in
   let f n =
     add_vout ((C.name n)^"'s "^(string_of_stat s.stat)^" changed by "^
-    (string_of_int d)^"!") evt;
+              (string_of_int d)^"!") evt;
     apply_effect s.stat d n
   in
   List.map f t
@@ -327,7 +318,7 @@ let use_item (i:item) c evt =
 
   let cast c s t evt =
     if s.to_cast = 0 || evt.form <> Battle then
-      let v = (C.name c)^" cast "^s.name^"!" in
+      let v = (C.name c)^" cast "^s.name^"!\n" in
       add_vout v evt;
       match s.stype with
       | Damage d -> begin
@@ -359,7 +350,7 @@ let use_item (i:item) c evt =
   let rec castAll s (e, tar) =
     match s with
     | [] -> (e,tar)
-    | h::t -> let (e', t') = update_and_cast h.castor h.spell h.targets e tar in
+    | h::t -> let (e', t') = update_and_cast h.castor {h.spell with to_cast=0} h.targets e tar in
       castAll t (e', tar @ t')
 
 let turn evt =

@@ -112,16 +112,21 @@ let update_wisdom  c w = {c with wisdom = w;
   let xp c = c.xp
   let update_xp c x = {c with xp = x}
   let level  c = c.level
-  let level_up  c l =
+let level_up  c l =
+  (*future goals: add character spells/abilities/score improvements*)
+  let prf = Database.prof_of_level l in
+  let addhp = Global.roll_dice_int 1 (c.hd) 1 in
+  let newhp = addhp + c.cons_mod in
+  let oldhp = c.hp in
+  let old_max = c.max_hp in
+  let old = c.prof_bonus in
     {c with
-      level = l
-(*TODO:
-  - add hd to hp
-  - new hd after every 5 levels
-  - prof bonus increase
-  - ability score increase
-  - reset skills *)
-    }
+      hd_qty = l;
+      prof_bonus = prf + old;
+      max_hp = old_max + newhp;
+      hp = oldhp + newhp;
+      level = l }
+
   let skills c =  c.skills
   let spells c = c.spells
   let add_spell c s =
@@ -221,6 +226,9 @@ let string_of_race r =
   | Half_Orc -> "Half-Orc"
   | Tiefling -> "Tiefling"
 
+let init_spells =
+  [(Database.get_spell_data "MagicMissile") |> Global.parse_spell ;
+   (Database.get_spell_data "Heal") |> Global.parse_spell ]
 
 let all_skills = (*Database.allskills*)
   {
@@ -426,7 +434,7 @@ let parse_char clist =
       xp=xp;
       level=lvl;
       skills= all_skills;
-      spells= [];
+      spells= init_spells;
       equipped= [],0;
       inv= [],0;
       money=cash;
@@ -460,7 +468,7 @@ let blank_char = {
   xp = 0;
   level = 1;
   skills = all_skills;
-  spells = [];
+  spells = init_spells;
   equipped = [],0;
   inv = [],0;
   money = 0;
@@ -534,13 +542,18 @@ let quickbuild n c r =
                  hd_qty = 1;
                  max_hp = hit;
                  hp = hit;
-                 speed = (*Database.speed_of r*) 40;
+                 speed = Database.speed_of r;
                 }
 
-      in
+    in
+      (*basic spells for all characters*)
+    let init_spells =
+        [(Database.get_spell_data "MagicMissile") |> Global.parse_spell ;
+                       (Database.get_spell_data "Heal") |> Global.parse_spell ] in
+
       let step3 =  (*initializing skills and items*)
               {step2 with
-                   spells = []; (*Database.get_spells c*)
+                   spells = init_spells; (*Database.get_spells c*)
                    skills = skill_set all_skills step2;
                    passive_wisdom = 10 + step2.wis_mod + step2.prof_bonus;
                    armor_class = 10+step2.dex_mod;
@@ -552,10 +565,12 @@ let details c =
   "Character " ^ c.name ^ ":\n" ^
     "Class: " ^ (c.c_class |> string_of_class) ^ "\n" ^
     "Race: " ^ (c.race|> string_of_race)  ^ "\n" ^
-    "HP: " ^ (c.hp |> string_of_int)  ^ "\n" ^
+  "HP: " ^ (c.hp |> string_of_int)  ^ "\n" ^
+  "Max HP" ^ (c.max_hp |> string_of_int)  ^ "\n" ^
     "Strength: " ^ (c.strength |> string_of_int)  ^ "\n" ^
     "Wisdom: " ^ (c.wisdom |> string_of_int)  ^ "\n" ^
     "Intelligence: " ^ (c.intel |> string_of_int) ^  "\n" ^
     "Dexterity: " ^ (c.dexterity |> string_of_int)  ^ "\n" ^
     "Constitution: " ^ (c.constitution |> string_of_int)  ^ "\n" ^
-    "Charisma: " ^ (c.charisma |> string_of_int)  ^ "\n"
+  "Charisma: " ^ (c.charisma |> string_of_int)  ^ "\n" ^
+  "Money: " ^ (c.money |>string_of_int)^"\n"

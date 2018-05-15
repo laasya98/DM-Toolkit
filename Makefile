@@ -21,4 +21,5 @@ zipcheck:
 
 clean:
 	ocamlbuild -clean
+	rm -rf save
 	rm -f dm-toolkitsrc.zip

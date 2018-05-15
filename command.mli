@@ -16,17 +16,20 @@ open Global
        |LoadEvent of string
        |QuickEvent of (string*string)
        |Inquiry
+       |Look
        |Move of string
        |Use of (string * string)
-       |Inv
+       |Inv of string
        |Give of string
        |Take of string
        |Drop of string
        |Shop of string
+       |Equip of (string * string)
        |Buy of (string * string *string)
        |Sell of (string * string *string)
        |Fight of (string * string)
        |Cast of (string * string * string list)
+       |Spell of string
        |Turn
        |QuickBuild of string list
        |CharacterAction

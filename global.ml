@@ -8,6 +8,16 @@ type stat =
   | Dex
   | HP
 
+  let string_of_stat s =
+    match s with
+    | Constitution -> "Constitution"
+    | Charisma -> "Charisma"
+    | Wisdom -> "Wisdom"
+    | Intel -> "Intelligence"
+    | Str -> "Strength"
+    | Dex -> "Dexterity"
+    | HP -> "HP"
+
 type effect = {
   stat:stat;
   die:string;
@@ -110,7 +120,7 @@ let parse_damage dlist =
     let r = int_of_string (find_assoc "Range" dlist) in
     let m =
       match find_assoc "Multiple" dlist with
-      |"true" -> true
+      |"TRUE" -> true
       |_ -> false
     in
     {damage_die = d; range = r; multiple=m}

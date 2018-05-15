@@ -221,6 +221,42 @@ let update_chars cs st =
   in
   r cs st.characters
 
+(** SAVE **)
+
+let rec string_of_locs lst =
+  match lst with
+  |[] -> ""
+  |l::locs -> l.name ^ " " ^ (string_of_locs locs)
+
+let string_of_role r =
+  match r with
+  |Party -> "Party"
+  |Friendly -> "Friendly"
+  |Hostile -> "Hostile"
+  |Neutral -> "Neutral"
+  |All -> "All"
+
+let rec string_of_chars (lst : (character * Global.role) list) =
+  match lst with
+  |[] -> ""
+  |(c, r)::chars -> c.name^":"^(string_of_role r)^" "^(string_of_chars chars)
+
+let save_game st =
+  let ls = st.locations |> string_of_locs |> String.trim in
+  let cs = st.characters |> string_of_chars |> String.trim in
+  let e = st.event |> E.get_name in
+  let cl = st.current_location.name in
+  let f = "save" in
+  let p = "./"^f^"/" in
+  let d = [["Locations";"Characters";"Event";"Curr_Loc";
+            "class_data";"race_data";"item_data";"loc_data";
+            "spell_data";"char_data"; "event_data"];
+           [ls;cs;e;cl;
+            p^"class.csv";p^"race.csv";p^"item.csv";"loc.csv";
+            p^"spell.csv";p^"char.csv";"event.csv"]] in
+  D.save_data f d
+
+
 (** SHOP **)
 
 let buy c i q evt st =
@@ -257,6 +293,17 @@ let item_helper c i q inv f evt st =
         alter_state st ("Action Failed: There are only "^(string_of_int n)^" available.")
       else
         f c i q evt st
+
+let equip c i st =
+match List.find_opt (fun ((x:character),_) -> x.name = c) st.characters with
+| None -> alter_state st "Action Failed: Invalid character name."
+| Some (c,_) ->
+  match List.find_opt (fun ((x:item),_) -> x.name =i) (C.inv c) with
+  | None ->  alter_state st "Action Failed: That item is not available."
+  | Some (i,_) ->
+    let c' = C.equip c i 1 in
+    alter_state st ~chars:(update_char c c' st) "Item equipped."
+
 
 let b_s_item c i q evt st buying =
   match E.get_form st.event with
@@ -295,13 +342,15 @@ let char_by_name s st =
 
 let cast c s t evt st =
   let c' = char_by_name c st in
-  let s' = failwith "match s with a spell in char spells" in
   try
     let find s = List.find (fun (x,_) -> C.name x = s) st.characters in
     let t' = List.map (fun s -> fst (find s)) t in
     match c' with
     | None -> alter_state st "The castor name is invalid."
     | Some c ->
+      match List.find_opt (fun (x:spell) -> x.name=s) (C.spells c) with
+      | None -> alter_state st "That castor doesn't know that spell."
+      | Some s' ->
       let (evt', t') = E.cast c s' t' evt in
       let chars = update_chars t' st in
       alter_state st ~evt:evt' ~chars:chars (E.verbose evt')
@@ -326,7 +375,9 @@ let distribute_xp c st =
   |Some (m,_) ->
     let party = List.filter (fun (_,r) -> r=Party) st.characters in
     let xp = C.xp m / (List.length party) in
-    let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp)) in
+    let p' = party |> List.map (fun (x,_) -> C.update_xp x (C.xp x + xp))
+             |>  List.map (fun x -> if ((x.xp) >= (D.xp_from_level (level x)))
+                            then level_up x ((level x) + 1) else x )  in
     alter_state st ~chars:(update_chars p' st) "XP distributed."
 
 let remove_char c st =
@@ -357,20 +408,47 @@ let print_chars_short st =
   List.map print_char_short st.characters
   |> List.fold_left (fun x a-> x^"\n"^a) ""
 
+let print_spells evt =
+  let lst = get_waiting_spells evt in
+  match lst with
+  |[] -> ""
+  |_ ->
+    let lst' =
+      List.map
+      (fun ((s:spell ),t) -> s.name^" will cast on turn "^(string_of_int t)^".")
+      lst
+    in
+    "Waiting Spells:\n"^List.fold_left (^) "\n" lst'
+
+let spell_info n =
+  try
+    let s = Database.get_spell_data n |> Global.parse_spell in
+    let d = match s.stype with
+      |Damage a -> "\nType: Damage\nDie: "^(a.damage_die)^"\nRange: "^
+                   (string_of_int a.range)^"\nSeperate target rolls: "^
+                   (if a.multiple then "True" else "False")
+      |Status a -> "\nType: Status\nDie: "^(a.die)^"\nStat: "^(string_of_stat a.stat)
+    in
+    "Spell: "^(s.name)^"\nLevel: "^(string_of_int s.level)^"\nTargets: "^
+    (string_of_int s.targets)^"\nTurns to cast: "^(string_of_int s.to_cast)^(d)
+with _ -> "Spell not found."
+
 let gen_printout st =
   let evt = st.event in
   match E.get_form evt with
   |Battle ->
     (st.output)^
     "\n\nTurn number "^(string_of_int (E.get_turn evt))^".\n"
-    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^(print_chars_short st)
+    ^(List.hd (E.get_turnlst evt))^"'s turn.\n\n"^
+    (print_spells evt)^(print_chars_short st)
   |Shop ->
     (st.output)^
-    "\n\nAt "^(E.get_name evt)^"\nItems available: "^(String.concat ", " (E.get_item_names evt))
+    "\n\nAt "^(E.get_name evt)^"\nItems available: \n"^(String.concat "\n" (E.get_item_details evt))
   |_ -> st.output
 
 let action (c:command) (st:state) =
   E.clear_vout st.event;
+  try
   match c with
   | Fight (a,b) -> begin
     match E.get_form st.event with
@@ -404,11 +482,12 @@ let action (c:command) (st:state) =
     let c = List.hd (List.tl lst) in
     let r = List.nth lst 2 in
     let newchar = C.quickbuild n c r in
+    let x c = () in (x newchar);
     let newcharls = ((newchar,Party) :: st.characters) in
     alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
       with _-> alter_state st "Failed. Your arguments might be off." end
   |QuickEvent (n,f) -> begin
-      let f' = match f with
+      let f' = match String.lowercase_ascii f with
       |"battle" -> Battle
       |"shop" -> Shop
       | _ -> Interaction
@@ -425,7 +504,23 @@ let action (c:command) (st:state) =
       in alter_state st s
     end
   | Event -> alter_state st ("Current Event: "^(E.get_name st.event))
+  | Look -> alter_state st ""
   | Kill c -> kill_char c st
+  | Spell s -> alter_state st (spell_info s)
+  | Equip (c,i) -> equip c i st
+  | Inv x -> begin
+      let s =
+        match char_by_name x st with
+        | None -> "Invalid move. That's not a character"
+        | Some c ->
+          let idetail ((i:item),q) =
+            i.name^"\tValue: "^(string_of_int i.value)^"\tQuantity: "^
+            (match q with |Infinity -> "inf" | Int q -> string_of_int q) in
+          List.map idetail (C.inv c) |> List.fold_left (fun x a -> x^"\n"^a) ""
+      in alter_state st s
+    end
+  | Save -> (*save_game st;*) alter_state st "Game saved!"
   | _ -> alter_state st "Invalid move. Try again. Type \"help commands\" for a list of commands"
+  with _ -> alter_state st "That command gave an error, sorry. Please check your arguments and game files."
 
 let output st = st.output

@@ -15,7 +15,7 @@ module type Database = sig
   val load_data : string -> data
 
   (** [save_data d f] writes a data object to a file [f]  *)
-  val save_data : string -> data -> unit
+  val save_data : string -> string list list -> unit
 
   (** [hit_die class] is the hit die belonging to a given class
       represented by the string [class]
@@ -43,6 +43,8 @@ module type Database = sig
   val get_event : string -> (string * string) list
   val get_char : string -> (string * string) list
   val prof_of_level : int -> int
+  val get_spell_data : string -> (string * string) list
+  val xp_from_level : int -> int
 end
 
 module Database = struct
@@ -62,7 +64,12 @@ module Database = struct
   let () =
     Hashtbl.add files "class_data" "./data/classes.csv";
     Hashtbl.add files "race_data" "./data/races.csv";
-    Hashtbl.add files "level_data" "./data/level_up.csv"
+    Hashtbl.add files "level_data" "./data/level_up.csv";
+    Hashtbl.add files "spell_data" "./data/spells.csv";
+    Hashtbl.add files "loc_data" "./data/locations.csv";
+    Hashtbl.add files "char_data" "./data/char_data.csv";
+    Hashtbl.add files "event_data" "./data/events.csv"
+
 
   let change_file field new_file =
     Hashtbl.add files field new_file
@@ -77,7 +84,10 @@ module Database = struct
 
 
   let save_data f d =
-    Unix.mkdir "save" 0o640
+    Unix.rmdir f;
+    Unix.mkdir f 0o640;
+    Csv.save ("./"^f^"/"^"newstate.csv") d
+
 
   (** []  *)
   let get_lst typ ind file =
@@ -113,5 +123,9 @@ module Database = struct
   let prof_of_level i =
     get "level" (string_of_int i) "prof" "level_data"
                          |> int_of_string
+  let get_spell_data s = get_lst "Name" s "spell_data"
+
+  let xp_from_level i = get "level" (string_of_int i) "exp" "level_data"
+                      |> int_of_string
 
 end
