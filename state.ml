@@ -67,7 +67,7 @@ let parse_characters data =
   let split_char s =
     let indxget = String.index s '+' in
     let c = String.sub s 0 indxget in
-    let r = (String.sub s (indxget) ((String.length rest) - indxget))
+    let r = (String.sub s (indxget) ((String.length s) - indxget))
             |>String.trim in
     (c,r)
   in
