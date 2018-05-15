@@ -1,1 +1,1 @@
-true: package(csv), package(unix), package(oUnit), package(str), package(qcheck), package(ANSITerminal)
+true: package(csv), package(unix), package(oUnit), package(str), package(qcheck), package(ansiterminal)

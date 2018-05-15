@@ -132,7 +132,30 @@ let rec start_game f =
  * You are welcome to improve the user interface, but it must
  * still prompt for a game to play rather than hardcode a game file. *)
 let main () =
-  ANSITerminal.(print_string [red] "\n\nWelcome to the DM toolkit\n");
+  ANSITerminal.(print_string [red] "\n\nWelcome to the DM toolkit for Dungeons and Dragons!\n\n
+
+                                                 __----~~~~~~~~~~~------___
+                                     .  .   ~~//====......          __--~ ~~
+                   -.              \\_|//     |||\\\\  ~~~~~~::::... /~
+                ___-==_       _-~o~  \\/    |||  \\\\            _/~~-
+       __---~~~.==~||\\=_    -_--~/_-~|-   |\\\\   \\\\        _/~
+   _-~~     .=~    |  \\\\-_    '-~7  /-   /  ||    \\      /
+ .~       .~       |   \\\\ -_    /  /-   /   ||      \\   /
+/  ____  /         |    \\ \\ ~-_/  /|- _/   .||       \\ /
+|~~    ~~|--~~~~--_ \\     ~==-/   | \\~--===~~        .\\
+           '         ~-|      /|    |-~\\~~       __--~~
+                       |-~~-_/ |    |   ~\\_   _-~            /\\
+                            /  \\     \\__   \\/~                \\__
+                        _--~ _/ | .-~~____--~-/                  ~~==.
+                      ((->/~   '.|||' -_|    ~~-/ ,              . _||
+                                 -_     ~\\      ~~---l__i__i__i--~~_/
+    _|   _    _|             _-~-__   ~)  \\--______________--~~
+   |_|  | |  |_|          //.-~~~-~_--~- |-------~~~~~~~~
+                                      //.-~~~--\
+
+
+
+");
   print_endline "Please enter the name of the game file you want to load.\n";
   print_string  "> ";
   match read_line () with
