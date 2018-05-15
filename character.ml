@@ -113,6 +113,7 @@ let update_wisdom  c w = {c with wisdom = w;
   let update_xp c x = {c with xp = x}
   let level  c = c.level
 let level_up  c l =
+  (*future goals: add character spells/abilities/score improvements*)
   let prf = Database.prof_of_level l in
   let addhp = Global.roll_dice_int 1 (c.hd) 1 in
   let newhp = addhp + c.cons_mod in
@@ -541,10 +542,15 @@ let quickbuild n c r =
                  speed = Database.speed_of r;
                 }
 
-      in
+    in
+      (*basic spells for all characters*)
+      let init_spells =
+        [(Database.get_spell_data "Magic Missile") |> Global.parse_spell ;
+         (Database.get_spell_data "Heal") |> Global.parse_spell ] in
+
       let step3 =  (*initializing skills and items*)
               {step2 with
-                   spells = []; (*Database.get_spells c*)
+                   spells = init_spells; (*Database.get_spells c*)
                    skills = skill_set all_skills step2;
                    passive_wisdom = 10 + step2.wis_mod + step2.prof_bonus;
                    armor_class = 10+step2.dex_mod;

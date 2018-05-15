@@ -22,7 +22,7 @@ open Global
     |Fight of (string * string)
     |Cast of (string * string * string list)
     |Turn
-    |QuickBuild of string list (* command entered: [name, class, race, (sub_race)]*)
+    |QuickBuild of string list (* command entered: [name, class, race]*)
     |CharacterAction
     |StateChange of (string * string)
     |ItemChange of (string * string)
