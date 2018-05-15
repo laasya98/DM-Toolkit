@@ -544,9 +544,9 @@ let quickbuild n c r =
 
     in
       (*basic spells for all characters*)
-      let init_spells =
+    let init_spells =
         [(Database.get_spell_data "MagicMissile") |> Global.parse_spell ;
-         (Database.get_spell_data "Heal") |> Global.parse_spell ] in
+                       (Database.get_spell_data "Heal") |> Global.parse_spell ] in
 
       let step3 =  (*initializing skills and items*)
               {step2 with
