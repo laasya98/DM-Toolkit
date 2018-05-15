@@ -43,6 +43,7 @@ module type Database = sig
   val get_event : string -> (string * string) list
   val get_char : string -> (string * string) list
   val prof_of_level : int -> int
+  val get_spell_data : string -> (string * string) list
 end
 
 module Database = struct
@@ -113,5 +114,6 @@ module Database = struct
   let prof_of_level i =
     get "level" (string_of_int i) "prof" "level_data"
                          |> int_of_string
+  let get_spell_data s = get_lst "Name" s "spell_data"
 
 end
