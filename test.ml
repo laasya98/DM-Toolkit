@@ -211,9 +211,9 @@ let event_tests = [
 
 type state = State.state
 
-let loc:(State.location) = {name="loc1"; description=""; characters=[]; contents=[]; exits =[]}
-let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""; files=[]}
-let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""; files=[]}
+let loc:(State.location) = {name="loc1"; description=""; characters=[]; items=[]; event=evtC1; exits =[]}
+let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""}
+let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""}
 
 let state_tests = [
   (*Combat*)
@@ -246,7 +246,7 @@ let command_tests = [
   "get characters hostile" >:: (fun _ -> assert_equal (GetCharacterList (Hostile)) (Command.parse "get characters hostile"));
   "get characters friendly" >:: (fun _ -> assert_equal (GetCharacterList (Friendly)) (Command.parse "get characters friendly"));
   "get characters neutral" >:: (fun _ -> assert_equal (GetCharacterList (Neutral)) (Command.parse "get characters neutral"));
-]
+  ]
 
 let suite =
   "Adventure test suite"
@@ -257,4 +257,4 @@ let suite =
     command_tests;
   ]
 
-let _ = run_test_tt_main suite
+      let _ = run_test_tt_main suite

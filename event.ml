@@ -234,8 +234,6 @@ let deal_damage a t = apply_effect HP (-1 *a) t
               ^" for "^(string_of_int d)^" damage." in
       add_vout v evt;
       (evt, deal_damage d t)
-(*TODO: add test for death, turn #, items becoming available, xp gain, etc
-*)
 
   (* [0 1 (2) 3] *)
   let get_turnlst evt = evt.turn_order
@@ -323,7 +321,7 @@ let use_item (i:item) c evt =
     if s.to_cast = 0 || evt.form <> Battle then
       let v = (C.name c)^" cast "^s.name^"!" in
       add_vout v evt;
-      match s.stype with (*TODO*)
+      match s.stype with
       | Damage d -> begin
           let t' = cast_damage c d t evt in
           (evt, t')

@@ -1,6 +1,6 @@
 open Csv
 open Hashtbl
-open
+
 module type Database = sig
 
   (* [data] is the format of the data *)
@@ -58,16 +58,18 @@ module Database = struct
 
   let files = create 3
 
-  let () = Hashtbl.add files "state" "data/init_state.csv";
-           Hashtbl.add files "class_data" "data/classes.csv";
-           Hashtbl.add files "race_data" "data/races.csv"
+  let () = Hashtbl.add files "state" "./data/init_state.csv";
+           Hashtbl.add files "class_data" "./data/classes.csv";
+           Hashtbl.add files "race_data" "./data/races.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file
 
-  let flatten d = List.flatten
+  let flatten data = List.flatten data
 
-  let load_data s = let tab = Csv.load s in
+  let load_data s =
+    let d = Hashtbl.find files s in
+    let tab = Csv.load d in
     Csv.associate (List.hd tab) (List.tl tab)
 
   let save_data f d =

@@ -16,7 +16,6 @@ type data = D.data
 
 type entity =
   |Item of item
-  |Effect of (entity * int)
   |Event of event
 
 type location = {
@@ -60,9 +59,6 @@ let parse_loc dlist =
     let exits = list_of_string (find_assoc "Exits" dlist) |> exits_of_string in
     {name=n; description=d; characters=cs; items=is; event=e; exits=exits}
   with _ -> raise (Failure "Invalid Save File.")
-
-(*TODO find out where effects came from*)
-let effects st = []
 
 let parse_locations data =
   let cs = String.split_on_char ' ' data in

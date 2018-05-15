@@ -432,7 +432,7 @@ let parse_char clist =
       equipped= [],0;
       inv= [],0;
       money=cash;
-    } |> skill_set all_skills
+    } (* )|> skill_set all_skills*)
   with _ -> raise (Failure "Invalid Character Data")
 
 let blank_char = {
