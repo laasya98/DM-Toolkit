@@ -18,6 +18,7 @@ open Global
     |Take of string
     |Drop of string
     |Shop of string
+    |Equip of (string * string)
     |Buy of (string * string *string)
     |Sell of (string * string *string)
     |Fight of (string * string)
@@ -35,7 +36,6 @@ open Global
     |GetCharacterList of role
     |GetExits
     |Whois of string
-    |Equip of string*string
     |Invalid
 
 
@@ -69,7 +69,8 @@ let parse s =
     | "look" -> Look
     | "inquiry" -> Inquiry
     | "turn" -> Turn
-    |"event" -> Event
+    | "event" -> Event
+    | "exits" -> GetExits
     | "characters" -> GetCharacterList (All)
     | _ -> Invalid end
   else let indx = (String.index str ' ') in
@@ -85,8 +86,6 @@ let parse s =
     |"shop" -> Shop rest
     |"help" -> Help rest
     |"move" -> Move rest
-    | "inv" -> Inv rest
-    | "inventory" -> Inv rest
     |"get" ->
       let indxget = if (String.contains rest ' ')
               then (String.index rest ' ') else String.length rest in
@@ -121,6 +120,11 @@ let parse s =
       begin match lst with
         | a::b::_ -> QuickEvent (a,b)
         | _ -> Invalid end
+    |"equip" -> let x = (remove_start "equip" s) in
+      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+      begin match lst with
+        | c::i::[] -> Equip (c,i)
+        | _ -> Invalid end
     |"buy" -> let x = (remove_start "buy" s) in
       let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
       begin match lst with
@@ -143,9 +147,6 @@ let parse s =
     | "whomst" -> let x = (remove_start "whomst" s) in Whois x
     |"kill" -> let x = (remove_start "kill" s) in Kill x
     | "spell" -> let x = (remove_start "spell" s) in Spell x
-    |"equip" -> let x = (remove_start "equip" s) in
-      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
-      begin match lst with
-        | a::b::_ -> Equip (a,b)
-        | _ -> Invalid end
+    | "inv" -> let x = (remove_start "inv" s) in Inv x
+    | "inventory" ->  let x = (remove_start "inventory" s) in Inv x
     |_ -> Invalid
