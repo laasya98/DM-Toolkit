@@ -19,7 +19,7 @@ open Global
        |Look
        |Move of string
        |Use of (string * string)
-       |Inv
+       |Inv of string
        |Give of string
        |Take of string
        |Drop of string
@@ -39,6 +39,7 @@ open Global
        |GetCharacterList of role
        |GetExits
        |Whois of string
+       |Equip of string*string
        |Invalid
 
 

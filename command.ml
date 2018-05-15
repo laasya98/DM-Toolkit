@@ -13,7 +13,7 @@ open Global
     |Look
     |Move of string
     |Use of (string * string)
-    |Inv
+    |Inv of string
     |Give of string
     |Take of string
     |Drop of string
@@ -34,6 +34,7 @@ open Global
     |GetCharacterList of role
     |GetExits
     |Whois of string
+    |Equip of string*string
     |Invalid
 
 
@@ -63,8 +64,6 @@ let parse s =
     | "save" -> Save
     | "quit" -> Quit
     | "help" -> Help ("")
-    | "inv" -> Inv
-    | "inventory" -> Inv
     | "inq" -> Inquiry
     | "look" -> Look
     | "inquiry" -> Inquiry
@@ -85,6 +84,8 @@ let parse s =
     |"shop" -> Shop rest
     |"help" -> Help rest
     |"move" -> Move rest
+    | "inv" -> Inv rest
+    | "inventory" -> Inv rest
     |"get" ->
       let indxget = if (String.contains rest ' ')
               then (String.index rest ' ') else String.length rest in
@@ -140,4 +141,9 @@ let parse s =
     | "who" -> let x = (remove_start "who is" s) in Whois x
     | "whomst" -> let x = (remove_start "whomst" s) in Whois x
     |"kill" -> let x = (remove_start "kill" s) in Kill x
+    |"equip" -> let x = (remove_start "equip" s) in
+      let lst = List.filter (fun x -> x <> "") (String.split_on_char ' ' x) in
+      begin match lst with
+        | a::b::_ -> Equip (a,b)
+        | _ -> Invalid end
     |_ -> Invalid
