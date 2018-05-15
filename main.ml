@@ -41,6 +41,44 @@ Characters ___ gives you the list of characters in the current room. The
 optional argument allows you to filter it by role.
 Roles: Party, Neutral, Hostile, or Friendly.
 Usage: \"characters ?role\"" );
+  ("quickbuild",
+   "-QuickBuild-
+Quickbuild [name] [class] [race] creates a new character based off the three arguments,
+and adds that character to the current party.
+Type \"help races\" or \"help classes\" to get a list of the classes in the game.
+Usage: \"quickbuild name class race\"" );
+  ("races",
+   "-Races-
+  The list of races currently in the game are:
+  | Dwarf
+  | Elf
+  | Halfling
+  | Human
+  | Dragonborn
+  | Gnome
+  | Half_Elf
+  | Half_Orc
+  | Tiefling" );
+  ("classes",
+   "-Classes-
+  The list of classes currently in the game are:
+  | Barbarian
+  | Bard
+  | Cleric
+  | Druid
+  | Fighter
+  | Monk
+  | Paladin
+  | Ranger
+  | Rogue
+  | Sorcerer
+  | Warlock
+  | Wizard" );
+  ("who is",
+   "-Who Is?-
+Who is [name] prints out the important stats about a player with name [name],
+including the race, class, HP, and core stat values.
+Usage: \"who is name \" or \"whomst name \"" )
 ]
 
 let help_file = String.concat "\n \n" (List.map (fun x-> snd x) helps)
@@ -58,14 +96,14 @@ let rec repl state =
     |Quit -> exit 0
     |Help s -> begin try
       let print = if (s = "") then help_file else (List.assoc s helps) in
-      ANSITerminal.(print_string [blue] print);
-        with _->  print_endline ("No help file for " ^ s) end
+      ANSITerminal.(print_string [blue] (print ^ "\n"));
+        with _->  print_endline ("No help file for " ^ s ^ "\n") end
     |Event ->  (*ANSITerminal.(print_string [green] "Current event is "^ s'.event);*)
-      print_endline (State.gen_printout s');
+      print_endline ((State.gen_printout s'));
       (*)|Inquiry -> *)
     |Move x-> (*ANSITerminal.(print_string [green] "You're now in "^ s'.current_location)*)
-      print_endline (State.gen_printout s');
-    | _ -> print_endline (State.gen_printout s');
+      print_endline ((State.gen_printout s'));
+    | _ -> print_endline ((State.gen_printout s'));
   in
 repl s'
 
