@@ -48,6 +48,7 @@ open Global
     event : event;
     output :string;
     current_location : location;
+    files: (string*string) list;
   }
 (* [empty_location] is an location with default record values.  *)
 val empty_location : location

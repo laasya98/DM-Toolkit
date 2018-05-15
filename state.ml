@@ -33,6 +33,7 @@ type state = {
   event : event;
   output :string;
   current_location : location;
+  files:(string*string) list;
 }
 
 let empty_location = {
@@ -45,10 +46,11 @@ let empty_location = {
 
 let empty_state = {
   locations = [];
-characters = [];
-event = init_event "";
-output = "";
-current_location = empty_location;
+  characters = [];
+  event = init_event "";
+  output = "";
+  current_location = empty_location;
+  files = [];
 }
 
 
@@ -62,6 +64,7 @@ let alter_state st ?(currLoc=st.current_location)
     event=evt;
     characters=chars;
     output=output;
+    files=st.files;
   }
 
 let init_state st = failwith "Unimplemented"(*TODO: uuuJuUuh *)

@@ -212,8 +212,8 @@ let event_tests = [
 type state = State.state
 
 let loc:(State.location) = {name="loc1"; description=""; characters=[]; contents=[]; exits =[]}
-let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""}
-let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""}
+let st1:(state) = {locations=[]; characters=[(char1, Party); (char2,Hostile)]; event=evtC2; current_location=loc; output=""; files=[]}
+let st2:(state) = {locations=[]; characters=[(char1, Party);(char3, Party)]; event=evtS;current_location=loc; output=""; files=[]}
 
 let state_tests = [
   (*Combat*)
