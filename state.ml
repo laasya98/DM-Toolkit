@@ -417,6 +417,7 @@ let action (c:command) (st:state) =
     let c = List.hd (List.tl lst) in
     let r = List.nth lst 2 in
     let newchar = C.quickbuild n c r in
+    let x c = () in (x newchar);
     let newcharls = ((newchar,Party) :: st.characters) in
     alter_state st ~chars:newcharls ("New Character, " ^ n ^ ", added to party!")
       with _-> alter_state st "Failed. Your arguments might be off." end
