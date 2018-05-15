@@ -42,6 +42,7 @@ module type Database = sig
   val get_location : string -> (string * string) list
   val get_event : string -> (string * string) list
   val get_char : string -> (string * string) list
+  val prof_of_level : int -> int
 end
 
 module Database = struct
@@ -56,11 +57,12 @@ module Database = struct
   (** [index] is a hash table of association  *)
   type index = (string, string) Hashtbl.t
 
-  let files = create 3
+  let files = create 5
 
   let () =
     Hashtbl.add files "class_data" "./data/classes.csv";
-    Hashtbl.add files "race_data" "./data/races.csv"
+    Hashtbl.add files "race_data" "./data/races.csv";
+    Hashtbl.add files "level_data" "./data/level_up.csv"
 
   let change_file field new_file =
     Hashtbl.add files field new_file
@@ -101,12 +103,15 @@ module Database = struct
                        |> tup_from_list
 
   let speed_of r =
-    get "race" r "speed" "race_data"
+    get "Race" r "Speed" "race_data"
                        |> int_of_string
 
   let get_item s = get_lst "Name" s "item_data"
   let get_location s = get_lst "Name" s "loc_data"
   let get_event s = get_lst "Name" s "event_data"
   let get_char s = get_lst "Name" s "char_data"
+  let prof_of_level i =
+    get "level" (string_of_int i) "prof" "level_data"
+                         |> int_of_string
 
 end

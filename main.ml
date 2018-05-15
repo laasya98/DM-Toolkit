@@ -156,10 +156,12 @@ let main () =
 
 
 ");
-  print_endline "Please enter the name of the game file you want to load.\n";
+  print_endline "Please enter the name of the game file you want to load.\n
+                 (def for default file)";
   print_string  "> ";
   match read_line () with
   | exception End_of_file -> ()
-  | file_name -> start_game file_name
+  | file_name -> if file_name = "def" then start_game "data/teststate.csv"
+                 else start_game file_name
 
 let () = main ()
