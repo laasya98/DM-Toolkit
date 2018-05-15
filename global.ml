@@ -100,8 +100,10 @@ try
 with _ ->  raise (Bad_dice "cannot read dice input")
 
 let roll_dice_string str =
-  let str' = str|>String.trim|>String.lowercase_ascii in
-  dice_helper str' 0
+  try
+    let str' = str|>String.trim|>String.lowercase_ascii in
+    dice_helper str' 0
+  with _-> -1
 
 let roll_dice_int n d t =
   (dice_roller n d []) |> List.sort compare |> List.rev |> sum_to_n t 0
