@@ -103,11 +103,12 @@ let add_item (i:item) q evt =
                       ~items:(change_item_q i (Infinity) evt.items) "Infinite added."
 
 let parse_itemlst ilst =
+
   let ilst' = String.split_on_char '+' ilst in
   let get_item str =
-    match String.split_on_char ':' ilst with
+    match String.split_on_char ':' str with
     | i::q::t -> begin
-        let q' = try Int (int_of_string q) with _ -> Infinity in
+        let q' = try Int (int_of_string (String.trim q)) with _ -> Infinity in
         (Database.get_item i |> parse_item, q')
     end
     | _ -> failwith "Invalid?"
@@ -154,7 +155,9 @@ let add_vout s evt = evt.v_out <- evt.v_out^s
 let get_items evt = evt.items
 
 let get_item_names evt =
-  List.map (fun ((i:item ),q) -> i.name) evt.items
+  List.map (fun ((i:item ),q) ->
+      i.name^": "^(match q with |Infinity -> "inf" | Int q -> string_of_int q))
+    evt.items
 
   let change_form form evt = alter_event evt ~form:(form) "Form changed."
 
